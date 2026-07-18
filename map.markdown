@@ -1,9 +1,12 @@
 ---
 layout: default
-title: Map
+title: Travel Map
 permalink: /map/
+load_map_js: true
 ---
 
-# Map
+# Travel Map
 
-My best photography will go here.
+This map will show every place I've photographed.
+
+<div id="map"></div>
