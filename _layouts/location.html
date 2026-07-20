@@ -5,10 +5,8 @@ layout: default
 <section class="location-page">
   <div class="location-hero mb-4">
     {% if page.cover %}
-      <img
-        src="{{ '/assets/images/' | append: page.cover | relative_url }}"
-        class="img-fluid rounded-4 shadow w-100"
-        alt="{{ page.title }}">
+    <img src="{{ '/assets/images/' | append: page.cover | relative_url }}" class="img-fluid rounded-4 shadow w-100"
+      alt="{{ page.title }}">
     {% endif %}
   </div>
 
@@ -22,6 +20,26 @@ layout: default
 
       <div class="location-story">
         {{ content }}
+        <h2 class="mt-5 mb-4">Gallery</h2>
+
+        <div class="row g-3">
+
+          <div class="col-md-4">
+            <img src="{{ '/assets/images/jasper.jpg' | relative_url }}" class="img-fluid rounded shadow gallery-image"
+              alt="Gallery image">
+          </div>
+
+          <div class="col-md-4">
+            <img src="{{ '/assets/images/snowman.jpg' | relative_url }}" class="img-fluid rounded shadow gallery-image"
+              alt="Gallery image">
+          </div>
+
+          <div class="col-md-4">
+            <img src="{{ '/assets/images/moana-chicken.jpg' | relative_url }}" class="img-fluid rounded shadow gallery-image"
+              alt="Gallery image">
+          </div>
+
+        </div>
       </div>
     </div>
 
@@ -31,18 +49,18 @@ layout: default
           <h2 class="h5 mb-3">Trip details</h2>
 
           {% if page.country %}
-            <p class="mb-2"><strong>Country:</strong> {{ page.country }}</p>
+          <p class="mb-2"><strong>Country:</strong> {{ page.country }}</p>
           {% endif %}
 
           {% if page.visited %}
-            <p class="mb-2"><strong>Visited:</strong> {{ page.visited }}</p>
+          <p class="mb-2"><strong>Visited:</strong> {{ page.visited }}</p>
           {% endif %}
 
           {% if page.coordinates %}
-            <p class="mb-0">
-              <strong>Coordinates:</strong><br>
-              {{ page.coordinates.lat }}, {{ page.coordinates.lng }}
-            </p>
+          <p class="mb-0">
+            <strong>Coordinates:</strong><br>
+            {{ page.coordinates.lat }}, {{ page.coordinates.lng }}
+          </p>
           {% endif %}
         </div>
       </div>

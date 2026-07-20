@@ -26,3 +26,9 @@ body {
 .location-story p:last-child {
   margin-bottom: 0;
 }
+
+.gallery-image {
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    object-fit: cover;
+}
