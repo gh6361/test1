@@ -1,7 +1,6 @@
 ---
 layout: default
 title: Oslo Gallery
-permalink: /portfolio/oslo/
 ---
 
 # Oslo Gallery

@@ -1,7 +1,6 @@
 ---
 layout: default
 title: Reykjavik Gallery
-permalink: /portfolio/reykjavik/
 ---
 
 # Reykjavik Gallery
