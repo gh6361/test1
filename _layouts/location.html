@@ -20,50 +20,46 @@ layout: default
 
       <div class="location-story">
         {{ content }}
+        {% if page.gallery %}
         <h2 class="mt-5 mb-4">Gallery</h2>
 
         <div class="row g-3">
-
+          {% for image in page.gallery %}
           <div class="col-md-4">
-            <img src="{{ '/assets/images/jasper.jpg' | relative_url }}" class="img-fluid rounded shadow gallery-image"
-              alt="Gallery image">
+            <a href="{{ '/assets/images/' | append: image | relative_url }}">
+              <img src="{{ '/assets/images/' | append: image | relative_url }}"
+                class="img-fluid rounded shadow gallery-image" alt="{{ page.title }}">
+            </a>
           </div>
-
-          <div class="col-md-4">
-            <img src="{{ '/assets/images/snowman.jpg' | relative_url }}" class="img-fluid rounded shadow gallery-image"
-              alt="Gallery image">
-          </div>
-
-          <div class="col-md-4">
-            <img src="{{ '/assets/images/moana-chicken.jpg' | relative_url }}" class="img-fluid rounded shadow gallery-image"
-              alt="Gallery image">
-          </div>
-
+          {% endfor %}
         </div>
+        {% endif %}
+
       </div>
     </div>
+  </div>
 
-    <div class="col-lg-4">
-      <div class="card shadow-sm border-0 rounded-4">
-        <div class="card-body">
-          <h2 class="h5 mb-3">Trip details</h2>
+  <div class="col-lg-4">
+    <div class="card shadow-sm border-0 rounded-4">
+      <div class="card-body">
+        <h2 class="h5 mb-3">Trip details</h2>
 
-          {% if page.country %}
-          <p class="mb-2"><strong>Country:</strong> {{ page.country }}</p>
-          {% endif %}
+        {% if page.country %}
+        <p class="mb-2"><strong>Country:</strong> {{ page.country }}</p>
+        {% endif %}
 
-          {% if page.visited %}
-          <p class="mb-2"><strong>Visited:</strong> {{ page.visited }}</p>
-          {% endif %}
+        {% if page.visited %}
+        <p class="mb-2"><strong>Visited:</strong> {{ page.visited }}</p>
+        {% endif %}
 
-          {% if page.coordinates %}
-          <p class="mb-0">
-            <strong>Coordinates:</strong><br>
-            {{ page.coordinates.lat }}, {{ page.coordinates.lng }}
-          </p>
-          {% endif %}
-        </div>
+        {% if page.coordinates %}
+        <p class="mb-0">
+          <strong>Coordinates:</strong><br>
+          {{ page.coordinates.lat }}, {{ page.coordinates.lng }}
+        </p>
+        {% endif %}
       </div>
     </div>
+  </div>
   </div>
 </section>
