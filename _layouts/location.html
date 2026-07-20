@@ -2,28 +2,50 @@
 layout: default
 ---
 
-<div class="row justify-content-center">
-  <div class="col-lg-8">
-    <h1 class="mb-3">{{ page.title }}</h1>
-
-    <p class="text-muted mb-4">
-      Visited: {{ page.visited }}
-    </p>
-
-    {% if page.coordinates %}
-    <p class="small text-secondary">
-      Latitude: {{ page.coordinates.lat }}<br>
-      Longitude: {{ page.coordinates.lng }}
-    </p>
-    {% endif %}
-
+<section class="location-page">
+  <div class="location-hero mb-4">
     {% if page.cover %}
-    <img
-      src="{{ '/assets/images/' | append: page.cover | relative_url }}"
-      class="img-fluid rounded shadow mb-4"
-      alt="{{ page.title }}">
+      <img
+        src="{{ '/assets/images/' | append: page.cover | relative_url }}"
+        class="img-fluid rounded-4 shadow w-100"
+        alt="{{ page.title }}">
     {% endif %}
-
-    {{ content }}
   </div>
-</div>
+
+  <div class="row g-4">
+    <div class="col-lg-8">
+      <h1 class="display-5 fw-bold mb-3">{{ page.title }}</h1>
+
+      <p class="lead text-secondary mb-4">
+        {{ page.visited }}
+      </p>
+
+      <div class="location-story">
+        {{ content }}
+      </div>
+    </div>
+
+    <div class="col-lg-4">
+      <div class="card shadow-sm border-0 rounded-4">
+        <div class="card-body">
+          <h2 class="h5 mb-3">Trip details</h2>
+
+          {% if page.country %}
+            <p class="mb-2"><strong>Country:</strong> {{ page.country }}</p>
+          {% endif %}
+
+          {% if page.visited %}
+            <p class="mb-2"><strong>Visited:</strong> {{ page.visited }}</p>
+          {% endif %}
+
+          {% if page.coordinates %}
+            <p class="mb-0">
+              <strong>Coordinates:</strong><br>
+              {{ page.coordinates.lat }}, {{ page.coordinates.lng }}
+            </p>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

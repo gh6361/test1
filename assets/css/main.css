@@ -7,3 +7,22 @@ body {
   width: 100%;
   border-radius: 12px;
 }
+
+.location-page {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.location-hero img {
+  max-height: 520px;
+  object-fit: cover;
+}
+
+.location-story {
+  font-size: 1.05rem;
+  line-height: 1.8;
+}
+
+.location-story p:last-child {
+  margin-bottom: 0;
+}
