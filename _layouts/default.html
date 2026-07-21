@@ -40,9 +40,18 @@
   {% endif %}
 
   <div id="lightbox" class="lightbox hidden">
-    <span id="lightbox-close">&times;</span>
+
+    <button id="lightbox-prev" class="lightbox-arrow">
+      &#10094;
+    </button>
 
     <img id="lightbox-image" src="" alt="">
+
+    <button id="lightbox-next" class="lightbox-arrow">
+      &#10095;
+    </button>
+
+    <span id="lightbox-close">&times;</span>
 
   </div>
   <script src="{{ '/assets/js/lightbox.js' | relative_url }}"></script>
