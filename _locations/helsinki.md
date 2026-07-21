@@ -8,9 +8,12 @@ coordinates:
 visited: 2025-05
 cover: helsinki/cover.jpg
 gallery:
-  - helsinki/001.jpg
-  - helsinki/jasper.jpg
-  - helsinki/snowman.jpg
+  - file: helsinki/001.jpg
+    caption: dumb chicken
+  - file: helsinki/jasper.jpg
+    caption: young Jasper
+  - file: helsinki/snowman.jpg
+    caption: snooooowman
 ---
 
 A first stop in Helsinki with bright light, quiet streets, and a simple cover photo to start the gallery.

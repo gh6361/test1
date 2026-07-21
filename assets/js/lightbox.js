@@ -1,117 +1,96 @@
 document.addEventListener('DOMContentLoaded', () => {
+  const overlay = document.getElementById('lightbox');
+  const imageA = document.getElementById('lightbox-image-a');
+  const imageB = document.getElementById('lightbox-image-b');
+  const close = document.getElementById('lightbox-close');
+  const prev = document.getElementById('lightbox-prev');
+  const next = document.getElementById('lightbox-next');
+  const counter = document.getElementById('lightbox-counter');
+  const caption = document.getElementById('lightbox-caption');
 
-    const overlay = document.getElementById('lightbox');
-    const image = document.getElementById('lightbox-image');
+  if (!overlay || !imageA || !imageB || !close || !prev || !next || !counter || !caption) return;
 
-    const close = document.getElementById('lightbox-close');
-    const prev = document.getElementById('lightbox-prev');
-    const next = document.getElementById('lightbox-next');
+  const triggers = [...document.querySelectorAll('.lightbox-trigger')];
+  if (!triggers.length) return;
 
-    if (!overlay || !image || !close) return;
+  const gallery = triggers.map((link) => ({
+    href: link.href,
+    caption: link.dataset.caption || ''
+  }));
 
-    const gallery = [...document.querySelectorAll('.lightbox-trigger')];
+  let currentIndex = 0;
+  let activeImage = imageA;
+  let inactiveImage = imageB;
 
-    let currentIndex = 0;
+  function swapImages() {
+    [activeImage, inactiveImage] = [inactiveImage, activeImage];
+  }
 
-    function showImage(index) {
+  function closeLightbox() {
+    overlay.classList.add('hidden');
+    imageA.src = '';
+    imageB.src = '';
+    counter.textContent = '';
+    caption.textContent = '';
+  }
 
-        currentIndex = index;
+  function showImage(index) {
+    currentIndex = (index + gallery.length) % gallery.length;
+    const item = gallery[currentIndex];
 
-        image.src = gallery[currentIndex].href;
+    counter.textContent = `${currentIndex + 1} / ${gallery.length}`;
+    caption.textContent = item.caption;
 
-        overlay.classList.remove('hidden');
+    inactiveImage.src = item.href;
+    inactiveImage.alt = item.caption || `Gallery image ${currentIndex + 1}`;
 
+    overlay.classList.remove('hidden');
+
+    requestAnimationFrame(() => {
+      activeImage.classList.remove('active');
+      inactiveImage.classList.add('active');
+      swapImages();
+    });
+  }
+
+  function nextImage() {
+    showImage(currentIndex + 1);
+  }
+
+  function previousImage() {
+    showImage(currentIndex - 1);
+  }
+
+  triggers.forEach((link, index) => {
+    link.addEventListener('click', (event) => {
+      event.preventDefault();
+      showImage(index);
+    });
+  });
+
+  next.addEventListener('click', (event) => {
+    event.stopPropagation();
+    nextImage();
+  });
+
+  prev.addEventListener('click', (event) => {
+    event.stopPropagation();
+    previousImage();
+  });
+
+  close.addEventListener('click', closeLightbox);
+
+  overlay.addEventListener('click', (event) => {
+    if (event.target === overlay) {
+      closeLightbox();
     }
+  });
 
-    function closeLightbox() {
+  document.addEventListener('keydown', (event) => {
+    if (overlay.classList.contains('hidden')) return;
 
-        overlay.classList.add('hidden');
-        image.src = '';
-
-    }
-
-    function nextImage() {
-
-        currentIndex++;
-
-        if (currentIndex >= gallery.length) {
-            currentIndex = 0;
-        }
-
-        showImage(currentIndex);
-
-    }
-
-    function previousImage() {
-
-        currentIndex--;
-
-        if (currentIndex < 0) {
-            currentIndex = gallery.length - 1;
-        }
-
-        showImage(currentIndex);
-
-    }
-
-    gallery.forEach((link, index) => {
-
-        link.addEventListener('click', event => {
-
-            event.preventDefault();
-
-            showImage(index);
-
-        });
-
-    });
-
-    next.addEventListener('click', event => {
-
-        event.stopPropagation();
-
-        nextImage();
-
-    });
-
-    prev.addEventListener('click', event => {
-
-        event.stopPropagation();
-
-        previousImage();
-
-    });
-
-    close.addEventListener('click', closeLightbox);
-
-    overlay.addEventListener('click', event => {
-
-        if (event.target === overlay) {
-            closeLightbox();
-        }
-
-    });
-
-    document.addEventListener('keydown', event => {
-
-        if (overlay.classList.contains('hidden')) return;
-
-        switch (event.key) {
-
-            case 'ArrowRight':
-                nextImage();
-                break;
-
-            case 'ArrowLeft':
-                previousImage();
-                break;
-
-            case 'Escape':
-                closeLightbox();
-                break;
-
-        }
-
-    });
-
+    if (event.key === 'ArrowRight') nextImage();
+    if (event.key === 'ArrowLeft') previousImage();
+    if (event.key === 'Escape') closeLightbox();
+  });
 });
