@@ -26,7 +26,7 @@ layout: default
         <div class="row g-3">
           {% for image in page.gallery %}
           <div class="col-md-4">
-            <a href="{{ '/assets/images/' | append: image | relative_url }}">
+            <a href="{{ '/assets/images/' | append: image | relative_url }}" class="lightbox-trigger">
               <img src="{{ '/assets/images/' | append: image | relative_url }}"
                 class="img-fluid rounded shadow gallery-image" alt="{{ page.title }}">
             </a>

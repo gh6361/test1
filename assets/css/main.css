@@ -32,3 +32,42 @@ body {
     aspect-ratio: 1 / 1;
     object-fit: cover;
 }
+
+.lightbox {
+    position: fixed;
+    inset: 0;
+
+    background: rgba(0,0,0,0.9);
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    z-index: 9999;
+}
+
+.hidden {
+    display: none;
+}
+
+#lightbox-image {
+
+    max-width: 90%;
+    max-height: 90%;
+
+    border-radius: 10px;
+}
+
+#lightbox-close {
+
+    position: absolute;
+
+    top: 25px;
+    right: 35px;
+
+    color: white;
+
+    font-size: 3rem;
+
+    cursor: pointer;
+}
