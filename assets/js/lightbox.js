@@ -6,10 +6,14 @@ document.addEventListener('DOMContentLoaded', () => {
   const close = document.getElementById('lightbox-close');
   const prev = document.getElementById('lightbox-prev');
   const next = document.getElementById('lightbox-next');
-  const counter = document.getElementById('lightbox-counter');
+  const leftZone = document.getElementById('lightbox-left-zone');
+  const rightZone = document.getElementById('lightbox-right-zone');
   const caption = document.getElementById('lightbox-caption');
 
-  if (!overlay || !stage || !imageA || !imageB || !close || !prev || !next || !counter || !caption) return;
+  if (
+    !overlay || !stage || !imageA || !imageB || !close ||
+    !prev || !next || !leftZone || !rightZone || !caption
+  ) return;
 
   const triggers = [...document.querySelectorAll('.lightbox-trigger')];
   if (!triggers.length) return;
@@ -22,29 +26,34 @@ document.addEventListener('DOMContentLoaded', () => {
   let currentIndex = 0;
   let activeImage = imageA;
   let inactiveImage = imageB;
+  let uiTimer = null;
+
+  const UI_HIDE_DELAY = 1800;
 
   function swapImages() {
     [activeImage, inactiveImage] = [inactiveImage, activeImage];
   }
 
-  function closeLightbox() {
-    overlay.classList.add('hidden');
-    stage.classList.remove('fullscreen');
-    imageA.src = '';
-    imageB.src = '';
-    counter.textContent = '';
-    caption.textContent = '';
+  function showUi() {
+    overlay.classList.add('show-ui');
+    clearTimeout(uiTimer);
+
+    uiTimer = window.setTimeout(() => {
+      if (!overlay.classList.contains('hidden') && overlay.classList.contains('fullscreen')) {
+        overlay.classList.remove('show-ui');
+      }
+    }, UI_HIDE_DELAY);
   }
 
-  function toggleFullscreen() {
-    overlay.classList.toggle('fullscreen');
+  function hideUi() {
+    overlay.classList.remove('show-ui');
+    clearTimeout(uiTimer);
   }
 
-  function showImage(index) {
+  function renderImage(index) {
     currentIndex = (index + gallery.length) % gallery.length;
     const item = gallery[currentIndex];
 
-    counter.textContent = `${currentIndex + 1} / ${gallery.length}`;
     caption.textContent = item.caption;
 
     inactiveImage.src = item.href;
@@ -59,27 +68,73 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
+  function openLightbox(index) {
+    overlay.classList.remove('fullscreen');
+    hideUi();
+    renderImage(index);
+  }
+
+  function closeLightbox() {
+    overlay.classList.add('hidden');
+    overlay.classList.remove('fullscreen', 'show-ui');
+    hideUi();
+
+    imageA.src = '';
+    imageB.src = '';
+    imageA.alt = '';
+    imageB.alt = '';
+    caption.textContent = '';
+
+    imageA.classList.add('active');
+    imageB.classList.remove('active');
+    activeImage = imageA;
+    inactiveImage = imageB;
+  }
+
   function nextImage() {
-    showImage(currentIndex + 1);
+    renderImage(currentIndex + 1);
+    if (overlay.classList.contains('fullscreen')) showUi();
   }
 
   function previousImage() {
-    showImage(currentIndex - 1);
+    renderImage(currentIndex - 1);
+    if (overlay.classList.contains('fullscreen')) showUi();
+  }
+
+  function toggleFullscreen() {
+    if (overlay.classList.contains('fullscreen')) {
+      overlay.classList.remove('fullscreen');
+      hideUi();
+    } else {
+      overlay.classList.add('fullscreen');
+      showUi();
+    }
   }
 
   triggers.forEach((link, index) => {
     link.addEventListener('click', event => {
       event.preventDefault();
-      showImage(index);
+      openLightbox(index);
     });
   });
 
-  stage.addEventListener('click', (event) => {
-    if (event.target.closest('button')) return;
+  stage.addEventListener('click', () => {
+    if (overlay.classList.contains('hidden')) return;
     toggleFullscreen();
   });
 
-  next.addEventListener('click', event => {
+  overlay.addEventListener('mousemove', () => {
+    if (overlay.classList.contains('fullscreen') && !overlay.classList.contains('hidden')) {
+      showUi();
+    }
+  });
+
+  leftZone.addEventListener('click', event => {
+    event.stopPropagation();
+    previousImage();
+  });
+
+  rightZone.addEventListener('click', event => {
     event.stopPropagation();
     nextImage();
   });
@@ -89,19 +144,18 @@ document.addEventListener('DOMContentLoaded', () => {
     previousImage();
   });
 
-  close.addEventListener('click', closeLightbox);
-
-  overlay.addEventListener('click', event => {
-    if (event.target === overlay) {
-      closeLightbox();
-    }
+  next.addEventListener('click', event => {
+    event.stopPropagation();
+    nextImage();
   });
+
+  close.addEventListener('click', closeLightbox);
 
   document.addEventListener('keydown', event => {
     if (overlay.classList.contains('hidden')) return;
 
-    if (event.key === 'ArrowRight') nextImage();
     if (event.key === 'ArrowLeft') previousImage();
+    if (event.key === 'ArrowRight') nextImage();
     if (event.key === 'Escape') closeLightbox();
   });
 });
