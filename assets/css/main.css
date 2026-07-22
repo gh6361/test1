@@ -51,7 +51,15 @@ body {
   position: relative;
   width: min(90vw, 1200px);
   height: min(80vh, 900px);
+  cursor: zoom-in;
 }
+
+.lightbox.fullscreen .lightbox-stage {
+  width: 100vw;
+  height: 100vh;
+  cursor: zoom-out;
+}
+
 
 .lightbox-image {
   position: absolute;
@@ -123,4 +131,13 @@ body {
 #lightbox-caption {
   margin: 0;
   font-size: 1rem;
+}
+
+.lightbox-ui {
+    transition: none;
+}
+
+.lightbox.fullscreen .lightbox-ui {
+    opacity: 0;
+    pointer-events: none;
 }

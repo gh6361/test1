@@ -40,18 +40,20 @@
   {% endif %}
 
   <div id="lightbox" class="lightbox hidden">
-    <button id="lightbox-prev" class="lightbox-arrow" type="button" aria-label="Previous image">&#10094;</button>
+    <button id="lightbox-prev" class="lightbox-arrow lightbox-ui" type="button"
+      aria-label="Previous image">&#10094;</button>
 
-    <div class="lightbox-stage">
+    <div id="lightbox-stage" class="lightbox-stage">
       <img id="lightbox-image-a" class="lightbox-image active" src="" alt="">
       <img id="lightbox-image-b" class="lightbox-image" src="" alt="">
     </div>
 
-    <button id="lightbox-next" class="lightbox-arrow" type="button" aria-label="Next image">&#10095;</button>
+    <button id="lightbox-next" class="lightbox-arrow lightbox-ui" type="button"
+      aria-label="Next image">&#10095;</button>
 
-    <span id="lightbox-close" aria-label="Close">&times;</span>
+    <span id="lightbox-close" class="lightbox-ui" aria-label="Close">&times;</span>
 
-    <div class="lightbox-meta">
+    <div class="lightbox-meta lightbox-ui">
       <span id="lightbox-counter"></span>
       <p id="lightbox-caption"></p>
     </div>

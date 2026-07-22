@@ -1,5 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
   const overlay = document.getElementById('lightbox');
+  const stage = document.getElementById('lightbox-stage');
   const imageA = document.getElementById('lightbox-image-a');
   const imageB = document.getElementById('lightbox-image-b');
   const close = document.getElementById('lightbox-close');
@@ -8,7 +9,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const counter = document.getElementById('lightbox-counter');
   const caption = document.getElementById('lightbox-caption');
 
-  if (!overlay || !imageA || !imageB || !close || !prev || !next || !counter || !caption) return;
+  if (!overlay || !stage || !imageA || !imageB || !close || !prev || !next || !counter || !caption) return;
 
   const triggers = [...document.querySelectorAll('.lightbox-trigger')];
   if (!triggers.length) return;
@@ -28,10 +29,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function closeLightbox() {
     overlay.classList.add('hidden');
+    stage.classList.remove('fullscreen');
     imageA.src = '';
     imageB.src = '';
     counter.textContent = '';
     caption.textContent = '';
+  }
+
+  function toggleFullscreen() {
+    overlay.classList.toggle('fullscreen');
   }
 
   function showImage(index) {
@@ -62,31 +68,36 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   triggers.forEach((link, index) => {
-    link.addEventListener('click', (event) => {
+    link.addEventListener('click', event => {
       event.preventDefault();
       showImage(index);
     });
   });
 
-  next.addEventListener('click', (event) => {
+  stage.addEventListener('click', (event) => {
+    if (event.target.closest('button')) return;
+    toggleFullscreen();
+  });
+
+  next.addEventListener('click', event => {
     event.stopPropagation();
     nextImage();
   });
 
-  prev.addEventListener('click', (event) => {
+  prev.addEventListener('click', event => {
     event.stopPropagation();
     previousImage();
   });
 
   close.addEventListener('click', closeLightbox);
 
-  overlay.addEventListener('click', (event) => {
+  overlay.addEventListener('click', event => {
     if (event.target === overlay) {
       closeLightbox();
     }
   });
 
-  document.addEventListener('keydown', (event) => {
+  document.addEventListener('keydown', event => {
     if (overlay.classList.contains('hidden')) return;
 
     if (event.key === 'ArrowRight') nextImage();
