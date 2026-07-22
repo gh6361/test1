@@ -4,6 +4,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const imageA = document.getElementById('lightbox-image-a');
   const imageB = document.getElementById('lightbox-image-b');
   const close = document.getElementById('lightbox-close');
+  const panelToggle = document.getElementById('lightbox-panel-toggle');
   const prev = document.getElementById('lightbox-prev');
   const next = document.getElementById('lightbox-next');
   const leftZone = document.getElementById('lightbox-left-zone');
@@ -12,7 +13,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   if (
     !overlay || !stage || !imageA || !imageB || !close ||
-    !prev || !next || !leftZone || !rightZone || !caption
+    !panelToggle || !prev || !next || !leftZone || !rightZone || !caption
   ) return;
 
   const triggers = [...document.querySelectorAll('.lightbox-trigger')];
@@ -28,7 +29,7 @@ document.addEventListener('DOMContentLoaded', () => {
   let inactiveImage = imageB;
   let uiTimer = null;
 
-  const UI_HIDE_DELAY = 1800;
+  const UI_HIDE_DELAY = 1000;
 
   function swapImages() {
     [activeImage, inactiveImage] = [inactiveImage, activeImage];
@@ -69,14 +70,16 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function openLightbox(index) {
+    overlay.classList.remove('hidden');
     overlay.classList.remove('fullscreen');
+    overlay.classList.add('panel-open');
     hideUi();
     renderImage(index);
   }
 
   function closeLightbox() {
     overlay.classList.add('hidden');
-    overlay.classList.remove('fullscreen', 'show-ui');
+    overlay.classList.remove('fullscreen', 'show-ui', 'panel-open');
     hideUi();
 
     imageA.src = '';
@@ -91,6 +94,47 @@ document.addEventListener('DOMContentLoaded', () => {
     inactiveImage = imageB;
   }
 
+  function enterFullscreen() {
+    overlay.classList.add('fullscreen');
+    overlay.classList.remove('panel-open');
+    showUi();
+  }
+
+  function exitFullscreen() {
+    overlay.classList.remove('fullscreen');
+    overlay.classList.add('panel-open');
+    hideUi();
+  }
+
+  function toggleFullscreen() {
+    if (overlay.classList.contains('fullscreen')) {
+      exitFullscreen();
+    } else {
+      enterFullscreen();
+    }
+  }
+
+  function togglePanel() {
+
+    if (overlay.classList.contains('panel-open')) {
+
+      overlay.classList.remove('panel-open');
+
+      if (!overlay.classList.contains('fullscreen')) {
+        overlay.classList.add('fullscreen');
+      }
+
+    } else {
+
+      overlay.classList.add('panel-open');
+      overlay.classList.remove('fullscreen');
+
+    }
+
+    showUi();
+
+  }
+
   function nextImage() {
     renderImage(currentIndex + 1);
     if (overlay.classList.contains('fullscreen')) showUi();
@@ -99,16 +143,6 @@ document.addEventListener('DOMContentLoaded', () => {
   function previousImage() {
     renderImage(currentIndex - 1);
     if (overlay.classList.contains('fullscreen')) showUi();
-  }
-
-  function toggleFullscreen() {
-    if (overlay.classList.contains('fullscreen')) {
-      overlay.classList.remove('fullscreen');
-      hideUi();
-    } else {
-      overlay.classList.add('fullscreen');
-      showUi();
-    }
   }
 
   triggers.forEach((link, index) => {
@@ -121,6 +155,11 @@ document.addEventListener('DOMContentLoaded', () => {
   stage.addEventListener('click', () => {
     if (overlay.classList.contains('hidden')) return;
     toggleFullscreen();
+  });
+
+  panelToggle.addEventListener('click', event => {
+    event.stopPropagation();
+    togglePanel();
   });
 
   overlay.addEventListener('mousemove', () => {
