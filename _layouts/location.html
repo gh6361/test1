@@ -3,63 +3,48 @@ layout: default
 ---
 
 <section class="location-page">
-  <div class="location-hero mb-4">
+  <div class="location-content">
     {% if page.cover %}
-    <img src="{{ '/assets/images/' | append: page.cover | relative_url }}" class="img-fluid rounded-4 shadow w-100"
-      alt="{{ page.title | escape }}">
-    {% endif %}
-  </div>
-
-  <div class="row g-4">
-    <div class="col-lg-8">
-      <h1 class="display-5 fw-bold mb-3">{{ page.title }}</h1>
-
-      <p class="lead text-secondary mb-4">
-        {{ page.visited }}
-      </p>
-
-      <div class="location-story">
-        {{ content }}
+      <div class="location-cover">
+        <img
+          src="{{ '/assets/images/' | append: page.cover | relative_url }}"
+          alt="{{ page.title | escape }}">
       </div>
+    {% endif %}
 
-      {% if page.gallery %}
-      <h2 class="mt-5 mb-4">Gallery</h2>
+    <header class="location-header">
+      <h1>{{ page.title }}</h1>
 
-      <div class="row g-3">
+      <p class="location-meta">
+        {% if page.country %}{{ page.country }}{% endif %}
+        {% if page.visited %}
+          {% if page.country %} · {% endif %}{{ page.visited }}
+        {% endif %}
+      </p>
+    </header>
+
+    <div class="location-story">
+      {{ content }}
+    </div>
+
+    {% if page.gallery %}
+      <h2 class="gallery-heading">Gallery</h2>
+
+      <div class="gallery-masonry">
         {% for photo in page.gallery %}
-        <div class="col-md-4">
-          <a href="{{ '/assets/images/' | append: photo.file | relative_url }}" class="lightbox-trigger"
-            data-caption="{{ photo.caption | escape }}">
-            <img src="{{ '/assets/images/' | append: photo.file | relative_url }}"
-              class="img-fluid rounded shadow gallery-image" alt="{{ photo.caption | default: page.title | escape }}">
-          </a>
-        </div>
+          <div class="gallery-item">
+            <a
+              href="{{ '/assets/images/' | append: photo.file | relative_url }}"
+              class="lightbox-trigger"
+              data-caption="{{ photo.caption | escape }}">
+              <img
+                src="{{ '/assets/images/' | append: photo.file | relative_url }}"
+                class="gallery-image"
+                alt="{{ photo.caption | default: page.title | escape }}">
+            </a>
+          </div>
         {% endfor %}
       </div>
-      {% endif %}
-    </div>
-
-    <div class="col-lg-4">
-      <div class="card shadow-sm border-0 rounded-4">
-        <div class="card-body">
-          <h2 class="h5 mb-3">Trip details</h2>
-
-          {% if page.country %}
-          <p class="mb-2"><strong>Country:</strong> {{ page.country }}</p>
-          {% endif %}
-
-          {% if page.visited %}
-          <p class="mb-2"><strong>Visited:</strong> {{ page.visited }}</p>
-          {% endif %}
-
-          {% if page.coordinates %}
-          <p class="mb-0">
-            <strong>Coordinates:</strong><br>
-            {{ page.coordinates.lat }}, {{ page.coordinates.lng }}
-          </p>
-          {% endif %}
-        </div>
-      </div>
-    </div>
+    {% endif %}
   </div>
 </section>

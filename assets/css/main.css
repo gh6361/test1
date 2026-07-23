@@ -9,28 +9,72 @@ body {
 }
 
 .location-page {
-  max-width: 1200px;
-  margin: 0 auto;
+  padding-bottom: 3rem;
 }
 
-.location-hero img {
-  max-height: 520px;
-  object-fit: cover;
+.location-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+.location-cover {
+  margin-bottom: 2rem;
+}
+
+.location-cover img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.location-header {
+  margin-bottom: 1.25rem;
+}
+
+.location-header h1 {
+  margin: 0 0 0.5rem 0;
+}
+
+.location-meta {
+  margin: 0;
+  color: #6c757d;
+  font-size: 1.05rem;
 }
 
 .location-story {
+  max-width: 860px;
   font-size: 1.05rem;
   line-height: 1.8;
+  margin-bottom: 2rem;
 }
 
-.location-story p:last-child {
-  margin-bottom: 0;
+.gallery-heading {
+  margin: 2.5rem 0 1rem;
+}
+
+.gallery-masonry {
+  column-width: 280px;
+  column-gap: 10px;
+}
+
+.gallery-item {
+  break-inside: avoid;
+  margin: 0 0 12px;
+}
+
+.gallery-item a {
+  display: block;
 }
 
 .gallery-image {
+  display: block;
   width: 100%;
-  aspect-ratio: 1 / 1;
-  object-fit: cover;
+  height: auto;
+  border-radius: 0;
+  box-shadow: none;
 }
 
 .lightbox {
