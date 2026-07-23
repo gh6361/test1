@@ -3,13 +3,20 @@ layout: default
 title: Travel Map
 permalink: /map/
 load_map_js: true
+full_width: true
 ---
 
-# Travel Map
+<div class="map-page">
+  <aside class="map-sidebar">
+    <div id="location-panel">
+      <h2>Travel Map</h2>
+      <p>Click a marker to see details about each place.</p>
+      <p class="map-panel-note">Use the popups to open the gallery pages.</p>
+    </div>
+  </aside>
 
-This map will show every place I've photographed.
-
-<div id="map"></div>
+  <div id="map"></div>
+</div>
 
 <script>
   window.siteBaseUrl = "{{ site.baseurl }}";
