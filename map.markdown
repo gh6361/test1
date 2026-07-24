@@ -18,10 +18,33 @@ full_width: true
   <div id="map"></div>
 </div>
 
-<!-- Simple Single Photo Lightbox -->
-<div id="single-photo-lightbox" class="single-lightbox hidden">
-  <button id="single-photo-close" class="single-lightbox-close" aria-label="Close lightbox">&times;</button>
-  <img id="single-photo-image" class="single-lightbox-image" src="" alt="">
+
+<!-- Standard Gallery Lightbox -->
+<div id="lightbox" class="lightbox hidden panel-open">
+  <div class="lightbox-main">
+    <div id="lightbox-stage" class="lightbox-stage">
+      <img id="lightbox-image-a" class="lightbox-image active" src="" alt="">
+      <img id="lightbox-image-b" class="lightbox-image" src="" alt="">
+      
+      <div class="lightbox-ui">
+        <button id="lightbox-left-zone" class="lightbox-zone"></button>
+        <button id="lightbox-right-zone" class="lightbox-zone"></button>
+        <button id="lightbox-prev" class="lightbox-arrow">‹</button>
+        <button id="lightbox-next" class="lightbox-arrow">›</button>
+      </div>
+    </div>
+    
+    <div class="lightbox-controls lightbox-ui">
+      <button id="lightbox-close" class="lightbox-control">&times;</button>
+    </div>
+    <button id="lightbox-panel-toggle" class="lightbox-control lightbox-ui">i</button>
+  </div>
+  
+  <div class="lightbox-panel">
+    <div class="lightbox-panel-content">
+      <p id="lightbox-caption"></p>
+    </div>
+  </div>
 </div>
 
 <script>
