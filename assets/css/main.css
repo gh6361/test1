@@ -2,19 +2,34 @@ body {
   font-family: system-ui, sans-serif;
 }
 
+/* --- Custom Navbar Height --- */
+.navbar {
+  height: 60px; 
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
 .map-page {
+  position: absolute;
+  top: 60px; /* Matches your exact nav bar height */
+  bottom: 0; /* Locks to the bottom of the screen */
+  left: 0;
+  right: 0;
   display: flex;
-  width: 100vw;
-  height: calc(100vh - 72px);
-  min-height: 700px;
   background: #fff;
+  overflow: hidden;
+  margin: 0;
+  padding: 0;
 }
 
 .map-sidebar {
-  width: 385px;
+  width: 385px; /* Or whatever width you set it to earlier */
   flex: 0 0 385px;
+  height: 100%; /* Locks the height to the map container */
+  min-height: 0; /* Magic flexbox property to force scrolling! */
   border-right: 1px solid #e5e5e5;
-  overflow-y: auto;
+  overflow-y: auto; /* Brings the vertical scrollbar back */
+  overflow-x: hidden; /* Prevents horizontal scrolling */
   background: #fff;
 }
 
@@ -161,6 +176,40 @@ body {
   #map {
     height: 60vh;
   }
+}
+
+/* --- Map Region Controls --- */
+.map-region-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 8px; 
+  margin-top: 15px !important; 
+  margin-right: 15px !important; /* Pushes the buttons away from the right edge */
+}
+
+.map-region-controls button {
+  background: white;
+  border: 2px solid rgba(0, 0, 0, 0.2);
+  border-radius: 4px;
+  padding: 8px 12px;
+  font-size: 0.9rem;
+  font-family: inherit;
+  font-weight: 500;
+  color: #333;
+  cursor: pointer;
+  box-shadow: 0 1px 5px rgba(0, 0, 0, 0.65);
+  transition: background-color 0.2s, transform 0.1s, opacity 0.2s;
+  text-align: center;
+  opacity: 0.75; 
+}
+
+.map-region-controls button:hover {
+  background: #f4f4f4;
+  opacity: 1; 
+}
+
+.map-region-controls button:active {
+  transform: scale(0.97);
 }
 
 .gallery-heading {

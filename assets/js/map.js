@@ -24,10 +24,61 @@ window.addEventListener('load', () => {
 
   if (!mapEl || !panel || typeof L === 'undefined') return;
 
-  const map = L.map(mapEl).setView([54, 15], 4);
+  // Define coordinate boundaries FIRST so the map can use them to load
+  const regionBounds = {
+    world: [[-60, -170], [78, 180]],
+    europe: [[38, -10], [69, 35]],
+    na: [[22, -175], [70, -45]],
+    oceania: [[-47, 110], [-10, 180]]
+  };
+
+  // Initialize map with default zoom control disabled, and fit to 'world' bounds
+  const map = L.map(mapEl, {
+    zoomControl: false
+  }).fitBounds(regionBounds.world);
+
+  // Manually add the zoom control to the bottom right
+  L.control.zoom({
+    position: 'bottomright'
+  }).addTo(map);
+
   L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: '&copy; OpenStreetMap contributors'
   }).addTo(map);
+
+  // Set region control back to topright
+  const regionControl = L.control({ position: 'topright' });
+
+  regionControl.onAdd = function (mapInstance) {
+    const div = L.DomUtil.create('div', 'map-region-controls');
+
+    div.innerHTML = `
+      <button type="button" data-region="world">World</button>
+      <button type="button" data-region="europe">Europe</button>
+      <button type="button" data-region="na">US & Canada</button>
+      <button type="button" data-region="oceania">Australia & NZ</button>
+    `;
+
+    L.DomEvent.disableClickPropagation(div);
+    L.DomEvent.disableScrollPropagation(div);
+
+    const buttons = div.querySelectorAll('button');
+    buttons.forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const region = e.target.dataset.region;
+        if (regionBounds[region]) {
+          mapInstance.flyToBounds(regionBounds[region], {
+            duration: 1.5,
+            padding: [20, 20]
+          });
+        }
+      });
+    });
+
+    return div;
+  };
+
+  regionControl.addTo(map);
 
   const baseUrl = window.siteBaseUrl || '';
 
@@ -58,7 +109,7 @@ window.addEventListener('load', () => {
       mode: 'stacked',
       images: [
         // Just one image triggers "Single Mode" automatically!
-        { src: `${baseUrl}/assets/images/oslo/cover.jpg`, caption: 'Calm Scandinavian streets.' } 
+        { src: `${baseUrl}/assets/images/oslo/cover.jpg`, caption: 'Calm Scandinavian streets.' }
       ]
     }
   ];
@@ -107,7 +158,7 @@ window.addEventListener('load', () => {
   function openGalleryLightbox(images, startIndex) {
     if (!galOverlay) return;
     galImages = images;
-    
+
     // Automatically apply Single Mode if there is only 1 image
     if (images.length <= 1) {
       galOverlay.classList.add('single-mode', 'fullscreen');
@@ -116,7 +167,7 @@ window.addEventListener('load', () => {
       galOverlay.classList.remove('single-mode', 'fullscreen', 'hidden');
       galOverlay.classList.add('panel-open');
     }
-    
+
     hideGalUi();
     renderGalImage(startIndex || 0);
   }
@@ -126,7 +177,7 @@ window.addEventListener('load', () => {
     galOverlay.classList.add('hidden');
     galOverlay.classList.remove('fullscreen', 'show-ui', 'panel-open', 'single-mode');
     hideGalUi();
-    
+
     if (galImageA) galImageA.src = '';
     if (galImageB) galImageB.src = '';
     if (galCaption) galCaption.textContent = '';
@@ -135,7 +186,7 @@ window.addEventListener('load', () => {
 
   function toggleGalFullscreen() {
     if (!galOverlay || galImages.length <= 1) return; // Disable toggle in single mode
-    
+
     if (galOverlay.classList.contains('fullscreen')) {
       galOverlay.classList.remove('fullscreen');
       galOverlay.classList.add('panel-open');
@@ -239,7 +290,7 @@ window.addEventListener('load', () => {
 
     marker.on('click', () => renderPanel(location));
   });
-  
+
   /* --- EVENT LISTENERS --- */
   if (galOverlay) {
     galOverlay.addEventListener('mousemove', () => {
@@ -247,7 +298,7 @@ window.addEventListener('load', () => {
         showGalUi();
       }
     });
-    
+
     if (galStage) galStage.addEventListener('click', () => {
       if (galOverlay.classList.contains('hidden')) return;
       if (galImages.length > 1) {
@@ -258,7 +309,7 @@ window.addEventListener('load', () => {
     });
 
     if (galPanelToggle) galPanelToggle.addEventListener('click', (e) => { e.stopPropagation(); toggleGalFullscreen(); });
-    
+
     if (galPrev) galPrev.addEventListener('click', (e) => { e.stopPropagation(); prevGalImage(); });
     if (galNext) galNext.addEventListener('click', (e) => { e.stopPropagation(); nextGalImage(); });
     if (galLeftZone) galLeftZone.addEventListener('click', (e) => { e.stopPropagation(); prevGalImage(); });
