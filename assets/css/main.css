@@ -718,3 +718,68 @@ a:hover {
   max-width: 100vw !important;
   cursor: default;
 }
+
+/* --- THE MAP TILES (Editorial Muted Filter) --- */
+/* This applies a soft, warm, desaturated look to the default map */
+.leaflet-tile-pane {
+    filter: grayscale(30%) sepia(5%) brightness(1.02) contrast(0.95);
+}
+
+
+/* --- THE RIGHT-SIDE MAP BUTTONS --- */
+/* Assuming these have standard button classes, we force the editorial style */
+.leaflet-top.leaflet-right .btn,
+.leaflet-control button,
+.map-controls-container button { /* Add whatever specific class your buttons use if they don't respond to this */
+    background-color: var(--bg-bone) !important;
+    color: var(--text-dark) !important;
+    border: 1px solid var(--text-dark) !important;
+    border-radius: 0 !important; /* Removes the rounded corners for a sharp look */
+    font-family: var(--font-sans) !important;
+    text-transform: uppercase !important;
+    font-size: 0.65rem !important;
+    letter-spacing: 2px !important;
+    padding: 8px 16px !important;
+    margin-bottom: 5px !important;
+    transition: all 0.3s ease !important;
+    box-shadow: none !important; /* Removes default drop shadows */
+}
+
+.leaflet-top.leaflet-right .btn:hover,
+.leaflet-control button:hover {
+    background-color: var(--text-dark) !important;
+    color: var(--bg-bone) !important;
+}
+
+
+/* --- THE MAP POPUPS --- */
+/* The main bubble */
+.leaflet-popup-content-wrapper {
+    background-color: var(--bg-bone) !important;
+    color: var(--text-dark) !important;
+    border-radius: 0 !important; /* Sharp corners */
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08) !important; /* Very soft, premium shadow */
+    padding: 5px !important;
+}
+
+/* The little triangle pointing to the marker */
+.leaflet-popup-tip {
+    background-color: var(--bg-bone) !important;
+}
+
+/* The popup text formatting */
+.leaflet-popup-content {
+    font-family: var(--font-sans) !important;
+    font-size: 0.8rem !important;
+    text-align: center !important;
+}
+
+/* The popup title (forcing the serif font) */
+.leaflet-popup-content b, 
+.leaflet-popup-content strong {
+    font-family: var(--font-serif) !important;
+    font-size: 1.2rem !important;
+    font-weight: 600 !important;
+    display: block !important;
+    margin-bottom: 5px !important;
+}
