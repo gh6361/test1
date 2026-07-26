@@ -266,29 +266,53 @@ window.addEventListener('load', () => {
 
   renderDefaultPanel();
 
-  locations.forEach((location) => {
-    const marker = L.marker(location.coords).addTo(map);
+  /* --- MARKER & TOOLTIP LOGIC --- */
 
-    if (location.mode === 'stacked') {
-      // Grammatically adjust popup text based on number of photos
-      const btnText = (location.images && location.images.length === 1) ? 'View Photo' : 'View Photos';
-      marker.bindPopup(`
-      <strong>${location.name}</strong><br>
-      <button type="button" class="btn btn-sm btn-primary mt-2 popup-open-stacked">${btnText}</button>
-      `);
-      marker.on('popupopen', () => {
-        const popupEl = marker.getPopup().getElement();
-        const btn = popupEl ? popupEl.querySelector('.popup-open-stacked') : null;
-        if (btn) btn.addEventListener('click', (e) => { e.preventDefault(); renderPanel(location); });
-      });
-    } else {
-      marker.bindPopup(`
-      <strong>${location.name}</strong><br>
-      <a href="${location.url}" class="btn btn-sm btn-primary mt-2">View Gallery</a>
-      `);
+  // Define a smaller version of Leaflet's default blue pin
+  const smallIcon = L.icon({
+    iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
+    iconRetinaUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',
+    shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
+    iconSize: [20, 32],      // Scaled down from the default 25x41
+    iconAnchor: [10, 32],    // Anchors the very bottom tip to the coordinates
+    shadowSize: [32, 32],
+    shadowAnchor: [10, 32],
+    className: 'interactive-marker' // We will use this class in CSS for the hover effect
+  });
+
+  locations.forEach((location) => {
+    // Pass the custom smallIcon to the marker
+    const marker = L.marker(location.coords, { icon: smallIcon }).addTo(map);
+
+    // Grab the appropriate cover image for the tooltip
+    let tooltipImageSrc = '';
+    if (location.mode === 'stacked' && location.images && location.images.length > 0) {
+      tooltipImageSrc = location.images[0].src;
+    } else if (location.previewImage) {
+      tooltipImageSrc = location.previewImage;
     }
 
-    marker.on('click', () => renderPanel(location));
+    // 1. Build the HTML for the hover card
+    const hoverContent = `
+      <div class="map-hover-card">
+        ${tooltipImageSrc ? `<img src="${tooltipImageSrc}" alt="${location.name}">` : ''}
+        <div class="map-hover-title">${location.name}</div>
+      </div>
+    `;
+
+    // 2. Bind it as a Tooltip
+    marker.bindTooltip(hoverContent, {
+      direction: 'bottom', // Switched to appear BELOW the marker
+      offset: [0, 5],      // Pushes the tooltip 5px below the tip of the pin
+      className: 'custom-map-tooltip',
+      opacity: 1
+    });
+
+    // 3. Handle the click event to close tooltip and open sidebar
+    marker.on('click', () => {
+      marker.closeTooltip();
+      renderPanel(location);
+    });
   });
 
   /* --- EVENT LISTENERS --- */
