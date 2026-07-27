@@ -135,18 +135,103 @@ h6 {
   border-bottom-color: var(--bg-bone);
 }
 
+/* --- DYNAMIC STICKY HEADER (BOOTSTRAP 5.3 OVERRIDE) --- */
+.editorial-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 9999 !important; /* Forces the nav to sit above the Leaflet map */
+  transition: background-color 0.3s ease, box-shadow 0.3s ease;
+  padding: 1rem 0; 
+}
+
+/* 1. THE TRANSPARENT STATE (When at the very top) */
+.editorial-header:not(.scrolled) {
+  background-color: transparent !important;
+  box-shadow: none !important;
+  /* Overrides Bootstrap 5 variables */
+  --bs-navbar-color: var(--bg-bone);
+  --bs-navbar-hover-color: #ffffff;
+  --bs-navbar-brand-color: var(--bg-bone);
+}
+
+.editorial-header:not(.scrolled) .navbar-brand,
+.editorial-header:not(.scrolled) .nav-link {
+  color: var(--bg-bone) !important;
+}
+
+/* 2. THE SCROLLED STATE (When scrolling down) */
+.editorial-header.scrolled {
+  background-color: var(--bg-bone) !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05); 
+  /* Swap Bootstrap variables back to dark */
+  --bs-navbar-color: var(--text-dark);
+  --bs-navbar-hover-color: var(--text-body);
+  --bs-navbar-brand-color: var(--text-dark);
+}
+
+.editorial-header.scrolled .navbar-brand,
+.editorial-header.scrolled .nav-link {
+  color: var(--text-dark) !important;
+}
+
+/* Font styling for all states */
+.editorial-header .nav-link {
+  font-family: var(--font-sans);
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  font-size: 0.8rem;
+  transition: color 0.3s ease;
+}
+
+.editorial-header .navbar-brand {
+  font-family: var(--font-serif);
+  font-size: 1.5rem;
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+/* --- PERMANENT SOLID HEADER (For map & utility pages) --- */
+/* 1. THE TRANSPARENT STATE (When at the very top AND not a solid header) */
+.editorial-header:not(.scrolled):not(.header-solid) {
+  background-color: transparent !important;
+  box-shadow: none !important;
+  --bs-navbar-color: var(--bg-bone);
+  --bs-navbar-hover-color: #ffffff;
+  --bs-navbar-brand-color: var(--bg-bone);
+}
+
+.editorial-header:not(.scrolled):not(.header-solid) .navbar-brand,
+.editorial-header:not(.scrolled):not(.header-solid) .nav-link {
+  color: var(--bg-bone) !important;
+}
+
+/* Pushes content down so the fixed nav doesn't cover the top of the map */
+.nav-spacer {
+  padding-top: 70px !important; /* Adjust slightly if your nav is taller/shorter */
+}
+
 /* --- LAYOUT & UI --- */
 
-/* --- THE SIDEBAR (Dark Olive Mode) --- */
-/* --- THE SIDEBAR (Dark Olive Mode) --- */
+/* --- MAP LAYOUT --- */
+.map-page {
+  display: flex;
+  height: 85vh;
+  overflow: hidden;
+  min-height: 0;
+}
+
 .map-sidebar {
-  background-color: var(--bg-olive) !important;
-  /* Forces the olive color */
-  color: var(--text-light);
-  border-right: none;
+  flex: 0 0 385px;
+  height: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
+  background: #44473d;
+  border-right: 1px solid rgba(244, 243, 238, 0.15);
+  z-index: 2;
   padding: 3rem 2.5rem;
-  height: 100vh;
-  /* Ensures it stretches to the bottom */
+  color: var(--text-light);
 }
 
 .map-sidebar h1,
@@ -160,6 +245,33 @@ h6 {
 
 .map-sidebar p {
   color: rgba(244, 243, 238, 0.75);
+}
+
+#map {
+  flex: 1;
+  height: 100%;
+  min-width: 0;
+  z-index: 1;
+}
+
+/* --- MOBILE --- */
+@media (max-width: 900px) {
+  .map-page {
+    flex-direction: column;
+    height: auto;
+    min-height: 0;
+  }
+
+  .map-sidebar {
+    width: 100%;
+    flex: none;
+    border-right: 0;
+    border-bottom: 1px solid rgba(244, 243, 238, 0.15);
+  }
+
+  #map {
+    height: 60vh;
+  }
 }
 
 /* Update sidebar buttons for the dark background */
@@ -274,36 +386,6 @@ a:hover {
   padding-bottom: 0;
 }
 
-.map-page {
-  position: absolute;
-  top: 50px;
-  /* Matches your exact nav bar height */
-  bottom: 0;
-  /* Locks to the bottom of the screen */
-  left: 0;
-  right: 0;
-  display: flex;
-  background: #fff;
-  overflow: hidden;
-  margin: 0;
-  padding: 0;
-}
-
-.map-sidebar {
-  width: 385px;
-  /* Or whatever width you set it to earlier */
-  flex: 0 0 385px;
-  height: 100%;
-  /* Locks the height to the map container */
-  min-height: 0;
-  /* Magic flexbox property to force scrolling! */
-  border-right: 1px solid #e5e5e5;
-  overflow-y: auto;
-  /* Brings the vertical scrollbar back */
-  overflow-x: hidden;
-  /* Prevents horizontal scrolling */
-  background: #fff;
-}
 
 
 /* --- Custom Map Hover Tooltip --- */
@@ -404,12 +486,6 @@ a:hover {
   font-size: 0.95rem;
 }
 
-#map {
-  flex: 1;
-  width: 100%;
-  height: 100%;
-}
-
 /* --- Standard Gallery Preview Override (e.g., Helsinki) --- */
 .location-preview-button {
   margin-left: -15px;
@@ -490,25 +566,6 @@ a:hover {
   font-size: 1.05rem;
   line-height: 1.8;
   margin-bottom: 2rem;
-}
-
-@media (max-width: 900px) {
-  .map-page {
-    flex-direction: column;
-    height: auto;
-    min-height: 0;
-  }
-
-  .map-sidebar {
-    width: 100%;
-    flex: none;
-    border-right: 0;
-    border-bottom: 1px solid #e5e5e5;
-  }
-
-  #map {
-    height: 60vh;
-  }
 }
 
 /* --- Map Region Controls --- */
@@ -849,3 +906,17 @@ a:hover {
     margin-bottom: 5px !important;
 }
 
+/* --- BULLETPROOF SOLID HEADER TEXT --- */
+nav.header-solid {
+  background-color: #f4f3ee !important; /* Forces the bone background */
+}
+
+nav.header-solid .navbar-brand,
+nav.header-solid .nav-link {
+  color: #1c1c1c !important; /* Forces the dark text, bypassing variables */
+  text-shadow: none !important;
+}
+
+nav.header-solid .nav-link:hover {
+  color: #595959 !important; /* Lighter gray for the hover state */
+}

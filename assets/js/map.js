@@ -1,19 +1,19 @@
-window.addEventListener('load', () => {
-  const mapEl = document.getElementById('map');
-  const panel = document.getElementById('location-panel');
+window.addEventListener("load", () => {
+  const mapEl = document.getElementById("map");
+  const panel = document.getElementById("location-panel");
 
   // Standard Gallery Lightbox Elements
-  const galOverlay = document.getElementById('lightbox');
-  const galStage = document.getElementById('lightbox-stage');
-  const galImageA = document.getElementById('lightbox-image-a');
-  const galImageB = document.getElementById('lightbox-image-b');
-  const galClose = document.getElementById('lightbox-close');
-  const galPanelToggle = document.getElementById('lightbox-panel-toggle');
-  const galPrev = document.getElementById('lightbox-prev');
-  const galNext = document.getElementById('lightbox-next');
-  const galLeftZone = document.getElementById('lightbox-left-zone');
-  const galRightZone = document.getElementById('lightbox-right-zone');
-  const galCaption = document.getElementById('lightbox-caption');
+  const galOverlay = document.getElementById("lightbox");
+  const galStage = document.getElementById("lightbox-stage");
+  const galImageA = document.getElementById("lightbox-image-a");
+  const galImageB = document.getElementById("lightbox-image-b");
+  const galClose = document.getElementById("lightbox-close");
+  const galPanelToggle = document.getElementById("lightbox-panel-toggle");
+  const galPrev = document.getElementById("lightbox-prev");
+  const galNext = document.getElementById("lightbox-next");
+  const galLeftZone = document.getElementById("lightbox-left-zone");
+  const galRightZone = document.getElementById("lightbox-right-zone");
+  const galCaption = document.getElementById("lightbox-caption");
 
   let galImages = [];
   let galCurrentIndex = 0;
@@ -22,35 +22,50 @@ window.addEventListener('load', () => {
   let galUiTimer = null;
   const UI_HIDE_DELAY = 1500;
 
-  if (!mapEl || !panel || typeof L === 'undefined') return;
+  if (!mapEl || !panel || typeof L === "undefined") return;
 
   // Define coordinate boundaries FIRST so the map can use them to load
   const regionBounds = {
-    world: [[-60, -170], [78, 180]],
-    europe: [[38, -10], [69, 35]],
-    na: [[22, -175], [70, -45]],
-    oceania: [[-47, 110], [-10, 180]]
+    world: [
+      [-60, -170],
+      [78, 180],
+    ],
+    europe: [
+      [38, -10],
+      [69, 35],
+    ],
+    na: [
+      [22, -175],
+      [70, -45],
+    ],
+    oceania: [
+      [-47, 110],
+      [-10, 180],
+    ],
   };
 
   // Initialize map with default zoom control disabled, and fit to 'world' bounds
   const map = L.map(mapEl, {
-    zoomControl: false
+    zoomControl: false,
   }).fitBounds(regionBounds.world);
 
-  // Manually add the zoom control to the bottom right
-  L.control.zoom({
-    position: 'bottomright'
-  }).addTo(map);
 
-  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    attribution: '&copy; OpenStreetMap contributors'
+  // Manually add the zoom control to the bottom right
+  L.control
+    .zoom({
+      position: "bottomright",
+    })
+    .addTo(map);
+
+  L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
+    attribution: "&copy; OpenStreetMap contributors",
   }).addTo(map);
 
   // Set region control back to topright
-  const regionControl = L.control({ position: 'topright' });
+  const regionControl = L.control({ position: "topright" });
 
   regionControl.onAdd = function (mapInstance) {
-    const div = L.DomUtil.create('div', 'map-region-controls');
+    const div = L.DomUtil.create("div", "map-region-controls");
 
     div.innerHTML = `
       <button type="button" data-region="world">World</button>
@@ -62,14 +77,14 @@ window.addEventListener('load', () => {
     L.DomEvent.disableClickPropagation(div);
     L.DomEvent.disableScrollPropagation(div);
 
-    const buttons = div.querySelectorAll('button');
-    buttons.forEach(btn => {
-      btn.addEventListener('click', (e) => {
+    const buttons = div.querySelectorAll("button");
+    buttons.forEach((btn) => {
+      btn.addEventListener("click", (e) => {
         const region = e.target.dataset.region;
         if (regionBounds[region]) {
           mapInstance.flyToBounds(regionBounds[region], {
             duration: 1.5,
-            padding: [20, 20]
+            padding: [20, 20],
           });
         }
       });
@@ -80,56 +95,73 @@ window.addEventListener('load', () => {
 
   regionControl.addTo(map);
 
-  const baseUrl = window.siteBaseUrl || '';
+  const baseUrl = window.siteBaseUrl || "";
 
   const locations = [
     {
-      name: 'Helsinki',
+      name: "Helsinki",
       coords: [60.1699, 24.9384],
       url: `${baseUrl}/portfolio/helsinki/`,
-      description: 'A first stop in Helsinki with bright light and quiet streets.',
+      description:
+        "A first stop in Helsinki with bright light and quiet streets.",
       previewImage: `${baseUrl}/assets/images/helsinki/cover.jpg`,
-      mode: 'gallery'
+      mode: "gallery",
     },
     {
-      name: 'Reykjavik',
+      name: "Reykjavik",
       coords: [64.1466, -21.9426],
-      description: 'A cold, bright stop with open skies and coastal views.',
-      mode: 'stacked',
+      description: "A cold, bright stop with open skies and coastal views.",
+      mode: "stacked",
       images: [
-        { src: `${baseUrl}/assets/images/reykjavik/slowducks.jpg`, caption: 'Open skies over Reykjavik.' },
-        { src: `${baseUrl}/assets/images/reykjavik/pig.jpg`, caption: 'Coastal architecture details.' },
-        { src: `${baseUrl}/assets/images/reykjavik/revolte.jpg`, caption: 'Cold bright streets at dusk.' }
-      ]
+        {
+          src: `${baseUrl}/assets/images/reykjavik/slowducks.jpg`,
+          caption: "Open skies over Reykjavik.",
+        },
+        {
+          src: `${baseUrl}/assets/images/reykjavik/pig.jpg`,
+          caption: "Coastal architecture details.",
+        },
+        {
+          src: `${baseUrl}/assets/images/reykjavik/revolte.jpg`,
+          caption: "Cold bright streets at dusk.",
+        },
+      ],
     },
     {
-      name: 'Oslo',
+      name: "Oslo",
       coords: [59.9139, 10.7522],
-      description: 'City light, water, and calm Scandinavian streets.',
-      mode: 'stacked',
+      description: "City light, water, and calm Scandinavian streets.",
+      mode: "stacked",
       images: [
         // Just one image triggers "Single Mode" automatically!
-        { src: `${baseUrl}/assets/images/oslo/cover.jpg`, caption: 'Calm Scandinavian streets.' }
-      ]
-    }
+        {
+          src: `${baseUrl}/assets/images/oslo/cover.jpg`,
+          caption: "Calm Scandinavian streets.",
+        },
+      ],
+    },
   ];
 
   /* --- GALLERY LIGHTBOX LOGIC --- */
   function showGalUi() {
     if (!galOverlay) return;
-    galOverlay.classList.add('show-ui');
+    galOverlay.classList.add("show-ui");
     clearTimeout(galUiTimer);
     galUiTimer = window.setTimeout(() => {
       // In single-mode, it behaves like fullscreen
-      if (!galOverlay.classList.contains('hidden') && (galOverlay.classList.contains('fullscreen') || galOverlay.classList.contains('single-mode'))) {
-        galOverlay.classList.remove('show-ui');
+      if (
+        !galOverlay.classList.contains("hidden") &&
+        (galOverlay.classList.contains("fullscreen") ||
+          galOverlay.classList.contains("single-mode"))
+      ) {
+        galOverlay.classList.remove("show-ui");
       }
     }, UI_HIDE_DELAY);
   }
 
   function hideGalUi() {
     if (!galOverlay) return;
-    galOverlay.classList.remove('show-ui');
+    galOverlay.classList.remove("show-ui");
     clearTimeout(galUiTimer);
   }
 
@@ -142,15 +174,15 @@ window.addEventListener('load', () => {
     galCurrentIndex = (index + galImages.length) % galImages.length;
     const item = galImages[galCurrentIndex];
 
-    if (galCaption) galCaption.textContent = item.caption || '';
+    if (galCaption) galCaption.textContent = item.caption || "";
     galInactive.src = item.src;
     galInactive.alt = item.caption || `Image ${galCurrentIndex + 1}`;
 
-    galOverlay.classList.remove('hidden');
+    galOverlay.classList.remove("hidden");
 
     requestAnimationFrame(() => {
-      galActive.classList.remove('active');
-      galInactive.classList.add('active');
+      galActive.classList.remove("active");
+      galInactive.classList.add("active");
       swapGalImages();
     });
   }
@@ -159,13 +191,17 @@ window.addEventListener('load', () => {
     if (!galOverlay) return;
     galImages = images;
 
+    // --- HIDE THE NAVBAR ---
+    const siteNav = document.querySelector(".editorial-header");
+    if (siteNav) siteNav.style.display = "none";
+
     // Automatically apply Single Mode if there is only 1 image
     if (images.length <= 1) {
-      galOverlay.classList.add('single-mode', 'fullscreen');
-      galOverlay.classList.remove('panel-open', 'hidden');
+      galOverlay.classList.add("single-mode", "fullscreen");
+      galOverlay.classList.remove("panel-open", "hidden");
     } else {
-      galOverlay.classList.remove('single-mode', 'fullscreen', 'hidden');
-      galOverlay.classList.add('panel-open');
+      galOverlay.classList.remove("single-mode", "fullscreen", "hidden");
+      galOverlay.classList.add("panel-open");
     }
 
     hideGalUi();
@@ -174,25 +210,34 @@ window.addEventListener('load', () => {
 
   function closeGalleryLightbox() {
     if (!galOverlay) return;
-    galOverlay.classList.add('hidden');
-    galOverlay.classList.remove('fullscreen', 'show-ui', 'panel-open', 'single-mode');
+    galOverlay.classList.add("hidden");
+    galOverlay.classList.remove(
+      "fullscreen",
+      "show-ui",
+      "panel-open",
+      "single-mode",
+    );
     hideGalUi();
 
-    if (galImageA) galImageA.src = '';
-    if (galImageB) galImageB.src = '';
-    if (galCaption) galCaption.textContent = '';
+    if (galImageA) galImageA.src = "";
+    if (galImageB) galImageB.src = "";
+    if (galCaption) galCaption.textContent = "";
     galImages = [];
+
+    // --- BRING THE NAVBAR BACK ---
+    const siteNav = document.querySelector(".editorial-header");
+    if (siteNav) siteNav.style.display = "";
   }
 
   function toggleGalFullscreen() {
     if (!galOverlay || galImages.length <= 1) return; // Disable toggle in single mode
 
-    if (galOverlay.classList.contains('fullscreen')) {
-      galOverlay.classList.remove('fullscreen');
-      galOverlay.classList.add('panel-open');
+    if (galOverlay.classList.contains("fullscreen")) {
+      galOverlay.classList.remove("fullscreen");
+      galOverlay.classList.add("panel-open");
     } else {
-      galOverlay.classList.add('fullscreen');
-      galOverlay.classList.remove('panel-open');
+      galOverlay.classList.add("fullscreen");
+      galOverlay.classList.remove("panel-open");
     }
     showGalUi();
   }
@@ -200,13 +245,13 @@ window.addEventListener('load', () => {
   function nextGalImage() {
     if (galImages.length <= 1) return;
     renderGalImage(galCurrentIndex + 1);
-    if (galOverlay.classList.contains('fullscreen')) showGalUi();
+    if (galOverlay.classList.contains("fullscreen")) showGalUi();
   }
 
   function prevGalImage() {
     if (galImages.length <= 1) return;
     renderGalImage(galCurrentIndex - 1);
-    if (galOverlay.classList.contains('fullscreen')) showGalUi();
+    if (galOverlay.classList.contains("fullscreen")) showGalUi();
   }
 
   /* --- MAP UI LOGIC --- */
@@ -219,44 +264,49 @@ window.addEventListener('load', () => {
   }
 
   function renderPanel(location) {
-    const isStacked = location.mode === 'stacked';
+    const isStacked = location.mode === "stacked";
 
     // Build stacked images HTML
-    let stackedHtml = '';
+    let stackedHtml = "";
     if (isStacked && location.images) {
       stackedHtml = `
         <div class="stacked-gallery">
-          ${location.images.map((img, idx) => `
+          ${location.images
+            .map(
+              (img, idx) => `
             <button type="button" class="stacked-image-btn" data-index="${idx}">
               <img src="${img.src}" alt="${img.caption}">
             </button>
-          `).join('')}
+          `,
+            )
+            .join("")}
         </div>
       `;
     }
 
     // Build the sidebar panel
     panel.innerHTML = `
-    ${(!isStacked && location.previewImage)
+    ${
+      !isStacked && location.previewImage
         ? `
           <button type="button" class="location-preview-button" aria-label="Open preview">
             <img class="location-image" src="${location.previewImage}" alt="${location.name}">
           </button>
         `
-        : ''
-      }
+        : ""
+    }
     <h2>${location.name}</h2>
     <p>${location.description}</p>
     
-    ${location.mode === 'gallery' ? `<a href="${location.url}" class="btn btn-sm btn-primary">View Gallery</a>` : ''}
-    ${isStacked ? stackedHtml : ''}
+    ${location.mode === "gallery" ? `<a href="${location.url}" class="btn btn-sm btn-primary">View Gallery</a>` : ""}
+    ${isStacked ? stackedHtml : ""}
   `;
 
     // Hook up Stacked mode buttons
     if (isStacked) {
-      const stackedButtons = panel.querySelectorAll('.stacked-image-btn');
-      stackedButtons.forEach(btn => {
-        btn.addEventListener('click', () => {
+      const stackedButtons = panel.querySelectorAll(".stacked-image-btn");
+      stackedButtons.forEach((btn) => {
+        btn.addEventListener("click", () => {
           const idx = parseInt(btn.dataset.index, 10);
           openGalleryLightbox(location.images, idx);
         });
@@ -270,14 +320,15 @@ window.addEventListener('load', () => {
 
   // Define a smaller version of Leaflet's default blue pin
   const smallIcon = L.icon({
-    iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
-    iconRetinaUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',
-    shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
-    iconSize: [20, 32],      // Scaled down from the default 25x41
-    iconAnchor: [10, 32],    // Anchors the very bottom tip to the coordinates
+    iconUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png",
+    iconRetinaUrl:
+      "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png",
+    shadowUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
+    iconSize: [20, 32], // Scaled down from the default 25x41
+    iconAnchor: [10, 32], // Anchors the very bottom tip to the coordinates
     shadowSize: [32, 32],
     shadowAnchor: [10, 32],
-    className: 'interactive-marker' // We will use this class in CSS for the hover effect
+    className: "interactive-marker", // We will use this class in CSS for the hover effect
   });
 
   locations.forEach((location) => {
@@ -285,8 +336,12 @@ window.addEventListener('load', () => {
     const marker = L.marker(location.coords, { icon: smallIcon }).addTo(map);
 
     // Grab the appropriate cover image for the tooltip
-    let tooltipImageSrc = '';
-    if (location.mode === 'stacked' && location.images && location.images.length > 0) {
+    let tooltipImageSrc = "";
+    if (
+      location.mode === "stacked" &&
+      location.images &&
+      location.images.length > 0
+    ) {
       tooltipImageSrc = location.images[0].src;
     } else if (location.previewImage) {
       tooltipImageSrc = location.previewImage;
@@ -295,21 +350,21 @@ window.addEventListener('load', () => {
     // 1. Build the HTML for the hover card
     const hoverContent = `
       <div class="map-hover-card">
-        ${tooltipImageSrc ? `<img src="${tooltipImageSrc}" alt="${location.name}">` : ''}
+        ${tooltipImageSrc ? `<img src="${tooltipImageSrc}" alt="${location.name}">` : ""}
         <div class="map-hover-title">${location.name}</div>
       </div>
     `;
 
     // 2. Bind it as a Tooltip
     marker.bindTooltip(hoverContent, {
-      direction: 'bottom', // Switched to appear BELOW the marker
-      offset: [0, 5],      // Pushes the tooltip 5px below the tip of the pin
-      className: 'custom-map-tooltip',
-      opacity: 1
+      direction: "bottom", // Switched to appear BELOW the marker
+      offset: [0, 5], // Pushes the tooltip 5px below the tip of the pin
+      className: "custom-map-tooltip",
+      opacity: 1,
     });
 
     // 3. Handle the click event to close tooltip and open sidebar
-    marker.on('click', () => {
+    marker.on("click", () => {
       marker.closeTooltip();
       renderPanel(location);
     });
@@ -317,35 +372,60 @@ window.addEventListener('load', () => {
 
   /* --- EVENT LISTENERS --- */
   if (galOverlay) {
-    galOverlay.addEventListener('mousemove', () => {
-      if (!galOverlay.classList.contains('hidden') && (galOverlay.classList.contains('fullscreen') || galOverlay.classList.contains('single-mode'))) {
+    galOverlay.addEventListener("mousemove", () => {
+      if (
+        !galOverlay.classList.contains("hidden") &&
+        (galOverlay.classList.contains("fullscreen") ||
+          galOverlay.classList.contains("single-mode"))
+      ) {
         showGalUi();
       }
     });
 
-    if (galStage) galStage.addEventListener('click', () => {
-      if (galOverlay.classList.contains('hidden')) return;
-      if (galImages.length > 1) {
+    if (galStage)
+      galStage.addEventListener("click", () => {
+        if (galOverlay.classList.contains("hidden")) return;
+        if (galImages.length > 1) {
+          toggleGalFullscreen();
+        } else {
+          showGalUi(); // Just wake up the UI for single mode
+        }
+      });
+
+    if (galPanelToggle)
+      galPanelToggle.addEventListener("click", (e) => {
+        e.stopPropagation();
         toggleGalFullscreen();
-      } else {
-        showGalUi(); // Just wake up the UI for single mode
-      }
-    });
+      });
 
-    if (galPanelToggle) galPanelToggle.addEventListener('click', (e) => { e.stopPropagation(); toggleGalFullscreen(); });
-
-    if (galPrev) galPrev.addEventListener('click', (e) => { e.stopPropagation(); prevGalImage(); });
-    if (galNext) galNext.addEventListener('click', (e) => { e.stopPropagation(); nextGalImage(); });
-    if (galLeftZone) galLeftZone.addEventListener('click', (e) => { e.stopPropagation(); prevGalImage(); });
-    if (galRightZone) galRightZone.addEventListener('click', (e) => { e.stopPropagation(); nextGalImage(); });
-    if (galClose) galClose.addEventListener('click', closeGalleryLightbox);
+    if (galPrev)
+      galPrev.addEventListener("click", (e) => {
+        e.stopPropagation();
+        prevGalImage();
+      });
+    if (galNext)
+      galNext.addEventListener("click", (e) => {
+        e.stopPropagation();
+        nextGalImage();
+      });
+    if (galLeftZone)
+      galLeftZone.addEventListener("click", (e) => {
+        e.stopPropagation();
+        prevGalImage();
+      });
+    if (galRightZone)
+      galRightZone.addEventListener("click", (e) => {
+        e.stopPropagation();
+        nextGalImage();
+      });
+    if (galClose) galClose.addEventListener("click", closeGalleryLightbox);
   }
 
-  document.addEventListener('keydown', (event) => {
-    if (!galOverlay?.classList.contains('hidden')) {
-      if (event.key === 'ArrowLeft') prevGalImage();
-      if (event.key === 'ArrowRight') nextGalImage();
-      if (event.key === 'Escape') closeGalleryLightbox();
+  document.addEventListener("keydown", (event) => {
+    if (!galOverlay?.classList.contains("hidden")) {
+      if (event.key === "ArrowLeft") prevGalImage();
+      if (event.key === "ArrowRight") nextGalImage();
+      if (event.key === "Escape") closeGalleryLightbox();
     }
   });
 

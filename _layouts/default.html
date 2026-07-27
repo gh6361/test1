@@ -19,25 +19,63 @@
 </head>
 
 <body>
-  <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-    <div class="container">
+  <!-- SINGLE PAGE STYLES & SMOOTH SCROLL -->
+<!-- DYNAMIC INLINE STYLES (Bypasses all CSS caching) -->
+<!-- DYNAMIC INLINE STYLES (Foolproof Class Version) -->
+<style>
+  /* 1. Default Transparent State (For the Homepage Hero) */
+  .editorial-header { 
+    background-color: transparent !important; 
+    box-shadow: none !important; 
+    transition: background-color 0.3s ease, box-shadow 0.3s ease; 
+  }
+  .editorial-header .nav-link, .editorial-header .navbar-brand { 
+    color: #f4f3ee !important; 
+    transition: color 0.3s ease; 
+  }
+  
+  /* 2. Solid State (Triggered by scrolling OR by the header-solid class on subpages) */
+  .editorial-header.scrolled, 
+  .editorial-header.header-solid { 
+    background-color: #f4f3ee !important; 
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05) !important; 
+  }
+  .editorial-header.scrolled .nav-link, .editorial-header.header-solid .nav-link,
+  .editorial-header.scrolled .navbar-brand, .editorial-header.header-solid .navbar-brand { 
+    color: #1c1c1c !important; 
+    text-shadow: none !important; 
+  }
+  .editorial-header.scrolled .nav-link:hover, .editorial-header.header-solid .nav-link:hover {
+    color: #595959 !important;
+  }
+</style>
 
-      <a class="navbar-brand" href="{{ '/' | relative_url }}">
-        Test1
-      </a>
+<!-- THE NAVIGATION BAR -->
+<nav class="navbar editorial-header fixed-top {% if page.header %}header-solid{% endif %}" style="z-index: 99999 !important;">
+  
+  <div class="container d-flex flex-row justify-content-between align-items-center">
 
-      <div class="navbar-nav ms-auto">
-        <a class="nav-link" href="{{ '/' | relative_url }}">Home</a>
-        <a class="nav-link" href="{{ '/portfolio/' | relative_url }}">Portfolio</a>
-        <a class="nav-link" href="{{ '/map/' | relative_url }}">Map</a>
-        <a class="nav-link" href="{{ '/about/' | relative_url }}">About</a>
-      </div>
+    <!-- Reverted to relative URLs -->
+    <a class="navbar-brand mb-0" href="{{ '/' | relative_url }}">
+      Test1
+    </a>
 
+    <div class="navbar-nav d-flex flex-row gap-4">
+      <a class="nav-link" href="{{ '/' | relative_url }}">Home</a>
+      <a class="nav-link" href="{{ '/portfolio/' | relative_url }}">Portfolio</a>
+      <a class="nav-link" href="{{ '/map/' | relative_url }}">Map</a>
+      <a class="nav-link" href="{{ '/about/' | relative_url }}">About</a>
     </div>
-  </nav>
 
-  <main class="{% if page.full_width %}container-fluid p-0{% else %}container py-4{% endif %}">
-    {{ content }}
+  </div>
+  
+</nav>
+
+  <main
+    class="{% if page.full_width %}container-fluid p-0{% else %}container py-4{% endif %} {% if page.header %}nav-spacer{% endif %}">
+  </main>
+  </main>
+  {{ content }}
   </main>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
@@ -79,6 +117,23 @@
     </div>
   </div>
   <script src="{{ '/assets/js/lightbox.js' | relative_url }}"></script>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const header = document.querySelector('.editorial-header');
+
+      // Safety check in case the header doesn't load
+      if (!header) return;
+
+      window.addEventListener('scroll', function () {
+        if (window.scrollY > 50) {
+          header.classList.add('scrolled');
+        } else {
+          header.classList.remove('scrolled');
+        }
+      });
+    });
+  </script>
 
 </body>
 
