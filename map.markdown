@@ -25,7 +25,7 @@ header: solid
 <aside class="map-sidebar" style="position: absolute !important; top: 0 !important; left: 0 !important; height: 100% !important; width: 385px !important; margin: 0 !important; background-color: #f2f1ea !important; z-index: 1000 !important; overflow-y: auto !important;">
   
   <!-- TEXT COLOR UPDATE: Changed color to #1c1c1c -->
-  <div id="location-panel" style="padding: 3rem 2.5rem; color: #1c1c1c;">
+  <div id="location-panel" style="padding: 2rem 0.5rem; color: #1c1c1c;">
     
     <!-- HEADER COLOR UPDATE: Changed color to #1c1c1c -->
     <h2 style="color: #1c1c1c; margin-top: 0 !important; margin-bottom: 1rem;">Travel Map</h2>
