@@ -2,6 +2,13 @@
 <html lang="en">
 
 <head>
+  <style>
+  /* Permanently prevent horizontal scrolling */
+  html, body {
+    overflow-x: hidden !important;
+    width: 100%;
+  }
+</style>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>{{ page.title | default: site.title }}</title>

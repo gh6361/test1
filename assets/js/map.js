@@ -49,7 +49,6 @@ window.addEventListener("load", () => {
     zoomControl: false,
   }).fitBounds(regionBounds.world);
 
-
   // Manually add the zoom control to the bottom right
   L.control
     .zoom({
@@ -57,8 +56,13 @@ window.addEventListener("load", () => {
     })
     .addTo(map);
 
+  // Moody, Dark Slate Theme (Carto Dark Matter)
+  // Carto Voyager - Muted, earthy daytime map
+  // Carto Positron - Clean, monochromatic light grey/linen map
   L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
-    attribution: "&copy; OpenStreetMap contributors",
+    maxZoom: 19,
+    attribution:
+      '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
   }).addTo(map);
 
   // Set region control back to topright

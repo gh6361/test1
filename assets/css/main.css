@@ -1,18 +1,13 @@
 /* --- THE TISA EDITORIAL THEME --- */
 :root {
   /* Sampled directly from the images */
-  --bg-bone: #f4f3ee;
-  /* The warm cream/bone background */
-  --bg-olive: #44473d;
-  /* The deep muted olive block */
+  --bg-bone: #f2f1ea;          /* Coastal Mist: Cool, crisp off-white */
+  --bg-dark-accent: #3f464d;   /* Stormy Slate: Cool, architectural blue-grey */
 
   /* Text Colors */
-  --text-dark: #1c1c1c;
-  /* Almost black for sharp contrast */
-  --text-body: #595959;
-  /* Soft dark gray for paragraphs */
-  --text-light: #f4f3ee;
-  /* Bone color for text on dark backgrounds */
+  --text-dark: #1c1c1c;        /* Almost black for sharp contrast */
+  --text-body: #595959;        /* Soft dark gray for paragraphs */
+  --text-light: #f2f1ea;       /* Updated to match the new background */
 
   /* Typography */
   --font-serif: 'Cormorant Garamond', serif;
@@ -73,7 +68,7 @@ h6 {
 /* --- FULL-BLEED HERO WITH OVERLAY --- */
 .full-bleed-hero {
   position: relative;
-  
+  z-index: 0;
   /* Break out of the Jekyll layout container */
   width: 100vw;
   margin-left: calc(-50vw + 50%);
@@ -103,7 +98,7 @@ h6 {
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(28, 28, 28, 0.35); 
+  background-color: rgba(28, 28, 28, 0.1); 
   z-index: 2;
 }
 
@@ -227,24 +222,22 @@ h6 {
   height: 100%;
   overflow-y: auto;
   overflow-x: hidden;
-  background: #44473d;
+  background: var(--bg-bone);
   border-right: 1px solid rgba(244, 243, 238, 0.15);
   z-index: 2;
   padding: 3rem 2.5rem;
-  color: var(--text-light);
+  color: var(--text-body);
 }
 
 .map-sidebar h1,
 .map-sidebar h2,
 .map-sidebar h3,
 .map-sidebar h4 {
-  color: var(--text-light);
-  font-family: var(--font-serif);
-  font-weight: 500;
+  color: var(--text-dark); /* Changed from var(--text-light) */
 }
 
 .map-sidebar p {
-  color: rgba(244, 243, 238, 0.75);
+  color: var(--text-body); /* Changed from rgba(244, 243, 238, 0.75) */
 }
 
 #map {
@@ -270,7 +263,7 @@ h6 {
   }
 
   #map {
-    height: 60vh;
+    height: 62vh;
   }
 }
 
@@ -381,7 +374,7 @@ a:hover {
 
 /* --- Custom Navbar Height --- */
 .navbar {
-  height: 50px;
+  height: 62px;
   padding-top: 0;
   padding-bottom: 0;
 }
@@ -844,9 +837,8 @@ a:hover {
 /* --- THE MAP TILES (Editorial Muted Filter) --- */
 /* This applies a soft, warm, desaturated look to the default map */
 .leaflet-tile-pane {
-    filter: grayscale(30%) sepia(5%) brightness(1.02) contrast(0.95);
+    filter: grayscale(20%) sepia(15%) brightness(0.98) contrast(0.95) saturate(1.1);
 }
-
 
 /* --- THE RIGHT-SIDE MAP BUTTONS --- */
 /* Assuming these have standard button classes, we force the editorial style */

@@ -6,26 +6,23 @@ load_map_js: true
 ---
 
 <!-- 1. HOME / HERO SECTION -->
+<!-- 1. HOME / HERO SECTION -->
 <section id="home">
-<div class="full-bleed-hero">
-  <!-- The Background Image -->
-  <img src="{{ '/assets/images/iceland.jpg' | relative_url }}" alt="Hero Background" class="full-bleed-bg">
+<!-- Force the height to 85vh (adjust this up or down as needed) -->
+<div class="full-bleed-hero" style="height: 100vh !important; position: relative !important; overflow: hidden !important;">
+  
+  <!-- The Background Image: Forced to cover the entire new height perfectly -->
+  <img src="{{ '/assets/images/rainbow.jpg' | relative_url }}" alt="Hero Background" class="full-bleed-bg" style="width: 100% !important; height: 100% !important; object-fit: cover !important;">
   
   <!-- The Tint Overlay (Essential for text readability) -->
   <div class="full-bleed-overlay"></div>
   
   <!-- The Text Overlay -->
-  <div class="full-bleed-content">
-    <p class="meta-text text-light">Photography · Places · Field Notes</p>
-    <h1 class="hero-title text-light">Stories and collections from the road.</h1>
-    
-    <div class="hero-links justify-center mt-4">
-      <a class="link-editorial text-light border-light" href="{{ '/map/' | relative_url }}">Open Atlas</a>
-      <a class="link-editorial text-light border-light" href="{{ '/collections/' | relative_url }}">Collections</a>
-    </div>
+  <div class="full-bleed-content" style="position: absolute !important; top: auto !important; bottom: 40% !important; transform: none !important; width: 100%; text-align: center;">
+    <h1 class="hero-title text-light" style="font-size: 4rem !important; font-weight: bold !important;">Stories and collections from the road.</h1>
   </div>
 </div>
-<section>
+</section>
 
 <!-- 2. PORTFOLIO SECTION -->
 <section id="portfolio" class="editorial-section">
