@@ -278,94 +278,38 @@ window.addEventListener("load", () => {
   function renderPanel(location) {
     const isStacked = location.mode === "stacked";
 
-    // Build stacked images HTML (Now a mini-carousel)
-    let stackedHtml = "";
-    if (isStacked && location.images) {
-      const showArrows = location.images.length > 1;
-
-      stackedHtml = `
-        <div class="stacked-gallery">
-          ${showArrows ? `<button type="button" class="sidebar-arrow sidebar-prev">‹</button>` : ""}
-          
-          <div class="sidebar-carousel-track">
-            ${location.images
-              .map(
-                (img, idx) => `
-              <div class="stacked-image-slide" data-index="${idx}">
-                <!-- New wrapper to hug the uncropped image -->
-                <div class="slide-content-wrapper">
-                  <img src="${img.src}" alt="${img.caption}">
-                  <button type="button" class="enlarge-btn" aria-label="Enlarge image" title="Enlarge image">⤢</button>
-                </div>
-              </div>
-            `,
-              )
-              .join("")}
-          </div>
-
-          ${showArrows ? `<button type="button" class="sidebar-arrow sidebar-next">›</button>` : ""}
+    // 1. Build Masonry Gallery HTML
+    let masonryHtml = "";
+    if (isStacked && location.images && location.images.length > 0) {
+      // Dynamic columns based on image count
+      const colCount = location.images.length === 1 ? 1 : 2; 
+      
+      masonryHtml = `
+        <div class="masonry-gallery" style="column-count: ${colCount};">
+          ${location.images.map((img, idx) => `
+            <div class="masonry-item" data-index="${idx}">
+              <img src="${img.src}" alt="${img.caption || location.name}">
+            </div>
+          `).join("")}
         </div>
       `;
     }
 
-    // Build the sidebar panel
+    // 2. Build the sidebar panel (Just Name + Masonry Grid!)
     panel.innerHTML = `
-    ${
-      !isStacked && location.previewImage
-        ? `
-          <button type="button" class="location-preview-button" aria-label="Open preview">
-            <img class="location-image" src="${location.previewImage}" alt="${location.name}">
-          </button>
-        `
-        : ""
-    }
-    <h2>${location.name}</h2>
-    <p>${location.description}</p>
-    
-    ${location.mode === "gallery" ? `<a href="${location.url}" class="btn btn-sm btn-primary">View Gallery</a>` : ""}
-    ${isStacked ? stackedHtml : ""}
-  `;
+      <h2 style="margin-top: 0; color: #1c1c1c;">${location.name}</h2>
+      ${isStacked ? masonryHtml : ""}
+    `;
 
-    // Hook up Stacked mode carousel AND lightbox triggers
+    // 3. Hook up Lightbox triggers for every masonry thumbnail
     if (isStacked && location.images) {
-      const stackedSlides = panel.querySelectorAll(".stacked-image-slide");
-      const prevBtn = panel.querySelector(".sidebar-prev");
-      const nextBtn = panel.querySelector(".sidebar-next");
-      let currentMiniIndex = 0;
-
-      // 1. Mini-Carousel Logic
-      function updateMiniGal() {
-        stackedSlides.forEach((slide, i) => {
-          // CHANGED: Using flex instead of block keeps the image centered
-          slide.style.display = i === currentMiniIndex ? "flex" : "none";
+      const masonryItems = panel.querySelectorAll(".masonry-item");
+      
+      masonryItems.forEach((item) => {
+        item.addEventListener("click", () => {
+          const idx = parseInt(item.dataset.index, 10);
+          openGalleryLightbox(location.images, idx);
         });
-      }
-
-      if (prevBtn && nextBtn) {
-        prevBtn.addEventListener("click", () => {
-          currentMiniIndex =
-            (currentMiniIndex - 1 + stackedSlides.length) %
-            stackedSlides.length;
-          updateMiniGal();
-        });
-        nextBtn.addEventListener("click", () => {
-          currentMiniIndex = (currentMiniIndex + 1) % stackedSlides.length;
-          updateMiniGal();
-        });
-      }
-
-      // Initialize the first image on load
-      updateMiniGal();
-
-      // 2. Lightbox Trigger Logic
-      stackedSlides.forEach((slide) => {
-        const enlargeBtn = slide.querySelector(".enlarge-btn");
-        if (enlargeBtn) {
-          enlargeBtn.addEventListener("click", () => {
-            const idx = parseInt(slide.dataset.index, 10);
-            openGalleryLightbox(location.images, idx);
-          });
-        }
       });
     }
   }

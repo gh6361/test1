@@ -22,9 +22,9 @@ header: solid
   
   <!-- Sidebar -->
   <!-- CHANGED: Replaced absolute positioning with flex: 0 0 40%. Added min/max widths so it doesn't get awkwardly small or huge. -->
-  <aside class="map-sidebar" style="flex: 0 0 35% !important; min-width: 380px !important; max-width: 800px !important; height: 100% !important; margin: 0 !important; background-color: #f2f1ea !important; z-index: 1000 !important; overflow-y: auto !important;">
+  <aside class="map-sidebar" style="flex: 0 0 35% !important; min-width: 380px !important; max-width: 800px !important; height: 100% !important; margin: 0 !important; background-color: #f8f4e6 !important; z-index: 1000 !important; overflow-y: auto !important;">
     
-    <div id="location-panel" style="padding: 2rem 0.5rem; color: #1c1c1c;">
+    <div id="location-panel" style="padding: 1rem 0.5rem; color: #1c1c1c;">
       <h2 style="color: #1c1c1c; margin-top: 0 !important; margin-bottom: 1rem;">Travel Map</h2>
       <p style="font-family: var(--font-sans); line-height: 1.6;">Click a marker to see details about each place.</p>
       <p class="map-panel-note" style="opacity: 0.7; font-size: 0.85em; margin-top: 2rem; border-top: 1px solid rgba(28, 28, 28, 0.2); padding-top: 1rem;">Use the buttons to open a gallery or a single photo.</p>
@@ -37,29 +37,29 @@ header: solid
   
 </div>
 
-<!-- Standard Gallery Lightbox -->
+<!-- Standard Gallery Lightbox (New 38.2% Layout) -->
 <div id="lightbox" class="lightbox hidden">
   <div class="lightbox-main">
-    <div id="lightbox-stage" class="lightbox-stage">
+    
+    <!-- Permanent UI Controls -->
+    <button id="lightbox-close" class="lightbox-control">&times;</button>
+    <button id="lightbox-prev" class="lightbox-arrow">‹</button>
+    <button id="lightbox-next" class="lightbox-arrow">›</button>
+
+    <!-- Centered Content Group -->
+    <div class="lightbox-center-group">
       
-      <img id="lightbox-image-a" class="lightbox-image active" src="" alt="">
-      <img id="lightbox-image-b" class="lightbox-image" src="" alt="">
+      <!-- The Image -->
+      <div class="lightbox-img-wrapper">
+        <img id="lightbox-image-a" class="lightbox-image active" src="" alt="">
+        <img id="lightbox-image-b" class="lightbox-image" src="" alt="">
+      </div>
       
-      <!-- Caption placed below the image, sharing UI visibility -->
-      <div class="lightbox-caption-container lightbox-ui">
+      <!-- The Description Box -->
+      <div class="lightbox-desc-wrapper">
         <p id="lightbox-caption"></p>
       </div>
       
-      <div class="lightbox-ui">
-        <button id="lightbox-left-zone" class="lightbox-zone"></button>
-        <button id="lightbox-right-zone" class="lightbox-zone"></button>
-        <button id="lightbox-prev" class="lightbox-arrow">‹</button>
-        <button id="lightbox-next" class="lightbox-arrow">›</button>
-      </div>
-    </div>
-    
-    <div class="lightbox-controls lightbox-ui">
-      <button id="lightbox-close" class="lightbox-control">&times;</button>
     </div>
   </div>
 </div>
