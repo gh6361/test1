@@ -17,38 +17,38 @@ header: solid
 </style>
 
 <!-- THE MAP CONTAINER -->
-<!-- Explicitly set to calc(100vh - 50px) to guarantee it hits the absolute bottom of the monitor -->
-<div class="map-page" style="position: fixed !important; top: 62px !important; left: 0 !important; right: 0 !important; height: calc(100vh - 50px) !important; z-index: 10 !important; background-color: #3f464d;">
+<!-- CHANGED: Added display: flex !important; to enable flexible layouts -->
+<div class="map-page" style="position: fixed !important; top: 62px !important; left: 0 !important; right: 0 !important; height: calc(100vh - 50px) !important; z-index: 10 !important; background-color: #3f464d; display: flex !important;">
   
-  <!-- Sidebar (Now uses height: 100% to perfectly fill the container) -->
-  <!-- Sidebar (Now uses height: 100% to perfectly fill the container) -->
-<aside class="map-sidebar" style="position: absolute !important; top: 0 !important; left: 0 !important; height: 100% !important; width: 385px !important; margin: 0 !important; background-color: #f2f1ea !important; z-index: 1000 !important; overflow-y: auto !important;">
-  
-  <!-- TEXT COLOR UPDATE: Changed color to #1c1c1c -->
-  <div id="location-panel" style="padding: 2rem 0.5rem; color: #1c1c1c;">
+  <!-- Sidebar -->
+  <!-- CHANGED: Replaced absolute positioning with flex: 0 0 40%. Added min/max widths so it doesn't get awkwardly small or huge. -->
+  <aside class="map-sidebar" style="flex: 0 0 35% !important; min-width: 380px !important; max-width: 800px !important; height: 100% !important; margin: 0 !important; background-color: #f2f1ea !important; z-index: 1000 !important; overflow-y: auto !important;">
     
-    <!-- HEADER COLOR UPDATE: Changed color to #1c1c1c -->
-    <h2 style="color: #1c1c1c; margin-top: 0 !important; margin-bottom: 1rem;">Travel Map</h2>
-    
-    <p style="font-family: var(--font-sans); line-height: 1.6;">Click a marker to see details about each place.</p>
-    
-    <!-- BORDER UPDATE: Changed the border-top to transparent black -->
-    <p class="map-panel-note" style="opacity: 0.7; font-size: 0.85em; margin-top: 2rem; border-top: 1px solid rgba(28, 28, 28, 0.2); padding-top: 1rem;">Use the buttons to open a gallery or a single photo.</p>
-    
-  </div>
-</aside>
+    <div id="location-panel" style="padding: 2rem 0.5rem; color: #1c1c1c;">
+      <h2 style="color: #1c1c1c; margin-top: 0 !important; margin-bottom: 1rem;">Travel Map</h2>
+      <p style="font-family: var(--font-sans); line-height: 1.6;">Click a marker to see details about each place.</p>
+      <p class="map-panel-note" style="opacity: 0.7; font-size: 0.85em; margin-top: 2rem; border-top: 1px solid rgba(28, 28, 28, 0.2); padding-top: 1rem;">Use the buttons to open a gallery or a single photo.</p>
+    </div>
+  </aside>
 
-  <!-- The Map (Also uses height: 100% to perfectly fill the container) -->
-  <div id="map" style="position: absolute !important; top: 0 !important; left: 385px !important; right: 0 !important; height: 100% !important; z-index: 1 !important;"></div>
+  <!-- The Map -->
+  <!-- CHANGED: Removed absolute positioning. flex: 1 automatically fills the remaining 60% of the screen perfectly. -->
+  <div id="map" style="flex: 1 !important; height: 100% !important; z-index: 1 !important;"></div>
   
 </div>
 
 <!-- Standard Gallery Lightbox -->
-<div id="lightbox" class="lightbox hidden panel-open">
+<div id="lightbox" class="lightbox hidden">
   <div class="lightbox-main">
     <div id="lightbox-stage" class="lightbox-stage">
+      
       <img id="lightbox-image-a" class="lightbox-image active" src="" alt="">
       <img id="lightbox-image-b" class="lightbox-image" src="" alt="">
+      
+      <!-- Caption placed below the image, sharing UI visibility -->
+      <div class="lightbox-caption-container lightbox-ui">
+        <p id="lightbox-caption"></p>
+      </div>
       
       <div class="lightbox-ui">
         <button id="lightbox-left-zone" class="lightbox-zone"></button>
@@ -61,17 +61,10 @@ header: solid
     <div class="lightbox-controls lightbox-ui">
       <button id="lightbox-close" class="lightbox-control">&times;</button>
     </div>
-    <button id="lightbox-panel-toggle" class="lightbox-control lightbox-ui">i</button>
-  </div>
-  
-  <div class="lightbox-panel">
-    <div class="lightbox-panel-content">
-      <p id="lightbox-caption"></p>
-    </div>
   </div>
 </div>
 
 <script>
   window.siteBaseUrl = "{{ site.baseurl }}";
 </script>
-<script src="{{ '/assets/js/map.js' | relative_url }}"></script>
+<script src="{{ '/assets/js/map.js' | relative_url }}?v=2"></script>

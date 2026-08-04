@@ -2,6 +2,11 @@ window.addEventListener("load", () => {
   const mapEl = document.getElementById("map");
   const panel = document.getElementById("location-panel");
 
+  // PREVENT DOUBLE INITIALIZATION ERROR
+  if (mapEl && mapEl._leaflet_id) {
+    return;
+  }
+
   // Standard Gallery Lightbox Elements
   const galOverlay = document.getElementById("lightbox");
   const galStage = document.getElementById("lightbox-stage");
@@ -20,7 +25,7 @@ window.addEventListener("load", () => {
   let galActive = galImageA;
   let galInactive = galImageB;
   let galUiTimer = null;
-  const UI_HIDE_DELAY = 1500;
+  const UI_HIDE_DELAY = 2500;
 
   if (!mapEl || !panel || typeof L === "undefined") return;
 
@@ -146,18 +151,17 @@ window.addEventListener("load", () => {
     },
   ];
 
-  /* --- GALLERY LIGHTBOX LOGIC --- */
   function showGalUi() {
     if (!galOverlay) return;
+
+    // Wake up the UI
     galOverlay.classList.add("show-ui");
     clearTimeout(galUiTimer);
+
+    // Start the inactivity countdown
     galUiTimer = window.setTimeout(() => {
-      // In single-mode, it behaves like fullscreen
-      if (
-        !galOverlay.classList.contains("hidden") &&
-        (galOverlay.classList.contains("fullscreen") ||
-          galOverlay.classList.contains("single-mode"))
-      ) {
+      // If the lightbox is still open, fade out the UI (caption, arrows, close button)
+      if (!galOverlay.classList.contains("hidden")) {
         galOverlay.classList.remove("show-ui");
       }
     }, UI_HIDE_DELAY);
@@ -199,16 +203,20 @@ window.addEventListener("load", () => {
     const siteNav = document.querySelector(".editorial-header");
     if (siteNav) siteNav.style.display = "none";
 
-    // Automatically apply Single Mode if there is only 1 image
+    // 1. Set single-mode if needed
     if (images.length <= 1) {
-      galOverlay.classList.add("single-mode", "fullscreen");
-      galOverlay.classList.remove("panel-open", "hidden");
+      galOverlay.classList.add("single-mode");
     } else {
-      galOverlay.classList.remove("single-mode", "fullscreen", "hidden");
-      galOverlay.classList.add("panel-open");
+      galOverlay.classList.remove("single-mode");
     }
 
-    hideGalUi();
+    // 2. ALWAYS add fullscreen and remove old panel classes
+    galOverlay.classList.add("fullscreen");
+    galOverlay.classList.remove("panel-open", "hidden");
+
+    // CHANGED: Tell the UI to wake up (instead of hide) when the gallery opens
+    showGalUi();
+
     renderGalImage(startIndex || 0);
   }
 
@@ -270,20 +278,32 @@ window.addEventListener("load", () => {
   function renderPanel(location) {
     const isStacked = location.mode === "stacked";
 
-    // Build stacked images HTML
+    // Build stacked images HTML (Now a mini-carousel)
     let stackedHtml = "";
     if (isStacked && location.images) {
+      const showArrows = location.images.length > 1;
+
       stackedHtml = `
         <div class="stacked-gallery">
-          ${location.images
-            .map(
-              (img, idx) => `
-            <button type="button" class="stacked-image-btn" data-index="${idx}">
-              <img src="${img.src}" alt="${img.caption}">
-            </button>
-          `,
-            )
-            .join("")}
+          ${showArrows ? `<button type="button" class="sidebar-arrow sidebar-prev">‹</button>` : ""}
+          
+          <div class="sidebar-carousel-track">
+            ${location.images
+              .map(
+                (img, idx) => `
+              <div class="stacked-image-slide" data-index="${idx}">
+                <!-- New wrapper to hug the uncropped image -->
+                <div class="slide-content-wrapper">
+                  <img src="${img.src}" alt="${img.caption}">
+                  <button type="button" class="enlarge-btn" aria-label="Enlarge image" title="Enlarge image">⤢</button>
+                </div>
+              </div>
+            `,
+              )
+              .join("")}
+          </div>
+
+          ${showArrows ? `<button type="button" class="sidebar-arrow sidebar-next">›</button>` : ""}
         </div>
       `;
     }
@@ -306,14 +326,46 @@ window.addEventListener("load", () => {
     ${isStacked ? stackedHtml : ""}
   `;
 
-    // Hook up Stacked mode buttons
-    if (isStacked) {
-      const stackedButtons = panel.querySelectorAll(".stacked-image-btn");
-      stackedButtons.forEach((btn) => {
-        btn.addEventListener("click", () => {
-          const idx = parseInt(btn.dataset.index, 10);
-          openGalleryLightbox(location.images, idx);
+    // Hook up Stacked mode carousel AND lightbox triggers
+    if (isStacked && location.images) {
+      const stackedSlides = panel.querySelectorAll(".stacked-image-slide");
+      const prevBtn = panel.querySelector(".sidebar-prev");
+      const nextBtn = panel.querySelector(".sidebar-next");
+      let currentMiniIndex = 0;
+
+      // 1. Mini-Carousel Logic
+      function updateMiniGal() {
+        stackedSlides.forEach((slide, i) => {
+          // CHANGED: Using flex instead of block keeps the image centered
+          slide.style.display = i === currentMiniIndex ? "flex" : "none";
         });
+      }
+
+      if (prevBtn && nextBtn) {
+        prevBtn.addEventListener("click", () => {
+          currentMiniIndex =
+            (currentMiniIndex - 1 + stackedSlides.length) %
+            stackedSlides.length;
+          updateMiniGal();
+        });
+        nextBtn.addEventListener("click", () => {
+          currentMiniIndex = (currentMiniIndex + 1) % stackedSlides.length;
+          updateMiniGal();
+        });
+      }
+
+      // Initialize the first image on load
+      updateMiniGal();
+
+      // 2. Lightbox Trigger Logic
+      stackedSlides.forEach((slide) => {
+        const enlargeBtn = slide.querySelector(".enlarge-btn");
+        if (enlargeBtn) {
+          enlargeBtn.addEventListener("click", () => {
+            const idx = parseInt(slide.dataset.index, 10);
+            openGalleryLightbox(location.images, idx);
+          });
+        }
       });
     }
   }
@@ -389,17 +441,14 @@ window.addEventListener("load", () => {
     if (galStage)
       galStage.addEventListener("click", () => {
         if (galOverlay.classList.contains("hidden")) return;
-        if (galImages.length > 1) {
-          toggleGalFullscreen();
-        } else {
-          showGalUi(); // Just wake up the UI for single mode
-        }
+        // Clicking the stage just wakes up the UI now, it doesn't force a layout shift
+        showGalUi();
       });
 
     if (galPanelToggle)
       galPanelToggle.addEventListener("click", (e) => {
         e.stopPropagation();
-        toggleGalFullscreen();
+        // Removed toggleGalFullscreen() - the panel is now pure hover-based!
       });
 
     if (galPrev)
