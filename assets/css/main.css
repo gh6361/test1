@@ -139,6 +139,8 @@ h6 {
   z-index: 9999 !important; /* Forces the nav to sit above the Leaflet map */
   transition: background-color 0.3s ease, box-shadow 0.3s ease;
   padding: 1rem 0; 
+  box-shadow: none !important; 
+  border-bottom: none !important;
 }
 
 /* 1. THE TRANSPARENT STATE (When at the very top) */
@@ -449,29 +451,71 @@ a:hover {
 }
 
 /* =========================================
-   1. MASONRY SIDEBAR GRID
+   1. JUSTIFIED SIDEBAR GALLERY
 ========================================= */
-.masonry-gallery {
-  column-gap: 15px;
+.justified-gallery {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px; /* Adjust the space between thumbnails here */
   margin-top: 1.5rem;
-  width: 100%;
 }
 
-.masonry-item {
-  break-inside: avoid;
-  margin-bottom: 15px;
+.justified-item {
+  /* This tells the item to stretch and fill empty row space */
+  flex-grow: 1; 
   cursor: zoom-in;
+  /* If the last row only has 1 image, don't let it stretch to a massive size */
+  max-width: 100%; 
 }
 
-.masonry-item img {
+.justified-item img {
   width: 100%;
-  display: block;
-  border-radius: 4px;
+  height: 100%;
+  /* Cover ensures the row is always perfectly filled and flush on the right */
+  object-fit: cover; 
   transition: opacity 0.2s ease;
+  display: block;
 }
 
-.masonry-item:hover img {
+.justified-item:hover img {
   opacity: 0.8;
+}
+
+/* =========================================
+   JUSTIFIED GALLERY OVERRIDES
+========================================= */
+
+/* --- 1. Single Image Override --- */
+.justified-gallery.single-override {
+  display: block; 
+}
+
+.justified-gallery.single-override .justified-item {
+  width: 100%;
+}
+
+.justified-gallery.single-override img {
+  width: 100%;
+  /* This prevents the image from forcing you to scroll down */
+  max-height: 65vh; 
+  /* 'cover' tells it to span the full width and crop the extra height */
+  object-fit: cover; 
+  object-position: center; /* Keeps the middle of the cropped image in view */
+}
+
+/* --- 2. Two Vertical Images Override --- */
+.justified-gallery.duo-vertical {
+  display: flex;
+  flex-direction: row;
+  gap: 6px;
+}
+
+.justified-gallery.duo-vertical .justified-item {
+  /* Forces them side-by-side perfectly equally */
+  flex: 1 1 0; 
+  height: auto !important; 
+  min-height: 0 !important; 
+  /* The JS mathematically injects the aspect-ratio here! */
 }
 
 /* --- Standard Gallery Preview Override (Single Images) --- */

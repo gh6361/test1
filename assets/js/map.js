@@ -9,23 +9,17 @@ window.addEventListener("load", () => {
 
   // Standard Gallery Lightbox Elements
   const galOverlay = document.getElementById("lightbox");
-  const galStage = document.getElementById("lightbox-stage");
   const galImageA = document.getElementById("lightbox-image-a");
   const galImageB = document.getElementById("lightbox-image-b");
   const galClose = document.getElementById("lightbox-close");
-  const galPanelToggle = document.getElementById("lightbox-panel-toggle");
   const galPrev = document.getElementById("lightbox-prev");
   const galNext = document.getElementById("lightbox-next");
-  const galLeftZone = document.getElementById("lightbox-left-zone");
-  const galRightZone = document.getElementById("lightbox-right-zone");
   const galCaption = document.getElementById("lightbox-caption");
 
   let galImages = [];
   let galCurrentIndex = 0;
   let galActive = galImageA;
   let galInactive = galImageB;
-  let galUiTimer = null;
-  const UI_HIDE_DELAY = 2500;
 
   if (!mapEl || !panel || typeof L === "undefined") return;
 
@@ -62,8 +56,6 @@ window.addEventListener("load", () => {
     .addTo(map);
 
   // Moody, Dark Slate Theme (Carto Dark Matter)
-  // Carto Voyager - Muted, earthy daytime map
-  // Carto Positron - Clean, monochromatic light grey/linen map
   L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
     maxZoom: 19,
     attribution:
@@ -108,15 +100,6 @@ window.addEventListener("load", () => {
 
   const locations = [
     {
-      name: "Helsinki",
-      coords: [60.1699, 24.9384],
-      url: `${baseUrl}/portfolio/helsinki/`,
-      description:
-        "A first stop in Helsinki with bright light and quiet streets.",
-      previewImage: `${baseUrl}/assets/images/helsinki/cover.jpg`,
-      mode: "gallery",
-    },
-    {
       name: "Reykjavik",
       coords: [64.1466, -21.9426],
       description: "A cold, bright stop with open skies and coastal views.",
@@ -127,11 +110,75 @@ window.addEventListener("load", () => {
           caption: "Open skies over Reykjavik.",
         },
         {
+          src: `${baseUrl}/assets/images/reykjavik/revolte.jpg`,
+          caption: "Cold bright streets at dusk.",
+        },
+        {
           src: `${baseUrl}/assets/images/reykjavik/pig.jpg`,
           caption: "Coastal architecture details.",
         },
+      ],
+    },
+    {
+      name: "Helsinki",
+      coords: [60.1699, 24.9384],
+      description: "A cold, bright stop with open skies and coastal views.",
+      mode: "stacked",
+      images: [
+        {
+          src: `${baseUrl}/assets/images/reykjavik/slowducks.jpg`,
+          caption: "Open skies over Reykjavik.",
+        },
         {
           src: `${baseUrl}/assets/images/reykjavik/revolte.jpg`,
+          caption: "Cold bright streets at dusk.",
+        },
+      ],
+    },
+    {
+      name: "Berlin",
+      coords: [52.5200, 13.4050],
+      description: "A cold, bright stop with open skies and coastal views.",
+      mode: "stacked",
+      images: [
+        {
+          src: `${baseUrl}/assets/images/helsinki/snowman.jpg`,
+          caption: "Open skies over Reykjavik.",
+        },
+        {
+          src: `${baseUrl}/assets/images/helsinki/bread.jpg`,
+          caption: "Cold bright streets at dusk.",
+        },
+      ],
+    },
+    {
+      name: "Stockholm",
+      coords: [59.33, 18.06],
+      description: "Köttbullar och kanelbulle.",
+      mode: "stacked",
+      images: [
+        {
+          src: `${baseUrl}/assets/images/helsinki/bread.jpg`,
+          caption: "Open skies over Reykjavik.",
+        },
+        {
+          src: `${baseUrl}/assets/images/helsinki/cricket.jpg`,
+          caption: "Coastal architecture details.",
+        },
+        {
+          src: `${baseUrl}/assets/images/helsinki/snowman.jpg`,
+          caption: "Cold bright streets at dusk.",
+        },
+        {
+          src: `${baseUrl}/assets/images/helsinki/popquiz.jpg`,
+          caption: "Cold bright streets at dusk.",
+        },
+        {
+          src: `${baseUrl}/assets/images/helsinki/rights.jpg`,
+          caption: "Cold bright streets at dusk.",
+        },
+        {
+          src: `${baseUrl}/assets/images/helsinki/round.jpg`,
           caption: "Cold bright streets at dusk.",
         },
       ],
@@ -142,36 +189,25 @@ window.addEventListener("load", () => {
       description: "City light, water, and calm Scandinavian streets.",
       mode: "stacked",
       images: [
-        // Just one image triggers "Single Mode" automatically!
         {
           src: `${baseUrl}/assets/images/oslo/cover.jpg`,
           caption: "Calm Scandinavian streets.",
         },
       ],
     },
+    {
+      name: "Copenhagen",
+      coords: [55.6761, 12.5683],
+      description: "City light, water, and calm Scandinavian streets.",
+      mode: "stacked",
+      images: [
+        {
+          src: `${baseUrl}/assets/images/helsinki/waltz.jpg`,
+          caption: "Calm Scandinavian streets.",
+        },
+      ],
+    },
   ];
-
-  function showGalUi() {
-    if (!galOverlay) return;
-
-    // Wake up the UI
-    galOverlay.classList.add("show-ui");
-    clearTimeout(galUiTimer);
-
-    // Start the inactivity countdown
-    galUiTimer = window.setTimeout(() => {
-      // If the lightbox is still open, fade out the UI (caption, arrows, close button)
-      if (!galOverlay.classList.contains("hidden")) {
-        galOverlay.classList.remove("show-ui");
-      }
-    }, UI_HIDE_DELAY);
-  }
-
-  function hideGalUi() {
-    if (!galOverlay) return;
-    galOverlay.classList.remove("show-ui");
-    clearTimeout(galUiTimer);
-  }
 
   function swapGalImages() {
     [galActive, galInactive] = [galInactive, galActive];
@@ -203,33 +239,21 @@ window.addEventListener("load", () => {
     const siteNav = document.querySelector(".editorial-header");
     if (siteNav) siteNav.style.display = "none";
 
-    // 1. Set single-mode if needed
+    // Set single-mode if needed
     if (images.length <= 1) {
       galOverlay.classList.add("single-mode");
     } else {
       galOverlay.classList.remove("single-mode");
     }
 
-    // 2. ALWAYS add fullscreen and remove old panel classes
-    galOverlay.classList.add("fullscreen");
-    galOverlay.classList.remove("panel-open", "hidden");
-
-    // CHANGED: Tell the UI to wake up (instead of hide) when the gallery opens
-    showGalUi();
-
+    galOverlay.classList.remove("hidden");
     renderGalImage(startIndex || 0);
   }
 
   function closeGalleryLightbox() {
     if (!galOverlay) return;
     galOverlay.classList.add("hidden");
-    galOverlay.classList.remove(
-      "fullscreen",
-      "show-ui",
-      "panel-open",
-      "single-mode",
-    );
-    hideGalUi();
+    galOverlay.classList.remove("single-mode");
 
     if (galImageA) galImageA.src = "";
     if (galImageB) galImageB.src = "";
@@ -241,29 +265,14 @@ window.addEventListener("load", () => {
     if (siteNav) siteNav.style.display = "";
   }
 
-  function toggleGalFullscreen() {
-    if (!galOverlay || galImages.length <= 1) return; // Disable toggle in single mode
-
-    if (galOverlay.classList.contains("fullscreen")) {
-      galOverlay.classList.remove("fullscreen");
-      galOverlay.classList.add("panel-open");
-    } else {
-      galOverlay.classList.add("fullscreen");
-      galOverlay.classList.remove("panel-open");
-    }
-    showGalUi();
-  }
-
   function nextGalImage() {
     if (galImages.length <= 1) return;
     renderGalImage(galCurrentIndex + 1);
-    if (galOverlay.classList.contains("fullscreen")) showGalUi();
   }
 
   function prevGalImage() {
     if (galImages.length <= 1) return;
     renderGalImage(galCurrentIndex - 1);
-    if (galOverlay.classList.contains("fullscreen")) showGalUi();
   }
 
   /* --- MAP UI LOGIC --- */
@@ -277,35 +286,122 @@ window.addEventListener("load", () => {
 
   function renderPanel(location) {
     const isStacked = location.mode === "stacked";
+    const imgCount = location.images ? location.images.length : 0;
 
-    // 1. Build Masonry Gallery HTML
-    let masonryHtml = "";
-    if (isStacked && location.images && location.images.length > 0) {
-      // Dynamic columns based on image count
-      const colCount = location.images.length === 1 ? 1 : 2; 
+    // 1. Build Justified Gallery HTML with Dynamic Overrides
+    let justifiedHtml = "";
+    if (isStacked && imgCount > 0) {
       
-      masonryHtml = `
-        <div class="masonry-gallery" style="column-count: ${colCount};">
-          ${location.images.map((img, idx) => `
-            <div class="masonry-item" data-index="${idx}">
-              <img src="${img.src}" alt="${img.caption || location.name}">
+      if (imgCount === 1) {
+        // --- 1. SINGLE IMAGE OVERRIDE ---
+        justifiedHtml = `
+          <div class="justified-gallery single-override">
+            <div class="justified-item" data-index="0">
+              <img src="${location.images[0].src}" alt="${location.images[0].caption || location.name}">
             </div>
-          `).join("")}
-        </div>
-      `;
+          </div>
+        `;
+      } else if (imgCount === 2) {
+        // --- 2. TWO IMAGES OVERRIDE ---
+        justifiedHtml = `
+          <div class="justified-gallery duo-override">
+            ${location.images.map((img, idx) => `
+              <div class="justified-item" data-index="${idx}">
+                <img src="${img.src}" alt="${img.caption || location.name}">
+              </div>
+            `).join("")}
+          </div>
+        `;
+      } else if (imgCount === 3) {
+        // --- 3. EXACTLY THREE IMAGES ---
+        // Slightly taller so the 3 images have room to breathe
+        let targetHeight = "39vh"; 
+        let minHeight = "150px";
+        
+        justifiedHtml = `
+          <div class="justified-gallery">
+            ${location.images.map((img, idx) => `
+              <div class="justified-item" data-index="${idx}" style="height: ${targetHeight}; min-height: ${minHeight};">
+                <img src="${img.src}" alt="${img.caption || location.name}">
+              </div>
+            `).join("")}
+          </div>
+        `;
+      } else {
+        // --- 4. FOUR OR MORE IMAGES (Standard Justified Grid) ---
+        // Tighter grid for easier scrolling through many photos
+        let targetHeight = "26vh"; 
+        let minHeight = "100px";
+        
+        justifiedHtml = `
+          <div class="justified-gallery">
+            ${location.images.map((img, idx) => `
+              <div class="justified-item" data-index="${idx}" style="height: ${targetHeight}; min-height: ${minHeight};">
+                <img src="${img.src}" alt="${img.caption || location.name}">
+              </div>
+            `).join("")}
+          </div>
+        `;
+      }
     }
 
-    // 2. Build the sidebar panel (Just Name + Masonry Grid!)
+    // 2. Build the sidebar panel
     panel.innerHTML = `
-      <h2 style="margin-top: 0; color: #1c1c1c;">${location.name}</h2>
-      ${isStacked ? masonryHtml : ""}
+      <h2 style="
+        margin-top: 0; 
+        color: #1c1c1c; 
+        font-weight: normal; /* 1. Removes the bold font */
+        width: max-content; /* Shrink-wraps the container to the text size */
+        position: relative; 
+        left: 26%; /* Pushes the left edge to 38.2% of the photo width */
+        transform: translateX(-50%); /* 2. Pulls it back half its length to center it */
+      ">${location.name}</h2>
+      
+      ${isStacked ? justifiedHtml : ""}
     `;
 
-    // 3. Hook up Lightbox triggers for every masonry thumbnail
-    if (isStacked && location.images) {
-      const masonryItems = panel.querySelectorAll(".masonry-item");
+    // 3. Post-Render Script for 2-Image Vertical Override (Syntax Error Fixed!)
+    if (isStacked && imgCount === 2) {
+      const duoWrapper = panel.querySelector('.duo-override');
+      const imgs = duoWrapper.querySelectorAll('img');
+      let loadedCount = 0;
       
-      masonryItems.forEach((item) => {
+      const checkOrientation = () => {
+        loadedCount++;
+        if (loadedCount === 2) {
+          const ratio1 = imgs[0].naturalHeight / imgs[0].naturalWidth;
+          const ratio2 = imgs[1].naturalHeight / imgs[1].naturalWidth;
+          
+          if (ratio1 > 1 && ratio2 > 1) {
+            duoWrapper.classList.add('duo-vertical');
+            const minRatio = Math.min(ratio1, ratio2);
+            
+            // FIXED: Removed the errant escape backslashes here!
+            imgs[0].parentElement.style.aspectRatio = `1 / ${minRatio}`;
+            imgs[1].parentElement.style.aspectRatio = `1 / ${minRatio}`;
+          } else {
+            imgs[0].parentElement.style.height = "39vh";
+            imgs[0].parentElement.style.minHeight = "200px";
+            imgs[1].parentElement.style.height = "39vh";
+            imgs[1].parentElement.style.minHeight = "200px";
+          }
+        }
+      };
+
+      imgs.forEach(img => {
+        if (img.complete) {
+          checkOrientation();
+        } else {
+          img.addEventListener('load', checkOrientation);
+        }
+      });
+    }
+
+    // 4. Hook up Lightbox triggers for every thumbnail
+    if (isStacked && imgCount > 0) {
+      const galleryItems = panel.querySelectorAll(".justified-item");
+      
+      galleryItems.forEach((item) => {
         item.addEventListener("click", () => {
           const idx = parseInt(item.dataset.index, 10);
           openGalleryLightbox(location.images, idx);
@@ -317,25 +413,21 @@ window.addEventListener("load", () => {
   renderDefaultPanel();
 
   /* --- MARKER & TOOLTIP LOGIC --- */
-
-  // Define a smaller version of Leaflet's default blue pin
   const smallIcon = L.icon({
     iconUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png",
     iconRetinaUrl:
       "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png",
     shadowUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
-    iconSize: [20, 32], // Scaled down from the default 25x41
-    iconAnchor: [10, 32], // Anchors the very bottom tip to the coordinates
+    iconSize: [20, 32], 
+    iconAnchor: [10, 32], 
     shadowSize: [32, 32],
     shadowAnchor: [10, 32],
-    className: "interactive-marker", // We will use this class in CSS for the hover effect
+    className: "interactive-marker", 
   });
 
   locations.forEach((location) => {
-    // Pass the custom smallIcon to the marker
     const marker = L.marker(location.coords, { icon: smallIcon }).addTo(map);
 
-    // Grab the appropriate cover image for the tooltip
     let tooltipImageSrc = "";
     if (
       location.mode === "stacked" &&
@@ -347,7 +439,6 @@ window.addEventListener("load", () => {
       tooltipImageSrc = location.previewImage;
     }
 
-    // 1. Build the HTML for the hover card
     const hoverContent = `
       <div class="map-hover-card">
         ${tooltipImageSrc ? `<img src="${tooltipImageSrc}" alt="${location.name}">` : ""}
@@ -355,15 +446,13 @@ window.addEventListener("load", () => {
       </div>
     `;
 
-    // 2. Bind it as a Tooltip
     marker.bindTooltip(hoverContent, {
-      direction: "bottom", // Switched to appear BELOW the marker
-      offset: [0, 5], // Pushes the tooltip 5px below the tip of the pin
+      direction: "bottom", 
+      offset: [0, 5], 
       className: "custom-map-tooltip",
       opacity: 1,
     });
 
-    // 3. Handle the click event to close tooltip and open sidebar
     marker.on("click", () => {
       marker.closeTooltip();
       renderPanel(location);
@@ -372,29 +461,6 @@ window.addEventListener("load", () => {
 
   /* --- EVENT LISTENERS --- */
   if (galOverlay) {
-    galOverlay.addEventListener("mousemove", () => {
-      if (
-        !galOverlay.classList.contains("hidden") &&
-        (galOverlay.classList.contains("fullscreen") ||
-          galOverlay.classList.contains("single-mode"))
-      ) {
-        showGalUi();
-      }
-    });
-
-    if (galStage)
-      galStage.addEventListener("click", () => {
-        if (galOverlay.classList.contains("hidden")) return;
-        // Clicking the stage just wakes up the UI now, it doesn't force a layout shift
-        showGalUi();
-      });
-
-    if (galPanelToggle)
-      galPanelToggle.addEventListener("click", (e) => {
-        e.stopPropagation();
-        // Removed toggleGalFullscreen() - the panel is now pure hover-based!
-      });
-
     if (galPrev)
       galPrev.addEventListener("click", (e) => {
         e.stopPropagation();
@@ -402,16 +468,6 @@ window.addEventListener("load", () => {
       });
     if (galNext)
       galNext.addEventListener("click", (e) => {
-        e.stopPropagation();
-        nextGalImage();
-      });
-    if (galLeftZone)
-      galLeftZone.addEventListener("click", (e) => {
-        e.stopPropagation();
-        prevGalImage();
-      });
-    if (galRightZone)
-      galRightZone.addEventListener("click", (e) => {
         e.stopPropagation();
         nextGalImage();
       });
