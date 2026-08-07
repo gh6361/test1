@@ -18,11 +18,11 @@ header: solid
 
 <!-- THE MAP CONTAINER -->
 <!-- CHANGED: Added display: flex !important; to enable flexible layouts -->
-<div class="map-page" style="position: fixed !important; top: 62px !important; left: 0 !important; right: 0 !important; height: calc(100vh - 50px) !important; z-index: 10 !important; background-color: #3f464d; display: flex !important;">
+<div class="map-page" style="position: fixed !important; top: 62px !important; left: 0 !important; right: 0 !important; height: calc(100vh - 62px) !important; z-index: 10 !important; background-color: #3f464d; display: flex !important; flex-direction: row !important; flex-wrap: nowrap !important;">
   
   <!-- Sidebar -->
   <!-- CHANGED: Replaced absolute positioning with flex: 0 0 40%. Added min/max widths so it doesn't get awkwardly small or huge. -->
-  <aside class="map-sidebar" style="flex: 0 0 38.2% !important; min-width: 380px !important; max-width: 800px !important; height: 100% !important; margin: 0 !important; background-color: #f4f3ee !important; z-index: 1000 !important; overflow-y: auto !important;">
+  <aside class="map-sidebar" style="flex: 0 0 38.2% !important; min-width: 280px !important; max-width: 800px !important; height: 100% !important; margin: 0 !important; background-color: #f4f3ee !important; z-index: 1000 !important; overflow-y: auto !important;">
     
     <div id="location-panel" style="padding: 1rem 0.5rem; color: #1c1c1c;">
       <h2 style="color: #1c1c1c; margin-top: 0 !important; margin-bottom: 1rem;">Travel Map</h2>

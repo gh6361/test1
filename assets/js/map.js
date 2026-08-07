@@ -137,7 +137,7 @@ window.addEventListener("load", () => {
     },
     {
       name: "Berlin",
-      coords: [52.5200, 13.4050],
+      coords: [52.52, 13.405],
       description: "A cold, bright stop with open skies and coastal views.",
       mode: "stacked",
       images: [
@@ -291,55 +291,74 @@ window.addEventListener("load", () => {
     // 1. Build Justified Gallery HTML with Dynamic Overrides
     let justifiedHtml = "";
     if (isStacked && imgCount > 0) {
-      
       if (imgCount === 1) {
         // --- 1. SINGLE IMAGE OVERRIDE ---
+        // Adjust this percentage! 82vh means the image will never take up more than 82% of the screen height.
+        // Short images will stay their natural size.
+        let singleMaxHeight = "81vh";
+
         justifiedHtml = `
           <div class="justified-gallery single-override">
-            <div class="justified-item" data-index="0">
-              <img src="${location.images[0].src}" alt="${location.images[0].caption || location.name}">
+            <div class="justified-item" data-index="0" style="width: 100%;">
+              <img src="${location.images[0].src}" alt="${location.images[0].caption || location.name}" style="width: 100%; height: auto; max-height: ${singleMaxHeight}; object-fit: cover; object-position: center; display: block;">
             </div>
           </div>
         `;
       } else if (imgCount === 2) {
         // --- 2. TWO IMAGES OVERRIDE ---
+        // Set your desired minimum height here!
+        let targetHeight = "39vh";
+        let minHeight = "250px";
+
         justifiedHtml = `
           <div class="justified-gallery duo-override">
-            ${location.images.map((img, idx) => `
-              <div class="justified-item" data-index="${idx}">
+            ${location.images
+              .map(
+                (img, idx) => `
+              <div class="justified-item" data-index="${idx}" style="min-height: ${minHeight};">
                 <img src="${img.src}" alt="${img.caption || location.name}">
               </div>
-            `).join("")}
+            `,
+              )
+              .join("")}
           </div>
         `;
       } else if (imgCount === 3) {
         // --- 3. EXACTLY THREE IMAGES ---
         // Slightly taller so the 3 images have room to breathe
-        let targetHeight = "39vh"; 
+        let targetHeight = "39vh";
         let minHeight = "150px";
-        
+
         justifiedHtml = `
           <div class="justified-gallery">
-            ${location.images.map((img, idx) => `
+            ${location.images
+              .map(
+                (img, idx) => `
               <div class="justified-item" data-index="${idx}" style="height: ${targetHeight}; min-height: ${minHeight};">
                 <img src="${img.src}" alt="${img.caption || location.name}">
               </div>
-            `).join("")}
+            `,
+              )
+              .join("")}
           </div>
         `;
       } else {
         // --- 4. FOUR OR MORE IMAGES (Standard Justified Grid) ---
         // Tighter grid for easier scrolling through many photos
-        let targetHeight = "26vh"; 
+        let targetHeight = "26vh";
         let minHeight = "100px";
-        
+
         justifiedHtml = `
           <div class="justified-gallery">
-            ${location.images.map((img, idx) => `
+            ${location.images
+              .map(
+                (img, idx) => `
               <div class="justified-item" data-index="${idx}" style="height: ${targetHeight}; min-height: ${minHeight};">
                 <img src="${img.src}" alt="${img.caption || location.name}">
               </div>
-            `).join("")}
+            `,
+              )
+              .join("")}
           </div>
         `;
       }
@@ -360,47 +379,87 @@ window.addEventListener("load", () => {
       ${isStacked ? justifiedHtml : ""}
     `;
 
-    // 3. Post-Render Script for 2-Image Vertical Override (Syntax Error Fixed!)
+    // 3. Post-Render Script for 2-Image Vertical Override
     if (isStacked && imgCount === 2) {
-      const duoWrapper = panel.querySelector('.duo-override');
-      const imgs = duoWrapper.querySelectorAll('img');
-      let loadedCount = 0;
-      
-      const checkOrientation = () => {
-        loadedCount++;
-        if (loadedCount === 2) {
-          const ratio1 = imgs[0].naturalHeight / imgs[0].naturalWidth;
-          const ratio2 = imgs[1].naturalHeight / imgs[1].naturalWidth;
+      const duoWrapper = panel.querySelector(".duo-override");
+      const imgs = duoWrapper.querySelectorAll("img");
+
+      const applyOrientation = () => {
+        // Fallback check to ensure the browser actually sees the dimensions
+        if (!imgs[0].naturalWidth || !imgs[1].naturalWidth) return;
+
+        const ratio1 = imgs[0].naturalHeight / imgs[0].naturalWidth;
+        const ratio2 = imgs[1].naturalHeight / imgs[1].naturalWidth;
+
+        // 1. Force the wrapper to use CSS Grid instead of Flexbox
+        duoWrapper.style.display = "grid";
+        duoWrapper.style.gap = "12px";
+
+        if (ratio1 > 1 && ratio2 > 1) {
+          // --- BOTH VERTICAL ---
+          const minRatio = Math.min(ratio1, ratio2);
+
+          // MATH: If Target Height = 250px, how wide does the image need to be?
+          const minWidthPx = 250 / minRatio;
+
+          // Tell the Grid to stack them into 1 column if the screen can't fit both side-by-side
+          duoWrapper.style.gridTemplateColumns =
+            "repeat(auto-fit, minmax(min(100%, " + minWidthPx + "px), 1fr))";
+
+          // Apply the aspect ratios and let Grid handle the height automatically
+          imgs[0].parentElement.style.aspectRatio = "1 / " + minRatio;
+          imgs[0].parentElement.style.height = "auto";
+
+          imgs[1].parentElement.style.aspectRatio = "1 / " + minRatio;
+          imgs[1].parentElement.style.height = "auto";
+        } else {
+          // --- NOT BOTH VERTICAL (e.g., Landscape or Mixed) ---
           
-          if (ratio1 > 1 && ratio2 > 1) {
-            duoWrapper.classList.add('duo-vertical');
-            const minRatio = Math.min(ratio1, ratio2);
-            
-            // FIXED: Removed the errant escape backslashes here!
-            imgs[0].parentElement.style.aspectRatio = `1 / ${minRatio}`;
-            imgs[1].parentElement.style.aspectRatio = `1 / ${minRatio}`;
-          } else {
-            imgs[0].parentElement.style.height = "39vh";
-            imgs[0].parentElement.style.minHeight = "200px";
-            imgs[1].parentElement.style.height = "39vh";
-            imgs[1].parentElement.style.minHeight = "200px";
-          }
+          // Switch to Flexbox for a guaranteed vertical stack
+          duoWrapper.style.display = "flex";
+          duoWrapper.style.flexDirection = "column";
+          duoWrapper.style.gap = "12px";
+          
+          // Image 1: Force auto-height so it shrinks proportionally, capped at 39vh
+          imgs[0].parentElement.style.width = "100%";
+          imgs[0].parentElement.style.height = "auto";
+          imgs[0].parentElement.style.minHeight = "0px";
+          
+          imgs[0].style.width = "100%";
+          imgs[0].style.height = "auto";
+          imgs[0].style.maxHeight = "39vh";
+          imgs[0].style.objectFit = "cover";
+          
+          // Image 2: Exact same constraints
+          imgs[1].parentElement.style.width = "100%";
+          imgs[1].parentElement.style.height = "auto";
+          imgs[1].parentElement.style.minHeight = "0px";
+          
+          imgs[1].style.width = "100%";
+          imgs[1].style.height = "auto";
+          imgs[1].style.maxHeight = "39vh";
+          imgs[1].style.objectFit = "cover";
         }
       };
 
-      imgs.forEach(img => {
-        if (img.complete) {
-          checkOrientation();
-        } else {
-          img.addEventListener('load', checkOrientation);
-        }
+      // Wrap the loading check in a Promise so it strictly waits for physical rendering
+      Promise.all(
+        Array.from(imgs).map((img) => {
+          if (img.complete && img.naturalHeight !== 0) return Promise.resolve();
+          return new Promise((resolve) => {
+            img.addEventListener("load", resolve);
+            img.addEventListener("error", resolve); // Resolves on error so the layout doesn't hang
+          });
+        }),
+      ).then(() => {
+        applyOrientation();
       });
     }
 
     // 4. Hook up Lightbox triggers for every thumbnail
     if (isStacked && imgCount > 0) {
       const galleryItems = panel.querySelectorAll(".justified-item");
-      
+
       galleryItems.forEach((item) => {
         item.addEventListener("click", () => {
           const idx = parseInt(item.dataset.index, 10);
@@ -413,17 +472,21 @@ window.addEventListener("load", () => {
   renderDefaultPanel();
 
   /* --- MARKER & TOOLTIP LOGIC --- */
+  /* --- MARKER & TOOLTIP LOGIC --- */
   const smallIcon = L.icon({
     iconUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png",
     iconRetinaUrl:
       "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png",
     shadowUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
-    iconSize: [20, 32], 
-    iconAnchor: [10, 32], 
+    iconSize: [20, 32],
+    iconAnchor: [10, 32],
     shadowSize: [32, 32],
     shadowAnchor: [10, 32],
-    className: "interactive-marker", 
+    className: "interactive-marker",
   });
+
+  // 1. Keep track of the currently selected marker globally
+  let activeMarker = null;
 
   locations.forEach((location) => {
     const marker = L.marker(location.coords, { icon: smallIcon }).addTo(map);
@@ -439,22 +502,48 @@ window.addEventListener("load", () => {
       tooltipImageSrc = location.previewImage;
     }
 
+    // 2. Define the HTML for the tooltip (Option 2 style)
     const hoverContent = `
-      <div class="map-hover-card">
-        ${tooltipImageSrc ? `<img src="${tooltipImageSrc}" alt="${location.name}">` : ""}
-        <div class="map-hover-title">${location.name}</div>
+      <div style="
+        width: max-content; 
+        white-space: nowrap; 
+        padding: 5px 12px; 
+        background-color: #3f464d; 
+        color: #f4f3ee; 
+        font-size: 1em; 
+        letter-spacing: 1px;
+      ">
+        ${location.name}
       </div>
     `;
-
+    
+    // 3. Attach it to the Leaflet marker
     marker.bindTooltip(hoverContent, {
-      direction: "bottom", 
-      offset: [0, 5], 
+      direction: "bottom",
+      offset: [0, 5],
       className: "custom-map-tooltip",
-      opacity: 1,
+      opacity: 1, 
     });
 
+    // 4. Handle the click event (manages color change and sidebar)
     marker.on("click", () => {
       marker.closeTooltip();
+
+      // Remove color change from the previous marker
+      if (activeMarker && activeMarker !== marker) {
+        const prevElement = activeMarker.getElement();
+        if (prevElement) {
+          prevElement.classList.remove("marker-active");
+        }
+      }
+
+      // Set this marker as active and apply the color-change class
+      activeMarker = marker;
+      const currentElement = marker.getElement();
+      if (currentElement) {
+        currentElement.classList.add("marker-active");
+      }
+
       renderPanel(location);
     });
   });
