@@ -668,6 +668,15 @@ a:hover {
 /* =========================================
    THE 38.2% LIGHTBOX LAYOUT
 ========================================= */
+:root {
+  /* 1. Experiment with your distance here! */
+  /* The caption width will automatically calculate itself to preserve your symmetry */
+  --desc-gap: 1.5vw; 
+}
+
+/* =========================================
+   THE 38.2% LIGHTBOX LAYOUT
+========================================= */
 .lightbox-main {
   width: 100vw;
   height: 100vh;
@@ -679,12 +688,11 @@ a:hover {
 
 .lightbox-center-group {
   display: flex;
-  align-items: center;
+  align-items: center; /* Vertically centers the image */
   justify-content: center;
   width: 100%;
-  padding: 5vh 0; 
-  /* 2vw Gap + 21.6vw Box = 23.6vw. Forces the image center to 38.2vw */
-  gap: 2vw; 
+  height: 100vh; /* Crucial: Ensures the flex container spans the full screen */
+  gap: var(--desc-gap); 
 }
 
 /* Container shrinks to exactly fit the active image */
@@ -697,13 +705,12 @@ a:hover {
 
 .lightbox-image {
   max-width: 65vw; 
-  max-height: 90vh; 
+  max-height: 83vh; /* Inherently creates your top/bottom padding */
   width: auto;
   height: auto;
   object-fit: contain;
   opacity: 0;
-  transition: opacity 200ms ease; /* Smooth crossfade */
-  /* Inactive images float in the center so they don't stretch the container */
+  transition: opacity 200ms ease; 
   position: absolute; 
   top: 50%;
   left: 50%;
@@ -712,7 +719,6 @@ a:hover {
 }
 
 .lightbox-image.active {
-  /* Only the active image dictates the physical size of the wrapper */
   position: relative; 
   top: auto;
   left: auto;
@@ -723,25 +729,79 @@ a:hover {
 
 /* The Description Box */
 .lightbox-desc-wrapper {
-  width: 21.6vw; 
+  /* 2. MAGIC HORIZONTAL MATH: Box + Gap ALWAYS = 23.6vw */
+  width: calc(23.6vw - var(--desc-gap)); 
+  
   flex-shrink: 0;
-  background-color: #f0eee7; 
+  background-color: #fcfbf9; /* Crisp, opaque white */
   padding: 2rem;
-  border-radius: 4px;
+  border-radius: 3px;
   color: #1c1c1c;
-  max-height: 90vh;
+  
+  /* 3. MAGIC VERTICAL MATH: Centers the box at 38.2vh */
+  align-self: flex-start;      /* Pins the box to the top of the flex group */
+  margin-top: 38.2vh;          /* Pushes the top edge down exactly 38.2% */
+  transform: translateY(-50%); /* Pulls it up by 50% of its computed dynamic height */
+  
+  /* Cap the maximum height at 74vh so it never grows tall enough to hit the top screen edge */
+  max-height: 74vh; 
+  
   overflow-y: auto;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.2);
 }
+
+/* --- Lightbox Caption Typography --- */
 
 #lightbox-caption {
-  font-family: var(--font-sans);
-  font-size: 0.95rem;
-  font-weight: 400;
-  line-height: 1.6;
+  display: flex;
+  flex-direction: column;
   margin: 0;
+  color: #1c1c1c; /* Main text color */
 }
 
+/* 1. Main Caption (Larger) */
+.caption-main {
+  font-family: var(--font-sans);
+  font-size: 1.15rem; 
+  font-weight: 500;
+  line-height: 1.4;
+  margin-bottom: 0.25rem; /* Tiny gap before location */
+}
+
+/* 2. Location & Date (Smaller) */
+.caption-meta {
+  font-family: var(--font-sans);
+  font-size: 0.85rem;
+  color: #555; /* Slightly softer color to establish hierarchy */
+  line-height: 1.3;
+  margin-bottom: 1.5rem; /* "Line space" before detailed description */
+}
+
+/* 3. Detailed Description (Same smaller font) */
+.caption-details {
+  font-family: var(--font-sans);
+  font-size: 0.85rem;
+  line-height: 1.6;
+  margin-bottom: 1.5rem; /* "Line space" before collections */
+}
+
+/* 4. Collections Links (Same smaller font) */
+.caption-collections {
+  font-family: var(--font-sans);
+  font-size: 0.85rem;
+  color: #555;
+}
+
+/* Style the actual links inside the collections */
+.caption-collections a {
+  color: #1c1c1c;
+  text-decoration: none;
+  border-bottom: 1px solid rgba(28, 28, 28, 0.3);
+  transition: border-bottom-color 0.2s ease;
+}
+
+.caption-collections a:hover {
+  border-bottom-color: rgba(28, 28, 28, 1);
+}
 /* =========================================
    PERMANENT UI (NO FADING)
 ========================================= */

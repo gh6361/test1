@@ -1,3 +1,6 @@
+// Import the combined locations array from your hub file
+import { locations } from '../data/index.js';
+
 window.addEventListener("load", () => {
   const mapEl = document.getElementById("map");
   const panel = document.getElementById("location-panel");
@@ -91,123 +94,10 @@ window.addEventListener("load", () => {
       });
     });
 
-    return div;
+    return div; // Correctly placed inside the function block
   };
 
   regionControl.addTo(map);
-
-  const baseUrl = window.siteBaseUrl || "";
-
-  const locations = [
-    {
-      name: "Reykjavik",
-      coords: [64.1466, -21.9426],
-      description: "A cold, bright stop with open skies and coastal views.",
-      mode: "stacked",
-      images: [
-        {
-          src: `${baseUrl}/assets/images/reykjavik/slowducks.jpg`,
-          caption: "Open skies over Reykjavik.",
-        },
-        {
-          src: `${baseUrl}/assets/images/reykjavik/revolte.jpg`,
-          caption: "Cold bright streets at dusk.",
-        },
-        {
-          src: `${baseUrl}/assets/images/reykjavik/pig.jpg`,
-          caption: "Coastal architecture details.",
-        },
-      ],
-    },
-    {
-      name: "Helsinki",
-      coords: [60.1699, 24.9384],
-      description: "A cold, bright stop with open skies and coastal views.",
-      mode: "stacked",
-      images: [
-        {
-          src: `${baseUrl}/assets/images/reykjavik/slowducks.jpg`,
-          caption: "Open skies over Reykjavik.",
-        },
-        {
-          src: `${baseUrl}/assets/images/reykjavik/revolte.jpg`,
-          caption: "Cold bright streets at dusk.",
-        },
-      ],
-    },
-    {
-      name: "Berlin",
-      coords: [52.52, 13.405],
-      description: "A cold, bright stop with open skies and coastal views.",
-      mode: "stacked",
-      images: [
-        {
-          src: `${baseUrl}/assets/images/helsinki/snowman.jpg`,
-          caption: "Open skies over Reykjavik.",
-        },
-        {
-          src: `${baseUrl}/assets/images/helsinki/bread.jpg`,
-          caption: "Cold bright streets at dusk.",
-        },
-      ],
-    },
-    {
-      name: "Stockholm",
-      coords: [59.33, 18.06],
-      description: "Köttbullar och kanelbulle.",
-      mode: "stacked",
-      images: [
-        {
-          src: `${baseUrl}/assets/images/helsinki/bread.jpg`,
-          caption: "Open skies over Reykjavik.",
-        },
-        {
-          src: `${baseUrl}/assets/images/helsinki/cricket.jpg`,
-          caption: "Coastal architecture details.",
-        },
-        {
-          src: `${baseUrl}/assets/images/helsinki/snowman.jpg`,
-          caption: "Cold bright streets at dusk.",
-        },
-        {
-          src: `${baseUrl}/assets/images/helsinki/popquiz.jpg`,
-          caption: "Cold bright streets at dusk.",
-        },
-        {
-          src: `${baseUrl}/assets/images/helsinki/rights.jpg`,
-          caption: "Cold bright streets at dusk.",
-        },
-        {
-          src: `${baseUrl}/assets/images/helsinki/round.jpg`,
-          caption: "Cold bright streets at dusk.",
-        },
-      ],
-    },
-    {
-      name: "Oslo",
-      coords: [59.9139, 10.7522],
-      description: "City light, water, and calm Scandinavian streets.",
-      mode: "stacked",
-      images: [
-        {
-          src: `${baseUrl}/assets/images/oslo/cover.jpg`,
-          caption: "Calm Scandinavian streets.",
-        },
-      ],
-    },
-    {
-      name: "Copenhagen",
-      coords: [55.6761, 12.5683],
-      description: "City light, water, and calm Scandinavian streets.",
-      mode: "stacked",
-      images: [
-        {
-          src: `${baseUrl}/assets/images/helsinki/waltz.jpg`,
-          caption: "Calm Scandinavian streets.",
-        },
-      ],
-    },
-  ];
 
   function swapGalImages() {
     [galActive, galInactive] = [galInactive, galActive];
@@ -216,11 +106,37 @@ window.addEventListener("load", () => {
   function renderGalImage(index) {
     if (!galImages.length || !galInactive || !galActive) return;
     galCurrentIndex = (index + galImages.length) % galImages.length;
-    const item = galImages[galCurrentIndex];
+    
+    // Note: We changed 'item' to 'image' here to match our data structure logically
+    const image = galImages[galCurrentIndex];
 
-    if (galCaption) galCaption.textContent = item.caption || "";
-    galInactive.src = item.src;
-    galInactive.alt = item.caption || `Image ${galCurrentIndex + 1}`;
+    // --- NEW CAPTION HTML INJECTION ---
+    if (galCaption) {
+      // Build the collections links dynamically if they exist
+      let collectionsHTML = "";
+      if (image.collections && image.collections.length > 0) {
+        const links = image.collections.map(c => `<a href="${c.url}">${c.name}</a>`).join(", ");
+        collectionsHTML = `In collections: ${links}`;
+      }
+
+      // Construct the new typographical hierarchy
+      galCaption.innerHTML = `
+        <div class="caption-main">${image.caption || ""}</div>
+        
+        <div class="caption-meta">
+          ${image.location ? `<div>${image.location}</div>` : ""}
+          ${image.date ? `<div>${image.date}</div>` : ""}
+        </div>
+        
+        ${image.detailedDescription ? `<div class="caption-details">${image.detailedDescription}</div>` : ""}
+        
+        ${collectionsHTML ? `<div class="caption-collections">${collectionsHTML}</div>` : ""}
+      `;
+    }
+    // --- END NEW CAPTION LOGIC ---
+
+    galInactive.src = image.src;
+    galInactive.alt = image.caption || `Image ${galCurrentIndex + 1}`;
 
     galOverlay.classList.remove("hidden");
 
@@ -345,8 +261,8 @@ window.addEventListener("load", () => {
       } else {
         // --- 4. FOUR OR MORE IMAGES (Standard Justified Grid) ---
         // Tighter grid for easier scrolling through many photos
-        let targetHeight = "26vh";
-        let minHeight = "100px";
+        let targetHeight = "25vh";
+        let minHeight = "90px";
 
         justifiedHtml = `
           <div class="justified-gallery">
@@ -471,7 +387,6 @@ window.addEventListener("load", () => {
 
   renderDefaultPanel();
 
-  /* --- MARKER & TOOLTIP LOGIC --- */
   /* --- MARKER & TOOLTIP LOGIC --- */
   const smallIcon = L.icon({
     iconUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png",

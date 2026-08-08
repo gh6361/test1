@@ -51,3 +51,4 @@ load_map_js: true
     The site is designed to let you explore by map, by collection, or by story.
   </p>
 </section>
+
