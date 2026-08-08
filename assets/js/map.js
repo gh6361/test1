@@ -243,7 +243,7 @@ window.addEventListener("load", () => {
         // --- 3. EXACTLY THREE IMAGES ---
         // Slightly taller so the 3 images have room to breathe
         let targetHeight = "39vh";
-        let minHeight = "150px";
+        let minHeight = "120px";
 
         justifiedHtml = `
           <div class="justified-gallery">
@@ -258,9 +258,9 @@ window.addEventListener("load", () => {
               .join("")}
           </div>
         `;
-      } else {
-        // --- 4. FOUR OR MORE IMAGES (Standard Justified Grid) ---
-        // Tighter grid for easier scrolling through many photos
+      } else if (imgCount === 4) {
+        // --- 4. EXACTLY FOUR IMAGES ---
+        // Standard grid sizing
         let targetHeight = "25vh";
         let minHeight = "90px";
 
@@ -277,20 +277,69 @@ window.addEventListener("load", () => {
               .join("")}
           </div>
         `;
+      } else {
+        // --- 5. FIVE OR MORE IMAGES (Dense Grid) ---
+        // Lowered to 12vh! This forces more images per row, stopping the "super wide" stretching.
+        let targetHeight = "16vh"; 
+        let minHeight = "60px";
+
+        justifiedHtml = `
+          <div class="justified-gallery dense-override">
+            ${location.images
+              .map(
+                (img, idx) => `
+              <div class="justified-item" data-index="${idx}" style="height: ${targetHeight}; min-height: ${minHeight};">
+                <img src="${img.src}" alt="${img.caption || location.name}">
+              </div>
+            `,
+              )
+              .join("")}
+          </div>
+        `;
       }
+    }
+
+    // Check if the name contains a colon, and split it if it does!
+    let mainTitle = location.name;
+    let subTitle = "";
+    
+    if (location.name.includes(":")) {
+      const parts = location.name.split(":");
+      mainTitle = parts[0].trim();
+      subTitle = parts[1].trim();
     }
 
     // 2. Build the sidebar panel
     panel.innerHTML = `
-      <h2 style="
-        margin-top: 0; 
-        color: #1c1c1c; 
-        font-weight: normal; /* 1. Removes the bold font */
-        width: max-content; /* Shrink-wraps the container to the text size */
+      <div style="
         position: relative; 
-        left: 26%; /* Pushes the left edge to 38.2% of the photo width */
-        transform: translateX(-50%); /* 2. Pulls it back half its length to center it */
-      ">${location.name}</h2>
+        left: 26%; 
+        transform: translateX(-50%); 
+        width: max-content; 
+        max-width: 90%; 
+        text-align: center; 
+        margin-bottom: 1.5rem;
+      ">
+        <h2 style="
+          margin: 0; 
+          color: #1c1c1c; 
+          font-weight: normal; 
+          white-space: normal;
+          font-size: 1.9rem; /* 1. Decreased main title font size */
+        ">${mainTitle}</h2>
+        
+        ${subTitle ? `
+          <div style="
+            font-family: var(--font-sans); 
+            font-size: 0.75rem; 
+            color: var(--text-body); 
+            text-transform: uppercase; 
+            letter-spacing: 0.15em; 
+            margin-top: 0.5rem;
+            transform: translateX(11.8%); /* 2. Shifts the subtitle so its 38.2% mark is dead center */
+          ">${subTitle}</div>
+        ` : ""}
+      </div>
       
       ${isStacked ? justifiedHtml : ""}
     `;
@@ -417,18 +466,25 @@ window.addEventListener("load", () => {
       tooltipImageSrc = location.previewImage;
     }
 
-    // 2. Define the HTML for the tooltip (Option 2 style)
+    // --- NEW: Split the title just like we did in the sidebar! ---
+    let hoverTitle = location.name;
+    if (location.name.includes(":")) {
+      hoverTitle = location.name.split(":")[0].trim();
+    }
+
+    // 2. Define the HTML for the tooltip
     const hoverContent = `
       <div style="
         width: max-content; 
         white-space: nowrap; 
         padding: 5px 12px; 
-        background-color: #3f464d; 
-        color: #f4f3ee; 
-        font-size: 1em; 
+        background-color: var(--bg-dark-accent, #3f464d); 
+        color: var(--text-light, #f4f3ee); 
+        font-family: var(--font-sans);
+        font-size: 0.9em; 
         letter-spacing: 1px;
       ">
-        ${location.name}
+        ${hoverTitle}
       </div>
     `;
     
