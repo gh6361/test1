@@ -107,20 +107,25 @@ window.addEventListener("load", () => {
     if (!galImages.length || !galInactive || !galActive) return;
     galCurrentIndex = (index + galImages.length) % galImages.length;
     
-    // Note: We changed 'item' to 'image' here to match our data structure logically
     const image = galImages[galCurrentIndex];
 
     // --- NEW CAPTION HTML INJECTION ---
     if (galCaption) {
-      // Build the collections links dynamically if they exist
       let collectionsHTML = "";
       if (image.collections && image.collections.length > 0) {
         const links = image.collections.map(c => `<a href="${c.url}">${c.name}</a>`).join(", ");
         collectionsHTML = `In collections: ${links}`;
       }
 
-      // Construct the new typographical hierarchy
+      // NEW: Only show the index counter if there is more than 1 image
+      let indexHtml = "";
+      if (galImages.length > 1) {
+        indexHtml = `<div class="caption-index">${galCurrentIndex + 1} / ${galImages.length}</div>`;
+      }
+
       galCaption.innerHTML = `
+        ${indexHtml} <!-- Injected right above the main title -->
+        
         <div class="caption-main">${image.caption || ""}</div>
         
         <div class="caption-meta">
@@ -318,7 +323,8 @@ window.addEventListener("load", () => {
         width: max-content; 
         max-width: 90%; 
         text-align: center; 
-        margin-bottom: 1.5rem;
+        margin-top: -0.75rem;   /* 1. DECREASED space above the main title */
+        margin-bottom: 0rem;
       ">
         <h2 style="
           margin: 0; 
@@ -515,6 +521,69 @@ window.addEventListener("load", () => {
         currentElement.classList.add("marker-active");
       }
 
+      // --- DYNAMIC OVERLAP DETECTION ---
+      let closestDistance = Infinity;
+      let closestLocation = null;
+
+      locations.forEach((otherLoc) => {
+        if (otherLoc !== location) {
+          const dist = map.distance(location.coords, otherLoc.coords);
+          if (dist < closestDistance) {
+            closestDistance = dist;
+            closestLocation = otherLoc;
+          }
+        }
+      });
+
+      let currentZoom = map.getZoom();
+      let targetZoom = currentZoom;
+
+      if (closestLocation) {
+        const minPixelSeparation = 20; 
+        const maxZoom = map.getMaxZoom() || 16; 
+
+        for (let z = currentZoom; z <= maxZoom; z++) {
+          const p1 = map.project(location.coords, z);
+          const p2 = map.project(closestLocation.coords, z);
+          const pixelDist = p1.distanceTo(p2);
+
+          if (pixelDist >= minPixelSeparation) {
+            targetZoom = z;
+            break; 
+          }
+          if (z === maxZoom) targetZoom = maxZoom; 
+        }
+      }
+
+      // --- NEW: FLY, BUT DON'T CENTER! ---
+      if (targetZoom > currentZoom) {
+        // 1. Where is the marker on the screen right now?
+        const markerScreenPoint = map.latLngToContainerPoint(location.coords);
+        
+        // 2. Where is the center of the screen?
+        const mapSize = map.getSize();
+        const centerScreenPoint = L.point(mapSize.x / 2, mapSize.y / 2);
+        
+        // 3. What is the pixel difference between the marker and the center?
+        const offset = centerScreenPoint.subtract(markerScreenPoint);
+        
+        // 4. Calculate where the marker WILL be at the new zoom level (absolute map pixels)
+        const targetMarkerPixel = map.project(location.coords, targetZoom);
+        
+        // 5. Shift the target center by our offset to keep the marker locked in its screen position
+        const targetCenterPixel = targetMarkerPixel.add(offset);
+        
+        // 6. Convert those perfect pixels back into GPS coordinates
+        const targetCenterLatLng = map.unproject(targetCenterPixel, targetZoom);
+        
+        // 7. Execute the flight to the offset center!
+        map.flyTo(targetCenterLatLng, targetZoom, {
+          animate: true,
+          duration: 1.8
+        });
+      }
+
+      // Render the sidebar
       renderPanel(location);
     });
   });

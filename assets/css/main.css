@@ -437,7 +437,7 @@ a:hover {
   display: flex;
   flex-wrap: wrap;
   gap: 6px; /* Adjust the space between thumbnails here */
-  margin-top: 1.5rem;
+  margin-top: 1rem;
 }
 
 .justified-item {
@@ -764,6 +764,16 @@ a:hover {
   flex-direction: column;
   margin: 0;
   color: var(--text-dark); /* Tie back to your root variable */
+}
+
+/* Image Index Counter (Subtle Overline) */
+.caption-index {
+  font-family: var(--font-sans);
+  font-size: 0.55rem; /* Deliberately tiny */
+  text-transform: uppercase;
+  letter-spacing: 0.25em; /* Extremely wide tracking for elegance */
+  color: #999; /* A soft, quiet gray so it recedes into the background */
+  margin-bottom: 0.85rem; /* Pushes the main title down slightly */
 }
 
 /* 1. Main Caption (Larger, Elegant Serif) */
