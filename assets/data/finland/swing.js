@@ -8,24 +8,19 @@ export const swing = {
   images: [
     {
       src: `../assets/images/finland/swing/reduced-6123.jpg`,
-      caption: "Open skies over Reykjavik.",
-      location: "Downtown Reykjavik, Iceland",
       date: "October 2023",
-      detailedDescription: "The crisp air and the endless blue sky made this afternoon unforgettable.",
+      detailedDescription: "Wouldn't it be nice to walk out onto that terrace \
+      every morning? And the high ceilings!",
     },
     {
       src: `../assets/images/finland/swing/reduced-6127.jpg`,
-      caption: "Open skies over Reykjavik.",
-      location: "Downtown Reykjavik, Iceland",
       date: "October 2023",
-      detailedDescription: "The crisp air and the endless blue sky made this afternoon unforgettable.",
+      detailedDescription: "The Ylläs Swing, situated on Lake Äkäslompolo.",
     },
     {
       src: `../assets/images/finland/swing/reduced-6153.jpg`,
-      caption: "Open skies over Reykjavik.",
-      location: "Downtown Reykjavik, Iceland",
       date: "October 2023",
-      detailedDescription: "The crisp air and the endless blue sky made this afternoon unforgettable.",
+      detailedDescription: "Just messing around or intentional juxtaposition?",
     },
   ]
 };

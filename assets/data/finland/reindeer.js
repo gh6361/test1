@@ -8,10 +8,14 @@ export const reindeer = {
   images: [
     {
       src: `../assets/images/finland/reindeer/reduced-6109.jpg`,
-      caption: "Open skies over Reykjavik.",
-      location: "Downtown Reykjavik, Iceland",
       date: "October 2023",
-      detailedDescription: "The crisp air and the endless blue sky made this afternoon unforgettable.",
+      detailedDescription: "The reindeer in Finnish Lapland are semi-\
+      domesticated (a collar can be seen on the reinder second from the \
+      right). Called reindeer husbandry, herding follows the seasons, and \
+      generally for most of the year the reindeer are allowed to roam freely &mdash;\
+      hence the not-uncommon encounters of reindeer <em>walking</em> the road. This was compounded by the \
+      fact that they were completely unafraid of cars and had next to no sense of \
+      road safety!",
     },
   ]
 };

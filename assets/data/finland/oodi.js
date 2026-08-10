@@ -8,24 +8,29 @@ export const oodi = {
   images: [
     {
       src: `../assets/images/finland/oodi/reduced-.jpg`,
-      caption: "Open skies over Reykjavik.",
-      location: "Downtown Reykjavik, Iceland",
       date: "October 2023",
-      detailedDescription: "The crisp air and the endless blue sky made this afternoon unforgettable.",
-    },
-    {
-      src: `../assets/images/finland/oodi/reduced--2.jpg`,
-      caption: "Open skies over Reykjavik.",
-      location: "Downtown Reykjavik, Iceland",
-      date: "October 2023",
-      detailedDescription: "The crisp air and the endless blue sky made this afternoon unforgettable.",
+      detailedDescription: "The Helsinki Central Library, named 'Oodi' after \
+      a lyrical poem ('ode'), was the flagship project to celebrate \
+      Finland's 100<sup>th</sup> year of independence. It opened on the eve of its \
+      Independence Day on December 5, 2018, and in 2019 it won the coveted \
+      Public Library of the Year award.",
     },
     {
       src: `../assets/images/finland/oodi/reduced--3.jpg`,
-      caption: "Open skies over Reykjavik.",
-      location: "Downtown Reykjavik, Iceland",
       date: "October 2023",
-      detailedDescription: "The crisp air and the endless blue sky made this afternoon unforgettable.",
+      detailedDescription: "Oodi is composed of three floors. The first floor is for \
+      meeting, the second floor is for creating, and the third floor is for reading. \
+      The Urban Workshop, located on the second floor, has 3D printers, a laser cutter, \
+      sewing machines, and so much more. This floor also has game rooms and rehearsal \
+      rooms and studios!",
+    },
+    {
+      src: `../assets/images/finland/oodi/reduced--2.jpg`,
+      date: "October 2023",
+      detailedDescription: "The third floor &mdash; a 'dedicated Book Heaven' &mdash; contains \
+      books in 22 languages. Integrating nature into the design, the ceiling resembles clouds, \
+      and there are even nine real bucida buceras trees! To the left of the image is the Citizen's \
+      Balcony, which overlooks Kansalaistori Square and the Finnish Parliament House.",
     },
   ]
 };

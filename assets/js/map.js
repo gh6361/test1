@@ -126,13 +126,6 @@ window.addEventListener("load", () => {
       galCaption.innerHTML = `
         ${indexHtml} <!-- Injected right above the main title -->
         
-        <div class="caption-main">${image.caption || ""}</div>
-        
-        <div class="caption-meta">
-          ${image.location ? `<div>${image.location}</div>` : ""}
-          ${image.date ? `<div>${image.date}</div>` : ""}
-        </div>
-        
         ${image.detailedDescription ? `<div class="caption-details">${image.detailedDescription}</div>` : ""}
         
         ${collectionsHTML ? `<div class="caption-collections">${collectionsHTML}</div>` : ""}
@@ -567,19 +560,31 @@ window.addEventListener("load", () => {
         // 3. What is the pixel difference between the marker and the center?
         const offset = centerScreenPoint.subtract(markerScreenPoint);
         
-        // 4. Calculate where the marker WILL be at the new zoom level (absolute map pixels)
+        // 4. Calculate where the marker WILL be at the new zoom level
         const targetMarkerPixel = map.project(location.coords, targetZoom);
         
-        // 5. Shift the target center by our offset to keep the marker locked in its screen position
+        // 5. Shift the target center by our offset
         const targetCenterPixel = targetMarkerPixel.add(offset);
         
         // 6. Convert those perfect pixels back into GPS coordinates
         const targetCenterLatLng = map.unproject(targetCenterPixel, targetZoom);
         
-        // 7. Execute the flight to the offset center!
+        // --- DYNAMIC FLIGHT DURATION ---
+        // How many zoom levels are we jumping?
+        const zoomDifference = targetZoom - currentZoom;
+        
+        // Set your constant "speed" (e.g., 0.4 seconds per zoom level)
+        const secondsPerLevel = 0.6;
+        let flightDuration = zoomDifference * secondsPerLevel;
+        
+        // Cap the duration so it's never too jarringly fast or agonizingly slow
+        // (Minimum 0.8 seconds, Maximum 3.0 seconds)
+        flightDuration = Math.min(Math.max(flightDuration, 0.8), 3);
+        
+        // 7. Execute the flight using our dynamic duration!
         map.flyTo(targetCenterLatLng, targetZoom, {
           animate: true,
-          duration: 1.8
+          duration: flightDuration
         });
       }
 
