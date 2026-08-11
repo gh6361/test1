@@ -309,38 +309,40 @@ window.addEventListener("load", () => {
 
     // 2. Build the sidebar panel
     panel.innerHTML = `
-      <div style="
-        position: relative; 
-        left: 26%; 
-        transform: translateX(-50%); 
-        width: max-content; 
-        max-width: 90%; 
-        text-align: center; 
-        margin-top: -0.75rem;   /* 1. DECREASED space above the main title */
-        margin-bottom: 0rem;
-      ">
-        <h2 style="
-          margin: 0; 
-          color: #1c1c1c; 
-          font-weight: normal; 
-          white-space: normal;
-          font-size: 1.9rem; /* 1. Decreased main title font size */
-        ">${mainTitle}</h2>
+      <div style="padding: 0 1.5rem;"> <!-- NEW: Master wrapper that adds left/right padding to everything -->
         
-        ${subTitle ? `
-          <div style="
-            font-family: var(--font-sans); 
-            font-size: 0.75rem; 
-            color: var(--text-body); 
-            text-transform: uppercase; 
-            letter-spacing: 0.15em; 
-            margin-top: 0.5rem;
-            transform: translateX(11.8%); /* 2. Shifts the subtitle so its 38.2% mark is dead center */
-          ">${subTitle}</div>
-        ` : ""}
-      </div>
-      
-      ${isStacked ? justifiedHtml : ""}
+        <div style="
+          text-align: left; 
+          margin-top: -0.75rem;   
+          margin-bottom: 0.5rem; 
+        ">
+          <h2 style="
+            margin: 0; 
+            color: #1c1c1c; 
+            font-weight: normal; 
+            white-space: normal;
+            font-size: 1.9rem; 
+            line-height: 1.1;
+          ">${mainTitle}</h2>
+          
+          ${subTitle ? `
+            <div style="
+              font-family: var(--font-sans); 
+              font-size: 0.75rem; 
+              color: var(--text-body); 
+              text-transform: uppercase; 
+              letter-spacing: 0.15em; 
+              margin-top: 0.9rem;
+              margin-bottom: 1.2rem;
+              margin-left: 0rem; 
+              line-height: 1.2;
+            ">${subTitle}</div>
+          ` : ""}
+        </div>
+        
+        ${isStacked ? justifiedHtml : ""}
+        
+      </div> <!-- NEW: Closes the master padding wrapper -->
     `;
 
     // 3. Post-Render Script for 2-Image Vertical Override
@@ -451,8 +453,24 @@ window.addEventListener("load", () => {
   // 1. Keep track of the currently selected marker globally
   let activeMarker = null;
 
+  // 1. Create the Cluster Group BEFORE the loop begins
+  const markers = L.markerClusterGroup({
+    showCoverageOnHover: false, // Hides the default bounding box outline
+    maxClusterRadius: 45,       // Distance in pixels before pins collapse into a circle
+    iconCreateFunction: function(cluster) {
+      const count = cluster.getChildCount();
+      return L.divIcon({
+        html: `<div class="custom-cluster-icon">${count}</div>`,
+        className: '', // Prevents Leaflet's default cluster styles from interfering
+        iconSize: L.point(36, 36)
+      });
+    }
+  });
+
+  // 2. Loop through your locations
   locations.forEach((location) => {
-    const marker = L.marker(location.coords, { icon: smallIcon }).addTo(map);
+    // IMPORTANT: Create the marker, but do NOT chain `.addTo(map)` here!
+    const marker = L.marker(location.coords, { icon: smallIcon });
 
     let tooltipImageSrc = "";
     if (
@@ -465,13 +483,13 @@ window.addEventListener("load", () => {
       tooltipImageSrc = location.previewImage;
     }
 
-    // --- NEW: Split the title just like we did in the sidebar! ---
+    // Split the title just like in the sidebar
     let hoverTitle = location.name;
     if (location.name.includes(":")) {
       hoverTitle = location.name.split(":")[0].trim();
     }
 
-    // 2. Define the HTML for the tooltip
+    // Define the HTML for the tooltip
     const hoverContent = `
       <div style="
         width: max-content; 
@@ -487,7 +505,7 @@ window.addEventListener("load", () => {
       </div>
     `;
     
-    // 3. Attach it to the Leaflet marker
+    // Attach it to the Leaflet marker
     marker.bindTooltip(hoverContent, {
       direction: "bottom",
       offset: [0, 5],
@@ -495,7 +513,7 @@ window.addEventListener("load", () => {
       opacity: 1, 
     });
 
-    // 4. Handle the click event (manages color change and sidebar)
+    // 3. Handle the click event (Drastically simplified!)
     marker.on("click", () => {
       marker.closeTooltip();
 
@@ -514,84 +532,16 @@ window.addEventListener("load", () => {
         currentElement.classList.add("marker-active");
       }
 
-      // --- DYNAMIC OVERLAP DETECTION ---
-      let closestDistance = Infinity;
-      let closestLocation = null;
-
-      locations.forEach((otherLoc) => {
-        if (otherLoc !== location) {
-          const dist = map.distance(location.coords, otherLoc.coords);
-          if (dist < closestDistance) {
-            closestDistance = dist;
-            closestLocation = otherLoc;
-          }
-        }
-      });
-
-      let currentZoom = map.getZoom();
-      let targetZoom = currentZoom;
-
-      if (closestLocation) {
-        const minPixelSeparation = 20; 
-        const maxZoom = map.getMaxZoom() || 16; 
-
-        for (let z = currentZoom; z <= maxZoom; z++) {
-          const p1 = map.project(location.coords, z);
-          const p2 = map.project(closestLocation.coords, z);
-          const pixelDist = p1.distanceTo(p2);
-
-          if (pixelDist >= minPixelSeparation) {
-            targetZoom = z;
-            break; 
-          }
-          if (z === maxZoom) targetZoom = maxZoom; 
-        }
-      }
-
-      // --- NEW: FLY, BUT DON'T CENTER! ---
-      if (targetZoom > currentZoom) {
-        // 1. Where is the marker on the screen right now?
-        const markerScreenPoint = map.latLngToContainerPoint(location.coords);
-        
-        // 2. Where is the center of the screen?
-        const mapSize = map.getSize();
-        const centerScreenPoint = L.point(mapSize.x / 2, mapSize.y / 2);
-        
-        // 3. What is the pixel difference between the marker and the center?
-        const offset = centerScreenPoint.subtract(markerScreenPoint);
-        
-        // 4. Calculate where the marker WILL be at the new zoom level
-        const targetMarkerPixel = map.project(location.coords, targetZoom);
-        
-        // 5. Shift the target center by our offset
-        const targetCenterPixel = targetMarkerPixel.add(offset);
-        
-        // 6. Convert those perfect pixels back into GPS coordinates
-        const targetCenterLatLng = map.unproject(targetCenterPixel, targetZoom);
-        
-        // --- DYNAMIC FLIGHT DURATION ---
-        // How many zoom levels are we jumping?
-        const zoomDifference = targetZoom - currentZoom;
-        
-        // Set your constant "speed" (e.g., 0.4 seconds per zoom level)
-        const secondsPerLevel = 0.6;
-        let flightDuration = zoomDifference * secondsPerLevel;
-        
-        // Cap the duration so it's never too jarringly fast or agonizingly slow
-        // (Minimum 0.8 seconds, Maximum 3.0 seconds)
-        flightDuration = Math.min(Math.max(flightDuration, 0.8), 3);
-        
-        // 7. Execute the flight using our dynamic duration!
-        map.flyTo(targetCenterLatLng, targetZoom, {
-          animate: true,
-          duration: flightDuration
-        });
-      }
-
       // Render the sidebar
       renderPanel(location);
     });
+
+    // 4. Add the individual marker to the CLUSTER GROUP instead of the map
+    markers.addLayer(marker);
   });
+
+  // 5. Finally, add the entire cluster group to the map AFTER the loop finishes
+  map.addLayer(markers);
 
   /* --- EVENT LISTENERS --- */
   if (galOverlay) {

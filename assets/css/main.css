@@ -430,6 +430,31 @@ a:hover {
   cursor: pointer;
 }
 
+/* Custom Leaflet Cluster Circle */
+.custom-cluster-icon {
+  background-color: #3b83f6e5; /* Change this to match your blue/yellow pins */
+  color: #ffffff;
+  border: 2px solid #ffffff;
+  border-radius: 50%;
+  box-shadow: none;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-family: var(--font-sans);
+  font-size: 0.8rem;
+  font-weight: bold;
+  width: 32px;
+  height: 32px;
+  transition: transform 0.2s ease, background-color 0.2s ease;
+}
+
+/* Add a subtle hover pop effect */
+.custom-cluster-icon:hover {
+  transform: scale(1.1);
+  background-color: #2563eb; 
+  cursor: pointer;
+}
+
 /* =========================================
    1. JUSTIFIED SIDEBAR GALLERY
 ========================================= */
