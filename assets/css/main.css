@@ -432,7 +432,7 @@ a:hover {
 
 /* Custom Leaflet Cluster Circle */
 .custom-cluster-icon {
-  background-color: #3b83f6e5; /* Change this to match your blue/yellow pins */
+  background-color: #3b83f6cb; /* Change this to match your blue/yellow pins */
   color: #ffffff;
   border: 2px solid #ffffff;
   border-radius: 50%;
