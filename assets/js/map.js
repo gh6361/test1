@@ -1,5 +1,5 @@
 // Import the combined locations array from your hub file
-import { locations } from '../data/index.js';
+import { locations } from "../data/index.js";
 
 window.addEventListener("load", () => {
   const mapEl = document.getElementById("map");
@@ -106,14 +106,16 @@ window.addEventListener("load", () => {
   function renderGalImage(index) {
     if (!galImages.length || !galInactive || !galActive) return;
     galCurrentIndex = (index + galImages.length) % galImages.length;
-    
+
     const image = galImages[galCurrentIndex];
 
     // --- NEW CAPTION HTML INJECTION ---
     if (galCaption) {
       let collectionsHTML = "";
       if (image.collections && image.collections.length > 0) {
-        const links = image.collections.map(c => `<a href="${c.url}">${c.name}</a>`).join(", ");
+        const links = image.collections
+          .map((c) => `<a href="${c.url}">${c.name}</a>`)
+          .join(", ");
         collectionsHTML = `In collections: ${links}`;
       }
 
@@ -278,7 +280,7 @@ window.addEventListener("load", () => {
       } else {
         // --- 5. FIVE OR MORE IMAGES (Dense Grid) ---
         // Lowered to 12vh! This forces more images per row, stopping the "super wide" stretching.
-        let targetHeight = "16vh"; 
+        let targetHeight = "18vh";
         let minHeight = "60px";
 
         justifiedHtml = `
@@ -300,7 +302,7 @@ window.addEventListener("load", () => {
     // Check if the name contains a colon, and split it if it does!
     let mainTitle = location.name;
     let subTitle = "";
-    
+
     if (location.name.includes(":")) {
       const parts = location.name.split(":");
       mainTitle = parts[0].trim();
@@ -325,7 +327,9 @@ window.addEventListener("load", () => {
             line-height: 1.1;
           ">${mainTitle}</h2>
           
-          ${subTitle ? `
+          ${
+            subTitle
+              ? `
             <div style="
               font-family: var(--font-sans); 
               font-size: 0.75rem; 
@@ -337,7 +341,9 @@ window.addEventListener("load", () => {
               margin-left: 0rem; 
               line-height: 1.2;
             ">${subTitle}</div>
-          ` : ""}
+          `
+              : ""
+          }
         </div>
         
         ${isStacked ? justifiedHtml : ""}
@@ -380,27 +386,27 @@ window.addEventListener("load", () => {
           imgs[1].parentElement.style.height = "auto";
         } else {
           // --- NOT BOTH VERTICAL (e.g., Landscape or Mixed) ---
-          
+
           // Switch to Flexbox for a guaranteed vertical stack
           duoWrapper.style.display = "flex";
           duoWrapper.style.flexDirection = "column";
           duoWrapper.style.gap = "12px";
-          
+
           // Image 1: Force auto-height so it shrinks proportionally, capped at 39vh
           imgs[0].parentElement.style.width = "100%";
           imgs[0].parentElement.style.height = "auto";
           imgs[0].parentElement.style.minHeight = "0px";
-          
+
           imgs[0].style.width = "100%";
           imgs[0].style.height = "auto";
           imgs[0].style.maxHeight = "39vh";
           imgs[0].style.objectFit = "cover";
-          
+
           // Image 2: Exact same constraints
           imgs[1].parentElement.style.width = "100%";
           imgs[1].parentElement.style.height = "auto";
           imgs[1].parentElement.style.minHeight = "0px";
-          
+
           imgs[1].style.width = "100%";
           imgs[1].style.height = "auto";
           imgs[1].style.maxHeight = "39vh";
@@ -449,22 +455,59 @@ window.addEventListener("load", () => {
     shadowAnchor: [10, 32],
     className: "interactive-marker",
   });
-
-  // 1. Keep track of the currently selected marker globally
+  
+  // --- NEW: Add this line back in! ---
   let activeMarker = null;
 
   // 1. Create the Cluster Group BEFORE the loop begins
   const markers = L.markerClusterGroup({
     showCoverageOnHover: false, // Hides the default bounding box outline
-    maxClusterRadius: 45,       // Distance in pixels before pins collapse into a circle
-    iconCreateFunction: function(cluster) {
+    maxClusterRadius: 45, // Distance in pixels before pins collapse into a circle
+    zoomToBoundsOnClick: false, // --- NEW: Disables the default robotic zoom ---
+    iconCreateFunction: function (cluster) {
       const count = cluster.getChildCount();
       return L.divIcon({
         html: `<div class="custom-cluster-icon">${count}</div>`,
-        className: '', // Prevents Leaflet's default cluster styles from interfering
-        iconSize: L.point(36, 36)
+        className: "", // Prevents Leaflet's default cluster styles from interfering
+        iconSize: L.point(36, 36),
       });
+    },
+  });
+
+  // --- NEW: Controlled "Spread" Zoom ---
+  markers.on('clusterclick', function (event) {
+    const cluster = event.layer;
+    const bounds = cluster.getBounds();
+    const targetCenter = bounds.getCenter(); 
+    
+    let currentZoom = map.getZoom();
+    let targetZoom = currentZoom;
+    const maxZoom = 15; // The absolute maximum you'll allow it to zoom
+    
+    // How wide (in pixels) do you want the group of pins to be spread out on screen?
+    // 100 is a great starting point for a neat, tight grouping.
+    const desiredPixelSpread = 100; 
+
+    // Look ahead to find the perfect zoom level to achieve that spread
+    for (let z = currentZoom; z <= maxZoom; z++) {
+      const corner1 = map.project(bounds.getSouthWest(), z);
+      const corner2 = map.project(bounds.getNorthEast(), z);
+      const pixelSpread = corner1.distanceTo(corner2);
+
+      if (pixelSpread >= desiredPixelSpread) {
+        targetZoom = z;
+        break; 
+      }
+      
+      if (z === maxZoom) targetZoom = maxZoom; 
     }
+
+    // Execute the flight directly to the center at our newly calculated, controlled zoom
+    map.flyTo(targetCenter, targetZoom, {
+      animate: true,
+      duration: 1.3, 
+      easeLinearity: 0.25 
+    });
   });
 
   // 2. Loop through your locations
@@ -504,13 +547,13 @@ window.addEventListener("load", () => {
         ${hoverTitle}
       </div>
     `;
-    
+
     // Attach it to the Leaflet marker
     marker.bindTooltip(hoverContent, {
       direction: "bottom",
       offset: [0, 5],
       className: "custom-map-tooltip",
-      opacity: 1, 
+      opacity: 1,
     });
 
     // 3. Handle the click event (Drastically simplified!)

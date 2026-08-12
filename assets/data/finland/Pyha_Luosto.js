@@ -15,8 +15,7 @@ export const Pyha_Luosto = {
       <em>Pyhä</em> means <em>holy</em> or <em>sacred</em>, \
       as it was sacred to the local Forest Sámi. The 35 km chain of fells is a \
       remnant of one of the oldest mountain ranges in the world, formed around \
-      2 billion years ago. The park also contains Finland's deepest gorge, \
-      Isokuru, which reaches roughly 220 m deep."
+      2 billion years ago."
     },
     {
       src: `../assets/images/finland/Pyha_Luosto/reduced-6163.jpg`,
