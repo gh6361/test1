@@ -62,6 +62,10 @@ header: solid
       
     </div>
   </div>
+
+  <!-- NEW: Thumbnail Bar (Sits at the very bottom of the screen) -->
+  <div id="lightbox-thumbnails" class="lightbox-thumbnails"></div>
+
 </div>
 
 <script>

@@ -766,20 +766,65 @@ a:hover {
   width: calc(23.6vw - var(--desc-gap)); 
   
   flex-shrink: 0;
-  background-color: #fcfbf9; /* Crisp, opaque white */
+  background-color: #fcfbf9; 
   padding: 1.5rem;
-  border-radius: 3px;
+  border-radius: 2px;
   color: #1c1c1c;
   
-  /* 3. MAGIC VERTICAL MATH: Centers the box at 38.2vh */
-  align-self: flex-start;      /* Pins the box to the top of the flex group */
-  margin-top: 38.2vh;          /* Pushes the top edge down exactly 38.2% */
-  transform: translateY(-50%); /* Pulls it up by 50% of its computed dynamic height */
+  align-self: flex-start; 
   
-  /* Cap the maximum height at 74vh so it never grows tall enough to hit the top screen edge */
+  /* REMOVED: transform and fixed margin-top */
+  /* ADDED: Smooth movement when the window resizes or thumbnails appear */
+  transition: margin-top 0.2s ease-out; 
+  
+  /* Cap the maximum height */
   max-height: 74vh; 
   
   overflow-y: auto;
+}
+
+/* --- LIGHTBOX THUMBNAILS --- */
+.lightbox-thumbnails {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 90px; /* Adjust this to make the bar taller or shorter */
+  display: none; /* Hidden by default */
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+  background-color: transparent; /* Or #1c1c1c depending on your lightbox background */
+  z-index: 1000;
+}
+
+/* When the lightbox has thumbnails, show the bar and shift the center group up! */
+.lightbox.has-thumbnails .lightbox-thumbnails {
+  display: flex;
+}
+.lightbox.has-thumbnails .lightbox-center-group {
+  /* Shifts the entire image and caption group up perfectly to make room */
+  transform: translateY(-24px); 
+  transition: transform 0.3s ease;
+}
+
+/* Individual Thumbnail Styles */
+.lb-thumb {
+  height: 50px;
+  width: 60px;
+  object-fit: cover;
+  cursor: pointer;
+  opacity: 0.5;
+  transition: opacity 0.3s ease, transform 0.2s ease;
+  border-radius: none;
+}
+.lb-thumb:hover {
+  opacity: 0.8;
+}
+.lb-thumb.active {
+  opacity: 1;
+  transform: scale(1.15);
+  border: 1px solid #f4f3ee;
 }
 
 /* --- Lightbox Caption Typography --- */
@@ -794,17 +839,17 @@ a:hover {
 /* Image Index Counter (Subtle Overline) */
 .caption-index {
   font-family: var(--font-sans);
-  font-size: 0.7rem; /* Deliberately tiny */
+  font-size: 0.65rem; /* Deliberately tiny */
   text-transform: uppercase;
   letter-spacing: 0.25em; /* Extremely wide tracking for elegance */
   color: #999; /* A soft, quiet gray so it recedes into the background */
-  margin-bottom: 0.85rem; /* Pushes the main title down slightly */
+  margin-bottom: 0.5rem; /* Pushes the main title down slightly */
 }
 
 /* 3. Detailed Description (Clean, readable paragraph) */
 .caption-details {
   font-family: var(--font-sans);
-  font-size: 0.85rem;
+  font-size: 0.8rem;
   color: var(--text-body);
   line-height: 1.8; /* Generous line height for breathability */
   margin-bottom: 1.5rem; 

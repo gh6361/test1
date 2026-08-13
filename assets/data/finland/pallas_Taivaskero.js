@@ -53,8 +53,10 @@ export const pallas_Taivaskero = {
       caption: "Open skies over Reykjavik.",
       location: "Downtown Reykjavik, Iceland",
       date: "October 2023",
-      detailedDescription: "A commemorative plaque at the summit of Taivaskero for the 1592 Olympics. \
-      Here the Olympic flame of Finland was lit, and relay runners carried it all the way to Helsinki.",
+      detailedDescription: "In English, tha plaque reads: <em>At this place, on Taivaskero, the Helsinki \
+      Olympic flame was lit on July 6, 1952</em>. Lit together with the midnight sun, the Olympic flame was \
+      carried by relay runners carried all the way to Helsinki where it was joined with the Olympic flame \
+      from Athens.",
     },
     {
       src: `../assets/images/finland/pallas_taivaskero/reduced-5935.jpg`,
@@ -83,7 +85,8 @@ export const pallas_Taivaskero = {
       caption: "Open skies over Reykjavik.",
       location: "Downtown Reykjavik, Iceland",
       date: "October 2023",
-      detailedDescription: "Pallastunturi is also a ski area in winter.",
+      detailedDescription: "Pallastunturi is also a ski area in winter, as hinted by the ski \
+      lift in the image.",
     },
   ]
 };

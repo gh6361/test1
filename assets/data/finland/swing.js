@@ -11,8 +11,7 @@ export const swing = {
       date: "October 2023",
       detailedDescription: "Lake Äkäslompolo is situated in Finnish \
       Lapland and lies completely above the Arctic Circle. It is surrounded by forest \
-      and fells of the Ylläs region, the latter of which are rounded, treeless or sparsely \
-      wooded mountains or hills, typical of northern Scandinavia.",
+      and fells of the Ylläs region.",
     },
     {
       src: `../assets/images/finland/swing/reduced-6127.jpg`,

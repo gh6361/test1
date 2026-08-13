@@ -2,7 +2,6 @@
 
 // 1. Import all your individual cities
 import { reykjavik } from './reykjavik.js';
-import { stockholm } from './stockholm.js';
 import { pallas_Taivaskero } from './finland/pallas_Taivaskero.js';
 import { pallas_palkaskero } from './finland/pallas_palkaskero.js';
 import { oodi } from './finland/oodi.js';
@@ -13,7 +12,6 @@ import { swing } from './finland/swing.js'
 // 2. Export them as one combined array for your map to use
 export const locations = [
   reykjavik,
-  stockholm,
   pallas_Taivaskero,
   pallas_palkaskero,
   oodi,

@@ -57,35 +57,36 @@ export const pallas_palkaskero = {
       caption: "Open skies over Reykjavik.",
       location: "Downtown Reykjavik, Iceland",
       date: "October 2023",
-      detailedDescription: ".",
+      detailedDescription: "Notice the stark contrast between the treeless fell top \
+      and the forest below.",
     },
     {
       src: `../assets/images/finland/pallas_palkaskero/reduced-6248.jpg`,
       caption: "Open skies over Reykjavik.",
       location: "Downtown Reykjavik, Iceland",
       date: "October 2023",
-      detailedDescription: ".",
+      detailedDescription: "Open fell country.",
     },
     {
       src: `../assets/images/finland/pallas_palkaskero/reduced-6268.jpg`,
       caption: "Open skies over Reykjavik.",
       location: "Downtown Reykjavik, Iceland",
       date: "October 2023",
-      detailedDescription: ".",
+      detailedDescription: "The summit is around 700 m above sea level.",
     },
     {
       src: `../assets/images/finland/pallas_palkaskero/reduced-6280.jpg`,
       caption: "Open skies over Reykjavik.",
       location: "Downtown Reykjavik, Iceland",
       date: "October 2023",
-      detailedDescription: ".",
+      detailedDescription: "The descent from Palkaskero, overlooking Pallasjärvi.",
     },
     {
       src: `../assets/images/finland/pallas_palkaskero/reduced-6292.jpg`,
       caption: "Open skies over Reykjavik.",
       location: "Downtown Reykjavik, Iceland",
       date: "October 2023",
-      detailedDescription: ".",
+      detailedDescription: "Such lovely spot to stop for a rest...",
     },
   ]
 };

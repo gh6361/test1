@@ -29,8 +29,8 @@ window.addEventListener("load", () => {
   // Define coordinate boundaries FIRST so the map can use them to load
   const regionBounds = {
     world: [
-      [-60, -170],
-      [78, 180],
+      [-55, -125], // Western edge (Keeps North America in frame)
+      [75, 180],
     ],
     europe: [
       [38, -10],
@@ -46,9 +46,30 @@ window.addEventListener("load", () => {
     ],
   };
 
-  // Initialize map with default zoom control disabled, and fit to 'world' bounds
+  // --- NEW: Vertical-Only Limits ---
+  // Latitude is strictly capped at -90 (South Pole) and 90 (North Pole).
+  // Longitude is set to massive numbers so they can pan horizontally forever.
+  const verticalBounds = [
+    [-90, -10000], 
+    [90, 10000]    
+  ];
+
+  // Initialize map with fractional zooming for a perfect, fluid fit
   const map = L.map(mapEl, {
     zoomControl: false,
+    zoomSnap: 0.1,       
+    wheelPxPerZoomLevel: 100,
+    minZoom: 1.8,
+    
+    // Apply the vertical-only bounds
+    maxBounds: verticalBounds, 
+    maxBoundsViscosity: 1.0,
+    
+    // --- NEW: Seamless Wrapping ---
+    // This tells Leaflet to seamlessly teleport the user's view if they drag 
+    // across the world's edge, making the infinite horizontal scrolling feel flawless.
+    worldCopyJump: true
+    
   }).fitBounds(regionBounds.world);
 
   // Manually add the zoom control to the bottom right
@@ -144,6 +165,23 @@ window.addEventListener("load", () => {
       galActive.classList.remove("active");
       galInactive.classList.add("active");
       swapGalImages();
+
+      // --- NEW: Update active thumbnail border ---
+      const thumbs = document.querySelectorAll(".lb-thumb");
+      if (thumbs.length > 0) {
+        thumbs.forEach((t) => t.classList.remove("active"));
+        const activeThumb = document.querySelector(
+          `.lb-thumb[data-index="${galCurrentIndex}"]`,
+        );
+        if (activeThumb) activeThumb.classList.add("active");
+      }
+
+      // --- NEW: Trigger Page Alignment ---
+      if (galActive.complete) {
+        setTimeout(alignCaptionToPage, 50);
+      } else {
+        galActive.onload = alignCaptionToPage;
+      }
     });
   }
 
@@ -155,11 +193,35 @@ window.addEventListener("load", () => {
     const siteNav = document.querySelector(".editorial-header");
     if (siteNav) siteNav.style.display = "none";
 
+    const thumbContainer = document.getElementById("lightbox-thumbnails");
+
     // Set single-mode if needed
     if (images.length <= 1) {
       galOverlay.classList.add("single-mode");
+      galOverlay.classList.remove("has-thumbnails");
+      if (thumbContainer) thumbContainer.innerHTML = "";
     } else {
       galOverlay.classList.remove("single-mode");
+
+      // --- NEW: Generate Thumbnails ---
+      galOverlay.classList.add("has-thumbnails");
+      if (thumbContainer) {
+        thumbContainer.innerHTML = images
+          .map(
+            (img, idx) => `
+          <img src="${img.src}" class="lb-thumb ${idx === (startIndex || 0) ? "active" : ""}" data-index="${idx}" alt="thumbnail">
+        `,
+          )
+          .join("");
+
+        // Make them clickable
+        thumbContainer.querySelectorAll(".lb-thumb").forEach((thumb) => {
+          thumb.addEventListener("click", (e) => {
+            const clickedIdx = parseInt(e.target.dataset.index, 10);
+            renderGalImage(clickedIdx);
+          });
+        });
+      }
     }
 
     galOverlay.classList.remove("hidden");
@@ -190,6 +252,32 @@ window.addEventListener("load", () => {
     if (galImages.length <= 1) return;
     renderGalImage(galCurrentIndex - 1);
   }
+
+  // NEW: Pins the top of the caption to exactly 23.7% of the screen height
+  function alignCaptionToPage() {
+    const descWrapper = document.querySelector(".lightbox-desc-wrapper");
+    const centerGroup = document.querySelector(".lightbox-center-group");
+
+    if (!descWrapper || !centerGroup) return;
+
+    // 1. Measure where the top of the entire image group sits on the screen.
+    // This parent container does not have a margin transition, so the measurement is always perfect!
+    const groupTop = centerGroup.getBoundingClientRect().top;
+
+    // 2. Calculate exactly 23.7% of the user's screen height (23.7vh)
+    const targetTop = window.innerHeight * 0.237;
+
+    // 3. Calculate how much margin we need to push the caption down to the target.
+    // If the math results in a negative number, we floor it at 0 so it never breaks out of the top.
+    let marginNeeded = targetTop - groupTop;
+    if (marginNeeded < 0) marginNeeded = 0;
+
+    // 4. Apply the margin safely
+    descWrapper.style.marginTop = `${marginNeeded}px`;
+  }
+
+  // Keep it aligned if the user resizes the window
+  window.addEventListener("resize", alignCaptionToPage);
 
   /* --- MAP UI LOGIC --- */
   function renderDefaultPanel() {
@@ -455,14 +543,14 @@ window.addEventListener("load", () => {
     shadowAnchor: [10, 32],
     className: "interactive-marker",
   });
-  
+
   // --- NEW: Add this line back in! ---
   let activeMarker = null;
 
   // 1. Create the Cluster Group BEFORE the loop begins
   const markers = L.markerClusterGroup({
     showCoverageOnHover: false, // Hides the default bounding box outline
-    maxClusterRadius: 45, // Distance in pixels before pins collapse into a circle
+    maxClusterRadius: 30, // Distance in pixels before pins collapse into a circle
     zoomToBoundsOnClick: false, // --- NEW: Disables the default robotic zoom ---
     iconCreateFunction: function (cluster) {
       const count = cluster.getChildCount();
@@ -475,18 +563,18 @@ window.addEventListener("load", () => {
   });
 
   // --- NEW: Controlled "Spread" Zoom ---
-  markers.on('clusterclick', function (event) {
+  markers.on("clusterclick", function (event) {
     const cluster = event.layer;
     const bounds = cluster.getBounds();
-    const targetCenter = bounds.getCenter(); 
-    
+    const targetCenter = bounds.getCenter();
+
     let currentZoom = map.getZoom();
     let targetZoom = currentZoom;
     const maxZoom = 15; // The absolute maximum you'll allow it to zoom
-    
+
     // How wide (in pixels) do you want the group of pins to be spread out on screen?
     // 100 is a great starting point for a neat, tight grouping.
-    const desiredPixelSpread = 100; 
+    const desiredPixelSpread = 110;
 
     // Look ahead to find the perfect zoom level to achieve that spread
     for (let z = currentZoom; z <= maxZoom; z++) {
@@ -496,17 +584,17 @@ window.addEventListener("load", () => {
 
       if (pixelSpread >= desiredPixelSpread) {
         targetZoom = z;
-        break; 
+        break;
       }
-      
-      if (z === maxZoom) targetZoom = maxZoom; 
+
+      if (z === maxZoom) targetZoom = maxZoom;
     }
 
     // Execute the flight directly to the center at our newly calculated, controlled zoom
     map.flyTo(targetCenter, targetZoom, {
       animate: true,
-      duration: 1.3, 
-      easeLinearity: 0.25 
+      duration: 1.2,
+      easeLinearity: 0.25,
     });
   });
 
