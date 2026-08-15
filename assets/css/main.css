@@ -614,6 +614,19 @@ a:hover {
   margin-bottom: 2rem;
 }
 
+/* --- SIDEBAR DESTINATION LINKS --- */
+.sidebar-loc-link {
+  cursor: pointer;
+  font-size: 0.95rem;
+  transition: color 0.2s ease, transform 0.2s ease;
+}
+
+.sidebar-loc-link:hover {
+  /* This uses your existing ocean blue map color */
+  color: #abc2c4; 
+  transform: translateX(2px);
+}
+
 /* --- Map Region Controls --- */
 .map-region-controls {
   display: flex;
@@ -839,7 +852,7 @@ a:hover {
 /* Image Index Counter (Subtle Overline) */
 .caption-index {
   font-family: var(--font-sans);
-  font-size: 0.65rem; /* Deliberately tiny */
+  font-size: 0.6rem; /* Deliberately tiny */
   text-transform: uppercase;
   letter-spacing: 0.25em; /* Extremely wide tracking for elegance */
   color: #999; /* A soft, quiet gray so it recedes into the background */
@@ -849,9 +862,9 @@ a:hover {
 /* 3. Detailed Description (Clean, readable paragraph) */
 .caption-details {
   font-family: var(--font-sans);
-  font-size: 0.8rem;
+  font-size: 0.85rem;
   color: var(--text-body);
-  line-height: 1.8; /* Generous line height for breathability */
+  line-height: 1.65; /* Generous line height for breathability */
   margin-bottom: 1.5rem; 
 }
 
@@ -993,3 +1006,43 @@ nav.header-solid .nav-link:hover {
   color: #595959 !important; /* Lighter gray for the hover state */
 }
 
+/* =========================================
+   UNIVERSAL LIGHTBOX IMAGE SIZING
+   (Applies to all screens, big and small)
+========================================= */
+.lightbox.has-thumbnails .lightbox-image,
+.lightbox .lightbox-image {
+  
+  /* Try your 350px here now! It will instantly work. */
+  max-height: calc(100vh - 270px) !important; 
+  max-width: calc(76.4vw - 140px) !important; 
+  
+  width: auto !important;
+  height: auto !important; 
+  display: block; 
+  margin: 0 auto; 
+}
+
+
+/* =========================================
+   SMALL SCREEN OVERRIDES 
+   (Only for shrinking text/padding on small screens)
+========================================= */
+@media (max-width: 1200px), (max-height: 800px) {
+  
+  .lightbox-desc-wrapper {
+    padding: 1.25rem !important;
+  }
+  
+  .lightbox-desc-wrapper, 
+  #lightbox-caption,
+  .caption-details {
+    font-size: 0.75rem !important; 
+    line-height: 1.65 !important;
+  }
+
+  .caption-index {
+    font-size: 0.55rem !important;
+    margin-bottom: 0.5rem !important; 
+  }
+}

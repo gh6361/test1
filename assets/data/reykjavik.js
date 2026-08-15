@@ -2,6 +2,7 @@
 
 export const reykjavik = {
   name: "Reykjavik",
+  country: "Iceland",
   coords: [64.1466, -21.9426],
   description: "A cold, bright stop with open skies and coastal views.",
   mode: "stacked",

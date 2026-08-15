@@ -2,6 +2,7 @@
 
 export const pallas_Taivaskero = {
   name: "Taivaskero: Pallas-Yllästunturi National Park, Finland",
+  country: "Finland",
   coords: [68.06796435859441, 24.049790004747106],
   description: "A cold, bright stop with open skies and coastal views.",
   mode: "stacked",

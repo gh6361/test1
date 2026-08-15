@@ -50,26 +50,25 @@ window.addEventListener("load", () => {
   // Latitude is strictly capped at -90 (South Pole) and 90 (North Pole).
   // Longitude is set to massive numbers so they can pan horizontally forever.
   const verticalBounds = [
-    [-90, -10000], 
-    [90, 10000]    
+    [-90, -10000],
+    [90, 10000],
   ];
 
   // Initialize map with fractional zooming for a perfect, fluid fit
   const map = L.map(mapEl, {
     zoomControl: false,
-    zoomSnap: 0.1,       
+    zoomSnap: 0.1,
     wheelPxPerZoomLevel: 100,
     minZoom: 1.8,
-    
+
     // Apply the vertical-only bounds
-    maxBounds: verticalBounds, 
+    maxBounds: verticalBounds,
     maxBoundsViscosity: 1.0,
-    
+
     // --- NEW: Seamless Wrapping ---
-    // This tells Leaflet to seamlessly teleport the user's view if they drag 
+    // This tells Leaflet to seamlessly teleport the user's view if they drag
     // across the world's edge, making the infinite horizontal scrolling feel flawless.
-    worldCopyJump: true
-    
+    worldCopyJump: true,
   }).fitBounds(regionBounds.world);
 
   // Manually add the zoom control to the bottom right
@@ -176,11 +175,21 @@ window.addEventListener("load", () => {
         if (activeThumb) activeThumb.classList.add("active");
       }
 
-      // --- NEW: Trigger Page Alignment ---
-      if (galActive.complete) {
-        setTimeout(alignCaptionToPage, 50);
+      // --- BULLETPROOF ALIGNMENT TRIGGER ---
+      // A small helper function that adds a tiny 50-millisecond delay.
+      // This forces the JavaScript to wait until the browser has physically
+      // painted the image to the screen BEFORE trying to measure it!
+      const triggerAlignment = () => {
+        setTimeout(alignCaptionToImageTop, 50);
+      };
+
+      // Check if the image is already fully loaded (e.g., from cache or resize)
+      if (galActive.complete && galActive.naturalHeight > 0) {
+        triggerAlignment();
       } else {
-        galActive.onload = alignCaptionToPage;
+        // If it's a fresh load (first click), wait for the exact millisecond
+        // the file finishes downloading, THEN fire our delayed trigger.
+        galActive.onload = triggerAlignment;
       }
     });
   }
@@ -253,39 +262,158 @@ window.addEventListener("load", () => {
     renderGalImage(galCurrentIndex - 1);
   }
 
-  // NEW: Pins the top of the caption to exactly 23.7% of the screen height
-  function alignCaptionToPage() {
+  // CONSTANT HEIGHT LOGIC (Locks to the top edge of the shortest photo)
+  function alignCaptionToImageTop() {
     const descWrapper = document.querySelector(".lightbox-desc-wrapper");
     const centerGroup = document.querySelector(".lightbox-center-group");
+    const activeImg = document.querySelector(".lightbox-image.active");
 
-    if (!descWrapper || !centerGroup) return;
+    if (
+      !descWrapper ||
+      !centerGroup ||
+      !activeImg ||
+      activeImg.naturalHeight === 0
+    )
+      return;
 
-    // 1. Measure where the top of the entire image group sits on the screen.
-    // This parent container does not have a margin transition, so the measurement is always perfect!
-    const groupTop = centerGroup.getBoundingClientRect().top;
+    const groupHeight = centerGroup.getBoundingClientRect().height;
 
-    // 2. Calculate exactly 23.7% of the user's screen height (23.7vh)
-    const targetTop = window.innerHeight * 0.237;
+    // 1. Read the live CSS constraints to mathematically check the gallery
+    const computed = window.getComputedStyle(activeImg);
+    const maxHeight = parseFloat(computed.maxHeight) || window.innerHeight;
+    const maxWidth = parseFloat(computed.maxWidth) || window.innerWidth;
 
-    // 3. Calculate how much margin we need to push the caption down to the target.
-    // If the math results in a negative number, we floor it at 0 so it never breaks out of the top.
-    let marginNeeded = targetTop - groupTop;
+    // Start with the maximum possible height
+    let minRenderedHeight = maxHeight;
+
+    // 2. Loop through the gallery array to find the absolute shortest image height
+    galImages.forEach((imgData) => {
+      const tempImg = new Image();
+      tempImg.src = imgData.src;
+
+      // If the browser already knows the dimensions
+      if (tempImg.naturalHeight > 0) {
+        const ratio = tempImg.naturalWidth / tempImg.naturalHeight;
+        const containerRatio = maxWidth / maxHeight;
+
+        let renderedHeight = maxHeight;
+        if (ratio > containerRatio) {
+          renderedHeight = maxWidth / ratio; // Image is limited by width
+        }
+
+        if (renderedHeight < minRenderedHeight) {
+          minRenderedHeight = renderedHeight;
+        }
+      }
+    });
+
+    // 3. Because the images are vertically centered, the distance from the top
+    // of the container down to the shortest image is half the remaining space.
+    let marginNeeded = (groupHeight - minRenderedHeight) / 2;
     if (marginNeeded < 0) marginNeeded = 0;
 
-    // 4. Apply the margin safely
     descWrapper.style.marginTop = `${marginNeeded}px`;
   }
 
-  // Keep it aligned if the user resizes the window
-  window.addEventListener("resize", alignCaptionToPage);
+  // Keep it perfectly aligned if the user resizes the window
+  window.addEventListener("resize", alignCaptionToImageTop);
 
-  /* --- MAP UI LOGIC --- */
   function renderDefaultPanel() {
+    // 1. Create a sortable array of items, preserving their original array index
+    const sidebarItems = locations.map((loc, index) => {
+      // Clean up the title just like the tooltips
+      let title = loc.name.includes(":") ? loc.name.split(":")[0].trim() : loc.name;
+      
+      // If a country exists, format it as "Country, Name". Otherwise, just use "Name".
+      let displayName = loc.country ? `${loc.country}, ${title}` : title;
+      
+      return {
+        displayName: displayName,
+        originalIndex: index
+      };
+    });
+
+    // 2. Sort the array alphabetically based on that new Display Name
+    sidebarItems.sort((a, b) => a.displayName.localeCompare(b.displayName));
+
+    // 3. Generate the HTML list using the sorted items
+    const locationListHtml = sidebarItems.map(item => {
+      return `<li class="sidebar-loc-link" data-index="${item.originalIndex}">${item.displayName}</li>`;
+    }).join("");
+
+    // 4. Render the panel
     panel.innerHTML = `
-      <h2>Travel Map</h2>
-      <p>Click a marker to see details about each place.</p>
-      <p class="map-panel-note">Use the buttons to open a gallery or a single photo.</p>
+      <div style="padding: 0 1.5rem;">
+        <h2 style="margin-bottom: 0.5rem; color: #1c1c1c; font-weight: normal; font-size: 1.9rem;">Travel Map</h2>
+        <p>Construction in progress!</p>
+        
+        <h3 style="font-family: var(--font-sans); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-body); border-bottom: 1px solid #ddd; padding-bottom: 0.5rem; margin-bottom: 1rem;">
+          Index of Destinations
+        </h3>
+        <ul style="list-style-type: none; padding-left: 0; margin: 0; display: flex; flex-direction: column; gap: 0.75rem;">
+          ${locationListHtml}
+        </ul>
+      </div>
     `;
+
+    // 5. Attach click events to every item in the list (Leave your Step 3 code here!)
+    // ... (Keep the exact same const links = panel.querySelectorAll('.sidebar-loc-link'); block below this!)
+
+    // 3. Attach click events to every item in the list
+    const links = panel.querySelectorAll('.sidebar-loc-link');
+    links.forEach(link => {
+      link.addEventListener('click', (e) => {
+        const idx = parseInt(e.target.dataset.index, 10);
+        const targetLocation = locations[idx];
+        const targetMarker = targetLocation.markerInstance;
+
+        if (targetMarker) {
+          const targetLatLng = targetMarker.getLatLng();
+          
+          // --- SET DEFAULT ZOOM ---
+          let targetZoom = 6; 
+
+          // Ask Leaflet what is currently visible
+          const visibleParent = markers.getVisibleParent(targetMarker);
+
+          if (visibleParent && visibleParent !== targetMarker) {
+            // MAGIC: Find the exact zoom level where this specific marker breaks out of its cluster!
+            if (targetMarker.__parent && typeof targetMarker.__parent._zoom === 'number') {
+              const breakZoom = targetMarker.__parent._zoom + 1;
+              targetZoom = Math.min(breakZoom, 15);
+            } else {
+              targetZoom = 15;
+            }
+          }
+
+          if (targetZoom < 6) targetZoom = 6;
+          
+          if (map.getZoom() === targetZoom && map.getCenter().equals(targetLatLng)) {
+            markers.zoomToShowLayer(targetMarker, () => targetMarker.fire('click'));
+            return;
+          }
+
+          // --- NEW: DYNAMIC FLIGHT DURATION ---
+          // If zooming in past level 10, slow it down to 1.6s for a smoother cinematic dive.
+          // Otherwise, stick to the brisk 1.2s flight.
+          const flightDuration = targetZoom > 7 ? 1.7 : 1.0;
+
+          // Execute ONE beautiful, continuous flight to the exact necessary zoom
+          map.flyTo(targetLatLng, targetZoom, {
+            animate: true,
+            duration: flightDuration, 
+            easeLinearity: 1,
+          });
+
+          // Wait for the continuous flight to finish...
+          map.once('moveend', () => {
+            markers.zoomToShowLayer(targetMarker, () => {
+              targetMarker.fire('click');
+            });
+          });
+        }
+      });
+    });
   }
 
   function renderPanel(location) {
@@ -529,7 +657,6 @@ window.addEventListener("load", () => {
     }
   }
 
-  renderDefaultPanel();
 
   /* --- MARKER & TOOLTIP LOGIC --- */
   const smallIcon = L.icon({
@@ -593,7 +720,7 @@ window.addEventListener("load", () => {
     // Execute the flight directly to the center at our newly calculated, controlled zoom
     map.flyTo(targetCenter, targetZoom, {
       animate: true,
-      duration: 1.2,
+      duration: 1.0,
       easeLinearity: 0.25,
     });
   });
@@ -602,6 +729,7 @@ window.addEventListener("load", () => {
   locations.forEach((location) => {
     // IMPORTANT: Create the marker, but do NOT chain `.addTo(map)` here!
     const marker = L.marker(location.coords, { icon: smallIcon });
+    location.markerInstance = marker;
 
     let tooltipImageSrc = "";
     if (
@@ -673,6 +801,12 @@ window.addEventListener("load", () => {
 
   // 5. Finally, add the entire cluster group to the map AFTER the loop finishes
   map.addLayer(markers);
+
+  // 5. Finally, add the entire cluster group to the map AFTER the loop finishes
+  map.addLayer(markers);
+
+  // --- NEW PLACEMENT: Render the sidebar now that the pins are ready! ---
+  renderDefaultPanel();
 
   /* --- EVENT LISTENERS --- */
   if (galOverlay) {

@@ -6,4 +6,6 @@ permalink: /portfolio/
 
 # Portfolio
 
-My best photography will go here.
+Looks like there's nothing here right now! 
+
+Have fun getting back 

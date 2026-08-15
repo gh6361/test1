@@ -2,6 +2,7 @@
 
 export const swing = {
   name: "Lake Äkäslompolo: Finland",
+  country: "Finland",
   coords: [67.60654643860333, 24.15775658460504],
   description: "A cold, bright stop with open skies and coastal views.",
   mode: "stacked",

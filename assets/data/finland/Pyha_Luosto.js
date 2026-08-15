@@ -2,6 +2,7 @@
 
 export const Pyha_Luosto = {
   name: "Tunturiaapa Nature Trail: Pyhä-Luosto National Park, Finland",
+  country: "Finland",
   coords: [67.01277652557667, 27.243051968242906],
   description: "A cold, bright stop with open skies and coastal views.",
   mode: "stacked",

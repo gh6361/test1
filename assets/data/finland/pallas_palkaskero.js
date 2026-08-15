@@ -2,6 +2,7 @@
 
 export const pallas_palkaskero = {
   name: "Palkaskero: Pallas-Yllästunturi National Park, Finland",
+  country: "Finland",
   coords: [68.03411749858194, 24.116048165808575],
   description: "A cold, bright stop with open skies and coastal views.",
   mode: "stacked",

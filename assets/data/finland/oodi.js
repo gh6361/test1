@@ -2,6 +2,7 @@
 
 export const oodi = {
   name: "Oodi: Helsinki Central Library, Finland",
+  country: "Finland",
   coords: [60.17370808477547, 24.9380890084605],
   description: "A cold, bright stop with open skies and coastal views.",
   mode: "stacked",

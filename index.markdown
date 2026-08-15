@@ -19,7 +19,7 @@ load_map_js: true
   
   <!-- The Text Overlay -->
   <div class="full-bleed-content" style="position: absolute !important; top: auto !important; bottom: 40% !important; transform: none !important; width: 100%; text-align: center;">
-    <h1 class="hero-title text-light" style="font-size: 4rem !important; font-weight: bold !important;">Stories and collections from the road.</h1>
+    <h1 class="hero-title text-light" style="font-size: 4rem !important; font-weight: bold !important;">better text will come here later.</h1>
   </div>
 </div>
 </section>
@@ -27,13 +27,13 @@ load_map_js: true
 <!-- 2. PORTFOLIO SECTION -->
 <section id="portfolio" class="editorial-section">
   <div class="section-header">
-    <h2 class="section-title">Latest works</h2>
+    <h2 class="section-title">page needs attention</h2>
   </div>
   
   <div class="editorial-grid">
     <a class="editorial-card" href="#map">
       <h3>Atlas</h3>
-      <p>Find photographs by place and open previews from the map.</p>
+      <p>don't mind all this.</p>
     </a>
     <a class="editorial-card" href="#portfolio">
       <h3>Collections</h3>
@@ -42,13 +42,4 @@ load_map_js: true
   </div>
 </section>
 
-
-<!-- 4. ABOUT SECTION -->
-<section id="about" class="editorial-footer-statement">
-  <h2>A travel archive built around real places</h2>
-  <p>
-    I focus on natural settings, everyday details, and the feeling of being somewhere specific. 
-    The site is designed to let you explore by map, by collection, or by story.
-  </p>
-</section>
 

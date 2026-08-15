@@ -2,6 +2,7 @@
 
 export const reindeer = {
   name: "Lapland: Finland",
+  country: "Finland",
   coords: [67.10601217426539, 27.00596534757806],
   description: "A cold, bright stop with open skies and coastal views.",
   mode: "stacked",
