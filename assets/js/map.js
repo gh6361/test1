@@ -319,66 +319,125 @@ window.addEventListener("load", () => {
   window.addEventListener("resize", alignCaptionToImageTop);
 
   function renderDefaultPanel() {
-    // 1. Create a sortable array of items, preserving their original array index
-    const sidebarItems = locations.map((loc, index) => {
-      // Clean up the title just like the tooltips
-      let title = loc.name.includes(":") ? loc.name.split(":")[0].trim() : loc.name;
+    // 1. Group locations by Country
+    const groupedLocations = {};
+
+    locations.forEach((loc, index) => {
+      // Default to "Other" if you forget to add a country tag
+      const country = loc.country || "Other"; 
       
-      // If a country exists, format it as "Country, Name". Otherwise, just use "Name".
-      let displayName = loc.country ? `${loc.country}, ${title}` : title;
+      // Simply use the default name logic (stripping out anything after a colon)
+      const displayName = loc.name.includes(":") ? loc.name.split(":")[0].trim() : loc.name;
+
+      // Create the country group array if it doesn't exist yet
+      if (!groupedLocations[country]) {
+        groupedLocations[country] = [];
+      }
       
-      return {
+      // Push the item into its specific country group
+      groupedLocations[country].push({
         displayName: displayName,
         originalIndex: index
-      };
+      });
     });
 
-    // 2. Sort the array alphabetically based on that new Display Name
-    sidebarItems.sort((a, b) => a.displayName.localeCompare(b.displayName));
+    // 2. Sort the countries alphabetically
+    const sortedCountries = Object.keys(groupedLocations).sort((a, b) => a.localeCompare(b));
 
-    // 3. Generate the HTML list using the sorted items
-    const locationListHtml = sidebarItems.map(item => {
-      return `<li class="sidebar-loc-link" data-index="${item.originalIndex}">${item.displayName}</li>`;
-    }).join("");
-
-    // 4. Render the panel
-    panel.innerHTML = `
-      <div style="padding: 0 1.5rem;">
-        <h2 style="margin-bottom: 0.5rem; color: #1c1c1c; font-weight: normal; font-size: 1.9rem;">Travel Map</h2>
-        <p>Construction in progress!</p>
+    // 3. Generate the grouped HTML list
+    let locationListHtml = "";
+    
+    sortedCountries.forEach(country => {
+      // Sort the places alphabetically inside this specific country
+      groupedLocations[country].sort((a, b) => a.displayName.localeCompare(b.displayName));
+      
+      // EXACT copy of your subtitle styling using a <div> to avoid global <h4> serif overrides!
+      locationListHtml += `
+        <li>
+          <div style="
+            font-family: var(--font-sans); 
+            font-size: 0.75rem; 
+            color: var(--text-body); 
+            text-transform: uppercase; 
+            letter-spacing: 0.15em; 
+            margin-top: 0.9rem;
+            margin-bottom: 0.9rem;
+            margin-left: 0rem; 
+            line-height: 1.2;
+          ">${country}</div>
+          <ul style="list-style-type: none; padding-left: 1rem; margin: 0; margin-bottom: 2rem; display: flex; flex-direction: column; gap: 0.25rem;">
+      `;
         
-        <h3 style="font-family: var(--font-sans); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-body); border-bottom: 1px solid #ddd; padding-bottom: 0.5rem; margin-bottom: 1rem;">
-          Index of Destinations
-        </h3>
-        <ul style="list-style-type: none; padding-left: 0; margin: 0; display: flex; flex-direction: column; gap: 0.75rem;">
+      // Add all the places beneath the header
+      groupedLocations[country].forEach(item => {
+        locationListHtml += `
+            <li class="sidebar-loc-link" data-index="${item.originalIndex}" style="font-size: 1rem; color: #1c1c1c;">
+              ${item.displayName}
+            </li>
+        `;
+      });
+      
+      locationListHtml += `
+          </ul>
+        </li>
+      `;
+    });
+
+    // 4. Render the panel using your exact title wrapper from renderPanel
+    panel.innerHTML = `
+      <div style="padding: 0 1.5rem;"> 
+        
+        <div style="
+          text-align: left; 
+          margin-top: -0.75rem;   
+          margin-bottom: 0.5rem; 
+        ">
+          <h2 style="
+            margin: 0; 
+            color: #1c1c1c; 
+            font-weight: normal; 
+            white-space: normal;
+            font-size: 1.9rem; 
+            line-height: 1.1;
+          ">Index</h2>
+          
+          <!-- The subtle border requested, spaced perfectly below the title -->
+          <div style="border-bottom: 1px solid #e2e0d8; margin-top: 1.2rem; margin-bottom: 1.5rem;"></div>
+        </div>
+        
+        <!-- The List -->
+        <ul style="list-style-type: none; padding-left: 0; margin: 0;">
           ${locationListHtml}
         </ul>
+        
       </div>
     `;
 
-    // 5. Attach click events to every item in the list (Leave your Step 3 code here!)
-    // ... (Keep the exact same const links = panel.querySelectorAll('.sidebar-loc-link'); block below this!)
-
-    // 3. Attach click events to every item in the list
+    // 5. Attach click events
     const links = panel.querySelectorAll('.sidebar-loc-link');
-    links.forEach(link => {
-      link.addEventListener('click', (e) => {
+    // ... keep your existing click event logic down below! ...
+    // ... keep the rest of your link event listener code exactly the same ...
+    links.forEach((link) => {
+      link.addEventListener("click", (e) => {
         const idx = parseInt(e.target.dataset.index, 10);
         const targetLocation = locations[idx];
         const targetMarker = targetLocation.markerInstance;
 
         if (targetMarker) {
           const targetLatLng = targetMarker.getLatLng();
-          
+
           // --- SET DEFAULT ZOOM ---
-          let targetZoom = 6; 
+          let targetZoom = 6;
 
           // Ask Leaflet what is currently visible
           const visibleParent = markers.getVisibleParent(targetMarker);
 
           if (visibleParent && visibleParent !== targetMarker) {
             // MAGIC: Find the exact zoom level where this specific marker breaks out of its cluster!
-            if (targetMarker.__parent && typeof targetMarker.__parent._zoom === 'number') {
+            if (
+              targetMarker.__parent &&
+              typeof targetMarker.__parent._zoom === "number"
+            ) {
               const breakZoom = targetMarker.__parent._zoom + 1;
               targetZoom = Math.min(breakZoom, 15);
             } else {
@@ -387,9 +446,14 @@ window.addEventListener("load", () => {
           }
 
           if (targetZoom < 6) targetZoom = 6;
-          
-          if (map.getZoom() === targetZoom && map.getCenter().equals(targetLatLng)) {
-            markers.zoomToShowLayer(targetMarker, () => targetMarker.fire('click'));
+
+          if (
+            map.getZoom() === targetZoom &&
+            map.getCenter().equals(targetLatLng)
+          ) {
+            markers.zoomToShowLayer(targetMarker, () =>
+              targetMarker.fire("click"),
+            );
             return;
           }
 
@@ -401,14 +465,14 @@ window.addEventListener("load", () => {
           // Execute ONE beautiful, continuous flight to the exact necessary zoom
           map.flyTo(targetLatLng, targetZoom, {
             animate: true,
-            duration: flightDuration, 
+            duration: flightDuration,
             easeLinearity: 1,
           });
 
           // Wait for the continuous flight to finish...
-          map.once('moveend', () => {
+          map.once("moveend", () => {
             markers.zoomToShowLayer(targetMarker, () => {
-              targetMarker.fire('click');
+              targetMarker.fire("click");
             });
           });
         }
@@ -656,7 +720,6 @@ window.addEventListener("load", () => {
       });
     }
   }
-
 
   /* --- MARKER & TOOLTIP LOGIC --- */
   const smallIcon = L.icon({

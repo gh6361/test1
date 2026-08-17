@@ -17,7 +17,7 @@ export const oodi = {
       Public Library of the Year award.",
     },
     {
-      src: `../assets/images/finland/oodi/reduced--3.jpg`,
+      src: `../assets/images/finland/oodi/reduced--4.jpg`,
       date: "October 2023",
       detailedDescription: "Oodi is composed of three floors. The first floor is for \
       meeting, the second floor is for creating, and the third floor is for reading. \

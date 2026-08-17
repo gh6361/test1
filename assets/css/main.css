@@ -1,7 +1,7 @@
 /* --- THE TISA EDITORIAL THEME --- */
 :root {
   /* Sampled directly from the images */
-  --bg-bone: #f2f1ea;          /* Coastal Mist: Cool, crisp off-white */
+  --bg-bone: #f4f3ee;          /* Coastal Mist: Cool, crisp off-white */
   --bg-dark-accent: #3f464d;   /* Stormy Slate: Cool, architectural blue-grey */
 
   /* Text Colors */
@@ -33,7 +33,7 @@ button, .btn, .leaflet-control-zoom a {
 
 /* --- BASE STYLES --- */
 body {
-  background-color: var(--bg-bone);
+  background-color: var(--bg-bone) !important;
   color: var(--text-body);
   font-family: var(--font-sans);
   font-size: 0.85rem;
@@ -130,6 +130,8 @@ h6 {
   border-bottom-color: var(--bg-bone);
 }
 
+
+
 /* --- DYNAMIC STICKY HEADER (BOOTSTRAP 5.3 OVERRIDE) --- */
 .editorial-header {
   position: fixed;
@@ -149,7 +151,7 @@ h6 {
   box-shadow: none !important;
   /* Overrides Bootstrap 5 variables */
   --bs-navbar-color: var(--bg-bone);
-  --bs-navbar-hover-color: #ffffff;
+  --bs-navbar-hover-color: #f2f1ea;
   --bs-navbar-brand-color: var(--bg-bone);
 }
 
@@ -161,7 +163,11 @@ h6 {
 /* 2. THE SCROLLED STATE (When scrolling down) */
 .editorial-header.scrolled {
   background-color: var(--bg-bone) !important;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05); 
+  
+  /* Force the shadow to disappear on solid, beige-on-beige pages */
+  box-shadow: none !important; 
+  border-bottom: none !important;
+  
   /* Swap Bootstrap variables back to dark */
   --bs-navbar-color: var(--text-dark);
   --bs-navbar-hover-color: var(--text-body);
@@ -209,8 +215,125 @@ h6 {
   padding-top: 70px !important; /* Adjust slightly if your nav is taller/shorter */
 }
 
-/* --- LAYOUT & UI --- */
+/* --- PERFECT NAVBAR ALIGNMENT --- */
+/* Forces the inside of the navbar to match your Collections grid */
+.editorial-header .container,
+.editorial-header .container-fluid {
+  max-width: 1400px !important;
+  padding-left: 4.2vw !important;
+  padding-right: 4.2vw !important;
+  margin: 0 auto;
+}
 
+/* Ensure the solid header state perfectly matches your beige background */
+.editorial-header.header-solid {
+  background-color: var(--bg-bone) !important;
+  box-shadow: none !important; /* Keeps it flat and seamless */
+}
+
+/* Force dark text on the solid header */
+.editorial-header.header-solid .navbar-brand,
+.editorial-header.header-solid .nav-link {
+  color: var(--text-dark) !important;
+}
+
+
+
+/* =========================================
+   COLLECTIONS PAGE GRID
+========================================= */
+
+.collections-wrapper {
+  max-width: 1400px;
+  margin: 0 auto 8rem auto;
+  padding: 0 4.2vw;
+  padding-top: 140px; /* Creates the perfect breathing room below the nav bar */
+  box-sizing: border-box;
+}
+
+/* 2. The CSS Grid */
+.collections-grid {
+  display: grid;
+  /* Auto-fit creates columns automatically. minmax ensures they never get too squished */
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 0.6rem 0.6rem;           /* 4rem vertical gap, 3rem horizontal gap between images */
+}
+
+/* 3. The clickable item link */
+.collection-item {
+  text-decoration: none;
+  display: block;
+  color: inherit;
+  cursor: pointer;
+}
+
+/* 4. The Image Box */
+.collection-img-box {
+  position: relative; /* CRITICAL: This traps the absolute text inside the box */
+  width: 100%;
+  aspect-ratio: 1 / 1; 
+  overflow: hidden;
+  /* Removed bottom margin since the text is no longer underneath it */
+}
+
+.collection-img-box img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.8s ease; 
+}
+
+/* THE DIMMING OVERLAY */
+.collection-overlay {
+  position: absolute;
+  top: 0; 
+  left: 0; 
+  right: 0; 
+  bottom: 0;
+  
+  /* A directional shadow: 60% dark in the top left, fading to only 15% dark in the bottom right */
+  background: linear-gradient(135deg, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0.15) 100%);
+  
+  z-index: 1;
+  opacity: 0; /* Keeps the photo perfectly clean and bright by default */
+  transition: opacity 0.5s ease; /* Matches the speed of your text fading in */
+}
+
+/* Fades the shadow in when the mouse hovers over the image */
+.collection-item:hover .collection-overlay {
+  opacity: 1; 
+}
+
+.collection-text {
+  position: absolute;
+  top: 1.8rem;   
+  left: 1.8rem;  
+  right: 1.8rem; 
+  text-align: left;
+  z-index: 2; 
+  padding: 0;
+  
+  /* The Hover Reveal logic */
+  opacity: 0; 
+  transform: translateY(-10px); /* Starts slightly lifted up */
+  transition: opacity 0.5s ease, transform 0.5s ease;
+}
+
+.collection-item:hover .collection-text {
+  opacity: 1;
+  transform: translateY(0); /* Slides down gently into perfect top-left position */
+}
+
+/* 4. The guaranteed Sans-Serif title */
+.collection-title {
+  font-family: var(--font-sans, sans-serif) !important; 
+  font-size: 1.2rem; 
+  font-weight: 500; 
+  color: #ffffff; 
+  text-transform: none; 
+  letter-spacing: 0em; 
+  margin: 0;
+}
 /* --- MAP LAYOUT --- */
 .map-page {
   display: flex;
@@ -660,32 +783,6 @@ a:hover {
 
 .map-region-controls button:active {
   transform: scale(0.97);
-}
-
-.gallery-heading {
-  margin: 2.5rem 0 1rem;
-}
-
-.gallery-masonry {
-  column-width: 300px;
-  column-gap: 10px;
-}
-
-.gallery-item {
-  break-inside: avoid;
-  margin: 0 0 12px;
-}
-
-.gallery-item a {
-  display: block;
-}
-
-.gallery-image {
-  display: block;
-  width: 100%;
-  height: auto;
-  border-radius: 0;
-  box-shadow: none;
 }
 
 /* =========================================
