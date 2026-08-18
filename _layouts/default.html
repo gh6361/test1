@@ -1,150 +1,150 @@
 <!doctype html>
 <html lang="en">
+  <head>
+    <style>
+      /* Permanently prevent horizontal scrolling */
+      html,
+      body {
+        overflow-x: hidden !important;
+        width: 100%;
+      }
+    </style>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{{ page.title | default: site.title }}</title>
 
-<head>
-  <style>
-  /* Permanently prevent horizontal scrolling */
-  html, body {
-    overflow-x: hidden !important;
-    width: 100%;
-  }
-</style>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>{{ page.title | default: site.title }}</title>
-  <!-- Tisa Theme Fonts -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link
-    href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Montserrat:wght@300;400;500&display=swap"
-    rel="stylesheet">
+    <!-- Tisa Theme Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <!-- Supercharged Tisa Theme Fonts (Includes Bold 600 and 700!) -->
+    <!-- Loads Garamond (for headings), DM Serif (for logo), and Montserrat (for text) -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=DM+Serif+Display&family=Montserrat:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet.markercluster/dist/MarkerCluster.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet.markercluster/dist/MarkerCluster.Default.css"
+    />
+    <link rel="stylesheet" href="{{ '/assets/css/main.css' | relative_url }}" />
+  </head>
 
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
-  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster/dist/MarkerCluster.css" />
-  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster/dist/MarkerCluster.Default.css" />
-  <link rel="stylesheet" href="{{ '/assets/css/main.css' | relative_url }}">
-</head>
+  <body>
+    <!-- THE NAVIGATION BAR -->
+    <!-- Removed fixed-top and the conditional header-solid logic -->
+    <nav class="navbar editorial-header">
+      <div
+        class="container d-flex flex-row justify-content-between align-items-center"
+      >
+        <a class="navbar-brand mb-0" href="{{ '/' | relative_url }}"
+          >Gleda Ho</a
+        >
 
-<body>
-  <!-- SINGLE PAGE STYLES & SMOOTH SCROLL -->
-<!-- DYNAMIC INLINE STYLES (Bypasses all CSS caching) -->
-<!-- DYNAMIC INLINE STYLES (Foolproof Class Version) -->
-<style>
-  /* 1. Default Transparent State (For the Homepage Hero) */
-  .editorial-header { 
-    background-color: transparent !important; 
-    box-shadow: none !important; 
-    transition: background-color 0.3s ease, box-shadow 0.3s ease; 
-  }
-  .editorial-header .nav-link, .editorial-header .navbar-brand { 
-    color: #f4f3ee !important; 
-    transition: color 0.3s ease; 
-  }
-  
-  /* 2. Solid State (Triggered by scrolling OR by the header-solid class on subpages) */
-  .editorial-header.scrolled, 
-  .editorial-header.header-solid { 
-    background-color: #f4f3ee !important; 
-    box-shadow: none !important; 
-  }
-  .editorial-header.scrolled .nav-link, .editorial-header.header-solid .nav-link,
-  .editorial-header.scrolled .navbar-brand, .editorial-header.header-solid .navbar-brand { 
-    color: #1c1c1c !important; 
-    text-shadow: none !important; 
-  }
-  .editorial-header.scrolled .nav-link:hover, .editorial-header.header-solid .nav-link:hover {
-    color: #595959 !important;
-  }
-</style>
-
-<!-- THE NAVIGATION BAR -->
-<nav class="navbar editorial-header fixed-top {% if page.header %}header-solid{% endif %}" style="z-index: 99999 !important;">
-  
-  <div class="container d-flex flex-row justify-content-between align-items-center">
-
-    <!-- Reverted to relative URLs -->
-    <a class="navbar-brand mb-0" href="{{ '/' | relative_url }}">
-      Test1
-    </a>
-
-    <div class="navbar-nav d-flex flex-row gap-4">
-      <a class="nav-link" href="{{ '/' | relative_url }}">Home</a>
-      <a class="nav-link" href="{{ '/portfolio/' | relative_url }}">Portfolio</a>
-      <a class="nav-link" href="{{ '/map/' | relative_url }}">Map</a>
-      <a class="nav-link" href="{{ '/about/' | relative_url }}">About</a>
-    </div>
-
-  </div>
-  
-</nav>
-
-  <main
-    class="{% if page.full_width %}container-fluid p-0{% else %}container py-4{% endif %} {% if page.header %}nav-spacer{% endif %}">
-  </main>
-  </main>
-  {{ content }}
-  </main>
-
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-  <script src="https://unpkg.com/leaflet.markercluster/dist/leaflet.markercluster.js"></script>
-  {% if page.load_map_js %}
-  <script src="{{ '/assets/js/map.js' | relative_url }}"></script>
-  {% endif %}
-
-  <div id="lightbox" class="lightbox hidden panel-open">
-    <div class="lightbox-main">
-      <button id="lightbox-prev" class="lightbox-arrow lightbox-ui" type="button"
-        aria-label="Previous image">&#10094;</button>
-
-      <button id="lightbox-left-zone" class="lightbox-zone" type="button" aria-label="Previous image"></button>
-
-      <div id="lightbox-stage" class="lightbox-stage">
-        <img id="lightbox-image-a" class="lightbox-image active" src="" alt="">
-        <img id="lightbox-image-b" class="lightbox-image" src="" alt="">
+        <div class="navbar-nav d-flex flex-row gap-4">
+          <a class="nav-link" href="{{ '/collections/' | relative_url }}"
+            >Collections</a
+          >
+          <a class="nav-link" href="{{ '/map/' | relative_url }}">Map</a>
+          <a class="nav-link" href="{{ '/about/' | relative_url }}">About</a>
+        </div>
       </div>
+    </nav>
 
-      <button id="lightbox-right-zone" class="lightbox-zone" type="button" aria-label="Next image"></button>
+    <main
+      class="{% if page.full_width %}container-fluid p-0{% else %}container py-4{% endif %}"
+    >
+      {{ content }}
+    </main>
 
-      <button id="lightbox-next" class="lightbox-arrow lightbox-ui" type="button"
-        aria-label="Next image">&#10095;</button>
-    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/leaflet.markercluster/dist/leaflet.markercluster.js"></script>
+    {% if page.load_map_js %}
+    <script src="{{ '/assets/js/map.js' | relative_url }}"></script>
+    {% endif %}
 
-    <aside class="lightbox-panel">
-      <div class="lightbox-panel-content">
-        <p id="lightbox-caption"></p>
-        <div class="lightbox-details">More details will go here.</div>
+    <!-- Your Lightbox HTML... -->
+    <div id="lightbox" class="lightbox hidden panel-open">
+      <div class="lightbox-main">
+        <button
+          id="lightbox-prev"
+          class="lightbox-arrow lightbox-ui"
+          type="button"
+          aria-label="Previous image"
+        >
+          &#10094;
+        </button>
+        <button
+          id="lightbox-left-zone"
+          class="lightbox-zone"
+          type="button"
+          aria-label="Previous image"
+        ></button>
+        <div id="lightbox-stage" class="lightbox-stage">
+          <img
+            id="lightbox-image-a"
+            class="lightbox-image active"
+            src=""
+            alt=""
+          />
+          <img id="lightbox-image-b" class="lightbox-image" src="" alt="" />
+        </div>
+        <button
+          id="lightbox-right-zone"
+          class="lightbox-zone"
+          type="button"
+          aria-label="Next image"
+        ></button>
+        <button
+          id="lightbox-next"
+          class="lightbox-arrow lightbox-ui"
+          type="button"
+          aria-label="Next image"
+        >
+          &#10095;
+        </button>
       </div>
-    </aside>
-
-    <div class="lightbox-controls lightbox-ui">
-      <button id="lightbox-close" class="lightbox-control" type="button" aria-label="Close">×</button>
-      <button id="lightbox-panel-toggle" class="lightbox-control" type="button" aria-label="Toggle information panel">
-        <i class="bi bi-info-circle"></i>
-      </button>
+      <aside class="lightbox-panel">
+        <div class="lightbox-panel-content">
+          <p id="lightbox-caption"></p>
+          <div class="lightbox-details">More details will go here.</div>
+        </div>
+      </aside>
+      <div class="lightbox-controls lightbox-ui">
+        <button
+          id="lightbox-close"
+          class="lightbox-control"
+          type="button"
+          aria-label="Close"
+        >
+          ×
+        </button>
+        <button
+          id="lightbox-panel-toggle"
+          class="lightbox-control"
+          type="button"
+          aria-label="Toggle information panel"
+        >
+          <i class="bi bi-info-circle"></i>
+        </button>
+      </div>
     </div>
-  </div>
-  <script src="{{ '/assets/js/lightbox.js' | relative_url }}"></script>
-
-  <script>
-    document.addEventListener('DOMContentLoaded', function () {
-      const header = document.querySelector('.editorial-header');
-
-      // Safety check in case the header doesn't load
-      if (!header) return;
-
-      window.addEventListener('scroll', function () {
-        if (window.scrollY > 50) {
-          header.classList.add('scrolled');
-        } else {
-          header.classList.remove('scrolled');
-        }
-      });
-    });
-  </script>
-
-</body>
-
+    <script src="{{ '/assets/js/lightbox.js' | relative_url }}"></script>
+  </body>
 </html>

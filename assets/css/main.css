@@ -1,7 +1,7 @@
 /* --- THE TISA EDITORIAL THEME --- */
 :root {
   /* Sampled directly from the images */
-  --bg-bone: #f4f3ee;          /* Coastal Mist: Cool, crisp off-white */
+  --bg-bone: #ffffff;          /* Coastal Mist: Cool, crisp off-white */
   --bg-dark-accent: #3f464d;   /* Stormy Slate: Cool, architectural blue-grey */
 
   /* Text Colors */
@@ -10,8 +10,16 @@
   --text-light: #f2f1ea;       /* Updated to match the new background */
 
   /* Typography */
-  --font-serif: 'Cormorant Garamond', serif;
+  --font-serif: 'Cormorant Garamond', serif; /* Back to your elegant original! */
   --font-sans: 'Montserrat', sans-serif;
+  
+  /* NEW: Your special occasion font */
+  --font-display: 'DM Serif Display', serif;
+}
+
+/* Disable Bootstrap's CSS scrolling so our JS can control the speed perfectly */
+html {
+  scroll-behavior: auto !important;
 }
 
 /* --- GLOBAL TYPOGRAPHY --- */
@@ -48,9 +56,9 @@ h3,
 h4,
 h5,
 h6 {
-  font-family: var(--font-serif);
+  font-family: var(--font-serif) !important; /* Uses Garamond */
   color: var(--text-dark);
-  font-weight: 500;
+  font-weight: 400; /* Reverted back to 500 so Garamond looks its best */
   letter-spacing: 0;
   margin-bottom: 1.2rem;
 }
@@ -131,114 +139,79 @@ h6 {
 }
 
 
-
-/* --- DYNAMIC STICKY HEADER (BOOTSTRAP 5.3 OVERRIDE) --- */
-.editorial-header {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  z-index: 9999 !important; /* Forces the nav to sit above the Leaflet map */
-  transition: background-color 0.3s ease, box-shadow 0.3s ease;
-  padding: 1rem 0; 
-  box-shadow: none !important; 
-  border-bottom: none !important;
-}
-
-/* 1. THE TRANSPARENT STATE (When at the very top) */
-.editorial-header:not(.scrolled) {
-  background-color: transparent !important;
-  box-shadow: none !important;
-  /* Overrides Bootstrap 5 variables */
-  --bs-navbar-color: var(--bg-bone);
-  --bs-navbar-hover-color: #f2f1ea;
-  --bs-navbar-brand-color: var(--bg-bone);
-}
-
-.editorial-header:not(.scrolled) .navbar-brand,
-.editorial-header:not(.scrolled) .nav-link {
-  color: var(--bg-bone) !important;
-}
-
-/* 2. THE SCROLLED STATE (When scrolling down) */
-.editorial-header.scrolled {
-  background-color: var(--bg-bone) !important;
-  
-  /* Force the shadow to disappear on solid, beige-on-beige pages */
-  box-shadow: none !important; 
-  border-bottom: none !important;
-  
-  /* Swap Bootstrap variables back to dark */
-  --bs-navbar-color: var(--text-dark);
-  --bs-navbar-hover-color: var(--text-body);
-  --bs-navbar-brand-color: var(--text-dark);
-}
-
-.editorial-header.scrolled .navbar-brand,
-.editorial-header.scrolled .nav-link {
-  color: var(--text-dark) !important;
-}
-
-/* Font styling for all states */
-.editorial-header .nav-link {
-  font-family: var(--font-sans);
-  text-transform: uppercase;
-  letter-spacing: 2px;
-  font-size: 0.8rem;
-  transition: color 0.3s ease;
-}
-
-.editorial-header .navbar-brand {
-  font-family: var(--font-serif);
-  font-size: 1.5rem;
-  text-transform: none;
-  letter-spacing: 0;
-}
-
-/* --- PERMANENT SOLID HEADER (For map & utility pages) --- */
-/* 1. THE TRANSPARENT STATE (When at the very top AND not a solid header) */
-.editorial-header:not(.scrolled):not(.header-solid) {
-  background-color: transparent !important;
-  box-shadow: none !important;
-  --bs-navbar-color: var(--bg-bone);
-  --bs-navbar-hover-color: #ffffff;
-  --bs-navbar-brand-color: var(--bg-bone);
-}
-
-.editorial-header:not(.scrolled):not(.header-solid) .navbar-brand,
-.editorial-header:not(.scrolled):not(.header-solid) .nav-link {
-  color: var(--bg-bone) !important;
-}
-
-/* Pushes content down so the fixed nav doesn't cover the top of the map */
-.nav-spacer {
-  padding-top: 70px !important; /* Adjust slightly if your nav is taller/shorter */
-}
+/* --- PERMANENT STICKY HEADER --- */
 
 /* --- PERFECT NAVBAR ALIGNMENT --- */
-/* Forces the inside of the navbar to match your Collections grid */
 .editorial-header .container,
 .editorial-header .container-fluid {
-  max-width: 1400px !important;
-  padding-left: 4.2vw !important;
-  padding-right: 4.2vw !important;
+  /* Let the container stretch across the entire screen */
+  max-width: 100% !important; 
+  
+  /* Push the logo and links closer to the edges */
+  padding-left: 10vw !important;  
+  padding-right: 10vw !important; 
+  
   margin: 0 auto;
 }
 
-/* Ensure the solid header state perfectly matches your beige background */
-.editorial-header.header-solid {
+.editorial-header {
+  position: sticky;  
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 9999 !important; 
+  
+  /* Make the bar nice and tall again! */
+  padding-top: 2rem !important; 
+  padding-bottom: 3.1rem !important;
+  
   background-color: var(--bg-bone) !important;
-  box-shadow: none !important; /* Keeps it flat and seamless */
+  border-bottom: none !important;
+  box-shadow: none !important; 
 }
 
-/* Force dark text on the solid header */
-.editorial-header.header-solid .navbar-brand,
-.editorial-header.header-solid .nav-link {
-  color: var(--text-dark) !important;
+/* 1. STRIP BOOTSTRAP'S PADDING */
+.editorial-header .navbar-brand,
+.editorial-header .nav-link {
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+  margin: 0 !important;
+  line-height: 1 !important; 
 }
 
 
+/* 3. TYPOGRAPHY: NAVIGATION LINKS */
+.editorial-header .nav-link {
+  font-family: var(--font-sans) !important; 
+  
+  /* Control your link size right here */
+  font-size: 0.75rem !important; 
+  
+  text-transform: uppercase !important; 
+  letter-spacing: 0.15em !important; 
+  line-height: 1.2 !important;
+  font-weight: 500 !important; 
+  color: var(--text-dark) !important; 
+  transition: color 0.3s ease;
+}
 
+/* 4. TYPOGRAPHY: BRAND LOGO (Special Occasion) */
+.editorial-header .navbar-brand {
+  font-family: var(--font-display) !important; /* Uses DM Serif Display! */
+  font-size: 1.8rem !important; 
+  text-transform: uppercase !important; 
+  letter-spacing: 0.03em !important; 
+  line-height: 1.2 !important;
+  font-weight: 400 !important; 
+  color: var(--text-dark) !important; 
+  transition: color 0.3s ease;
+}
+
+/* 5. HOVER EFFECT FOR BOTH */
+.editorial-header .nav-link:hover,
+.editorial-header .navbar-brand:hover {
+  color: var(--text-body) !important; 
+}
 /* =========================================
    COLLECTIONS PAGE GRID
 ========================================= */
@@ -755,7 +728,7 @@ a:hover {
   display: flex;
   flex-direction: column;
   gap: 8px;
-  margin-top: 15px !important;
+  margin-top: 1.5rem !important;
   margin-right: 15px !important;
   /* Pushes the buttons away from the right edge */
 }
@@ -791,7 +764,7 @@ a:hover {
 .lightbox {
   position: fixed;
   inset: 0;
-  background: rgba(242, 241, 234, 0.97); 
+  background: rgba(240, 239, 237, 0.97); 
   display: flex;
   align-items: stretch;
   justify-content: stretch;
@@ -876,7 +849,7 @@ a:hover {
   width: calc(23.6vw - var(--desc-gap)); 
   
   flex-shrink: 0;
-  background-color: #fcfbf9; 
+  background-color: #ffffff; 
   padding: 1.5rem;
   border-radius: 2px;
   color: #1c1c1c;
@@ -1027,7 +1000,7 @@ a:hover {
 /* --- THE MAP TILES (Editorial Muted Filter) --- */
 /* This applies a soft, warm, desaturated look to the default map */
 .leaflet-tile-pane {
-    filter: grayscale(20%) sepia(15%) brightness(0.98) contrast(0.95) saturate(1.1);
+    filter: grayscale(0%) sepia(15%) brightness(0.98) contrast(1) saturate(0.98);
 }
 
 /* --- THE RIGHT-SIDE MAP BUTTONS --- */

@@ -1,6 +1,7 @@
 ---
 layout: default
 title: Collections
+permalink: /collections/
 full_width: true
 ---
 

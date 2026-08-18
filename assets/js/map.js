@@ -389,13 +389,13 @@ window.addEventListener("load", () => {
         
         <div style="
           text-align: left; 
-          margin-top: -0.75rem;   
+          margin-top: 1.2rem;   
           margin-bottom: 0.5rem; 
         ">
           <h2 style="
             margin: 0; 
             color: #1c1c1c; 
-            font-weight: normal; 
+            font-weight: 600 !important; 
             white-space: normal;
             font-size: 1.9rem; 
             line-height: 1.1;
@@ -595,13 +595,13 @@ window.addEventListener("load", () => {
         
         <div style="
           text-align: left; 
-          margin-top: -0.75rem;   
+          margin-top: 1.2rem;   
           margin-bottom: 0.5rem; 
         ">
           <h2 style="
             margin: 0; 
             color: #1c1c1c; 
-            font-weight: normal; 
+            font-weight: 600 !important; 
             white-space: normal;
             font-size: 1.9rem; 
             line-height: 1.1;
