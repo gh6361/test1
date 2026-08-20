@@ -154,8 +154,14 @@ h6 {
   margin: 0 auto;
 }
 
+/* --- FIX HIDDEN OVERFLOWS & PREVENT HORIZONTAL SCROLLING --- */
+html, body {
+  max-width: 100%;
+  overflow-x: clip !important; /* 'clip' hides the horizontal scrollbar without breaking sticky nav! */
+}
+
 .editorial-header {
-  position: sticky;  
+  position: sticky;       /* NO !important */
   top: 0;
   left: 0;
   width: 100%;

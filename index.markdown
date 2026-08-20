@@ -22,23 +22,22 @@ full_width: true
   }
 </style>
 
-<!-- 1. HOME / HERO SECTION -->
 <section id="home">
-  <!-- CHANGED: height is now exactly 100vh minus the ~72px height of your navbar -->
-  <div class="full-bleed-hero" style="height: calc(100vh - 90px); position: relative; overflow: hidden;">
+  <div class="full-bleed-hero" style="height: calc(100vh - 80px); position: relative; overflow: hidden;">
     
-    <img src="{{ '/assets/images/rainbow.jpg' | relative_url }}" alt="Hero Background" style="width: 100%; height: 100%; object-fit: cover;">
+   <img src="{{ '/assets/images/car4.jpg' | relative_url }}" alt="Hero Background" style="width: 100%; height: 100%; object-fit: cover;">
     
-    <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.1);"></div>
+    <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0);"></div>
     
-    <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 100%; text-align: center;">
-      <h1 style="font-size: 4rem; font-weight: normal; color: #ffffff; font-family: var(--font-serif);">Archives & Journals</h1>
+    <div style="position: absolute; top: 45%; left: 50%; transform: translate(-50%, -50%); width: 100%; text-align: center;">
+      <h1 style="font-family: var(--font-sans); text-transform: uppercase; font-weight: 700; font-size: 1.8rem; letter-spacing: 0.03em;">
+        <span style="color: #ffffff;">a photo journal </span>
+        <span style="color: #1c1c1c;">from many places</span>
+      </h1>
     </div>
 
-    <!-- THE SCROLL ARROW -->
-    <div id="scroll-arrow" style="position: absolute; bottom: 2rem; left: 50%; transform: translateX(-50%); z-index: 10; cursor: pointer; text-align: center;">
-      <!-- Using Bootstrap Icons which you already have loaded in your default.html -->
-      <i class="bi bi-chevron-down" style="font-size: 2rem; font-weight: 300;"></i>
+    <div id="scroll-arrow" style="position: absolute; bottom: 1.5rem; left: 50%; transform: translateX(-50%); z-index: 10; cursor: pointer; text-align: center; opacity: 1 !important; transition: opacity 0.3s ease;">
+      <i class="bi bi-chevron-down" style="font-size: 2rem; color: #ffffff; text-shadow: 0px 2px 4px rgba(0,0,0,0.3);"></i>
     </div>
 
   </div>
@@ -54,18 +53,35 @@ full_width: true
     if (header && hero) {
       // 1. Physically move the navigation bar directly under the hero image
       hero.parentNode.insertBefore(header, hero.nextSibling);
+
+      // 2. FORCE the initial state so the global CSS doesn't confuse it
+      header.style.position = "relative";
+      header.style.top = "auto";
+
+      // 3. Track the scrolling to lock it at the top
+      window.addEventListener("scroll", function() {
+        if (window.scrollY >= hero.offsetHeight) {
+          header.style.position = "fixed";
+          header.style.top = "0";
+          header.style.width = "100%";
+          header.style.zIndex = "9999";
+          document.body.style.paddingTop = header.offsetHeight + "px"; 
+        } else {
+          header.style.position = "relative";
+          header.style.top = "auto";
+          document.body.style.paddingTop = "0px";
+        }
+      });
     }
 
+    // --- THE CINEMATIC SCROLL ARROW ---
     if (scrollArrow && header) {
-      
-      // 2. The Custom Cinematic Scroll Function
       function smoothScrollTo(targetElement, duration) {
         const targetPosition = targetElement.getBoundingClientRect().top + window.scrollY;
         const startPosition = window.scrollY;
         const distance = targetPosition - startPosition;
         let startTime = null;
 
-        // Mathematical easing function (starts slow, speeds up, slows down smoothly)
         function easeInOutQuad(time, start, distance, duration) {
           time /= duration / 2;
           if (time < 1) return distance / 2 * time * time + start;
@@ -77,21 +93,16 @@ full_width: true
           if (startTime === null) startTime = currentTime;
           const timeElapsed = currentTime - startTime;
           const run = easeInOutQuad(timeElapsed, startPosition, distance, duration);
-          
           window.scrollTo(0, run);
-          
           if (timeElapsed < duration) {
             requestAnimationFrame(animation);
           } else {
-            // THE LANDING GEAR: Guarantees it stops exactly on the pixel without snapping short
             window.scrollTo(0, targetPosition);
           }
         }
-
         requestAnimationFrame(animation);
       }
 
-      // 3. Trigger the slow scroll when the arrow is clicked
       scrollArrow.addEventListener('click', function() {
         smoothScrollTo(header, 1200); 
       });
@@ -144,5 +155,3 @@ full_width: true
     </a>
   </div>
 </section>
-
-
