@@ -54,22 +54,42 @@ window.addEventListener("load", () => {
     [90, 10000],
   ];
 
+  // --- NEW: CHECK URL BEFORE INITIALIZING MAP ---
+  const urlParams = new URLSearchParams(window.location.search);
+  let startCenter = null;
+  let startZoom = null;
+
+  if (urlParams.has("loc")) {
+    const locIdx = parseInt(urlParams.get("loc"), 10);
+    if (!isNaN(locIdx) && locations[locIdx]) {
+      startCenter = locations[locIdx].coords;
+      startZoom = 6; // Instantly start zoomed in!
+    }
+  } else if (urlParams.has("lat") && urlParams.has("lng")) {
+    startCenter = [
+      parseFloat(urlParams.get("lat")),
+      parseFloat(urlParams.get("lng")),
+    ];
+    startZoom = urlParams.has("zoom") ? parseInt(urlParams.get("zoom"), 10) : 6;
+  }
+
   // Initialize map with fractional zooming for a perfect, fluid fit
   const map = L.map(mapEl, {
     zoomControl: false,
     zoomSnap: 0.1,
     wheelPxPerZoomLevel: 100,
     minZoom: 1.8,
-
-    // Apply the vertical-only bounds
     maxBounds: verticalBounds,
     maxBoundsViscosity: 1.0,
-
-    // --- NEW: Seamless Wrapping ---
-    // This tells Leaflet to seamlessly teleport the user's view if they drag
-    // across the world's edge, making the infinite horizontal scrolling feel flawless.
     worldCopyJump: true,
-  }).fitBounds(regionBounds.world);
+  });
+
+  // Apply the starting view instantly before drawing any tiles!
+  if (startCenter && startZoom) {
+    map.setView(startCenter, startZoom);
+  } else {
+    map.fitBounds(regionBounds.world);
+  }
 
   // Manually add the zoom control to the bottom right
   L.control
@@ -324,33 +344,39 @@ window.addEventListener("load", () => {
 
     locations.forEach((loc, index) => {
       // Default to "Other" if you forget to add a country tag
-      const country = loc.country || "Other"; 
-      
+      const country = loc.country || "Other";
+
       // Simply use the default name logic (stripping out anything after a colon)
-      const displayName = loc.name.includes(":") ? loc.name.split(":")[0].trim() : loc.name;
+      const displayName = loc.name.includes(":")
+        ? loc.name.split(":")[0].trim()
+        : loc.name;
 
       // Create the country group array if it doesn't exist yet
       if (!groupedLocations[country]) {
         groupedLocations[country] = [];
       }
-      
+
       // Push the item into its specific country group
       groupedLocations[country].push({
         displayName: displayName,
-        originalIndex: index
+        originalIndex: index,
       });
     });
 
     // 2. Sort the countries alphabetically
-    const sortedCountries = Object.keys(groupedLocations).sort((a, b) => a.localeCompare(b));
+    const sortedCountries = Object.keys(groupedLocations).sort((a, b) =>
+      a.localeCompare(b),
+    );
 
     // 3. Generate the grouped HTML list
     let locationListHtml = "";
-    
-    sortedCountries.forEach(country => {
+
+    sortedCountries.forEach((country) => {
       // Sort the places alphabetically inside this specific country
-      groupedLocations[country].sort((a, b) => a.displayName.localeCompare(b.displayName));
-      
+      groupedLocations[country].sort((a, b) =>
+        a.displayName.localeCompare(b.displayName),
+      );
+
       // EXACT copy of your subtitle styling using a <div> to avoid global <h4> serif overrides!
       locationListHtml += `
         <li>
@@ -367,16 +393,16 @@ window.addEventListener("load", () => {
           ">${country}</div>
           <ul style="list-style-type: none; padding-left: 1rem; margin: 0; margin-bottom: 2rem; display: flex; flex-direction: column; gap: 0.25rem;">
       `;
-        
+
       // Add all the places beneath the header
-      groupedLocations[country].forEach(item => {
+      groupedLocations[country].forEach((item) => {
         locationListHtml += `
             <li class="sidebar-loc-link" data-index="${item.originalIndex}" style="font-size: 1rem; color: #1c1c1c;">
               ${item.displayName}
             </li>
         `;
       });
-      
+
       locationListHtml += `
           </ul>
         </li>
@@ -414,7 +440,7 @@ window.addEventListener("load", () => {
     `;
 
     // 5. Attach click events
-    const links = panel.querySelectorAll('.sidebar-loc-link');
+    const links = panel.querySelectorAll(".sidebar-loc-link");
     // ... keep your existing click event logic down below! ...
     // ... keep the rest of your link event listener code exactly the same ...
     links.forEach((link) => {
@@ -893,6 +919,46 @@ window.addEventListener("load", () => {
       if (event.key === "Escape") closeGalleryLightbox();
     }
   });
+
+  // --- URL PARAMETER ROUTING (NO DELAY) ---
+  if (urlParams.has("loc")) {
+    const locIndex = parseInt(urlParams.get("loc"), 10);
+
+    if (!isNaN(locIndex) && locations[locIndex]) {
+      const targetMarker = locations[locIndex].markerInstance;
+
+      if (targetMarker) {
+        // 1. Render the side gallery instantly
+        renderPanel(locations[locIndex]);
+
+        // 2. Calculate the exact targeted zoom (identical to sidebar logic!)
+        let targetZoom = 6;
+        const visibleParent = markers.getVisibleParent(targetMarker);
+
+        if (visibleParent && visibleParent !== targetMarker) {
+          if (
+            targetMarker.__parent &&
+            typeof targetMarker.__parent._zoom === "number"
+          ) {
+            const breakZoom = targetMarker.__parent._zoom + 1;
+            targetZoom = Math.min(breakZoom, 15);
+          } else {
+            targetZoom = 15;
+          }
+        }
+        if (targetZoom < 6) targetZoom = 6;
+
+        // 3. Instantly snap the map to the perfect calculated zoom
+        map.setView(targetMarker.getLatLng(), targetZoom, { animate: false });
+
+        // 4. Fire the click to highlight the active pin
+        // (A tiny 50ms delay guarantees the map tiles have snapped first)
+        setTimeout(() => {
+          targetMarker.fire("click");
+        }, 50);
+      }
+    }
+  }
 
   setTimeout(() => map.invalidateSize(), 300);
 });

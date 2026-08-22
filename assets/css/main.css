@@ -106,7 +106,7 @@ h6 {
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(28, 28, 28, 0.1); 
+  background-color: rgba(28, 28, 28, 0); 
   z-index: 2;
 }
 
@@ -148,8 +148,8 @@ h6 {
   max-width: 100% !important; 
   
   /* Push the logo and links closer to the edges */
-  padding-left: 10vw !important;  
-  padding-right: 10vw !important; 
+  padding-left: 13.5vw !important;  
+  padding-right: 13.5vw !important; 
   
   margin: 0 auto;
 }
@@ -161,18 +161,21 @@ html, body {
 }
 
 .editorial-header {
-  position: sticky;       /* NO !important */
+  position: sticky; 
   top: 0;
   left: 0;
   width: 100%;
+  
+  /* 1. Force the exact height (adjust this number if you want it taller/shorter) */
+  height: 68px !important; 
+  
+  /* 2. Vertically center the text inside the new height */
+  display: flex !important;
+  align-items: center !important;
+  
   z-index: 9999 !important; 
-  
-  /* Make the bar nice and tall again! */
-  padding-top: 2rem !important; 
-  padding-bottom: 3.1rem !important;
-  
   background-color: var(--bg-bone) !important;
-  border-bottom: none !important;
+  border-bottom: 1px solid #e5e5e5 !important;
   box-shadow: none !important; 
 }
 
@@ -218,6 +221,51 @@ html, body {
 .editorial-header .navbar-brand:hover {
   color: var(--text-body) !important; 
 }
+
+/* --- HOMEPAGE MAP THUMBNAIL MARKERS --- */
+.mini-map-thumb {
+  position: relative;
+  width: 40px;
+  height: 40px;
+  border-radius: 4px;
+  border: 2px solid #ffffff;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+  transition: transform 0.2s ease, z-index 0s;
+  cursor: pointer;
+  z-index: 100;
+}
+
+.mini-map-thumb:hover {
+  transform: scale(1.5); /* Enlarges on hover */
+  z-index: 999 !important; /* Forces hovered image to the front */
+}
+
+.mini-map-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 2px;
+  display: block;
+}
+
+.thumb-badge {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  background: #1c1c1c;
+  color: #ffffff;
+  font-family: var(--font-sans);
+  font-size: 0.7rem;
+  font-weight: 700;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid #ffffff;
+}
+
 /* =========================================
    COLLECTIONS PAGE GRID
 ========================================= */
