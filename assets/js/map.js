@@ -29,7 +29,7 @@ window.addEventListener("load", () => {
   // Define coordinate boundaries FIRST so the map can use them to load
   const regionBounds = {
     world: [
-      [-55, -125], // Western edge (Keeps North America in frame)
+      [-55, -170], // Western edge (Keeps North America in frame)
       [75, 180],
     ],
     europe: [
@@ -151,27 +151,32 @@ window.addEventListener("load", () => {
 
     // --- NEW CAPTION HTML INJECTION ---
     if (galCaption) {
-      let collectionsHTML = "";
-      if (image.collections && image.collections.length > 0) {
-        const links = image.collections
-          .map((c) => `<a href="${c.url}">${c.name}</a>`)
-          .join(", ");
-        collectionsHTML = `In collections: ${links}`;
-      }
-
-      // NEW: Only show the index counter if there is more than 1 image
-      let indexHtml = "";
-      if (galImages.length > 1) {
-        indexHtml = `<div class="caption-index">${galCurrentIndex + 1} / ${galImages.length}</div>`;
-      }
-
-      galCaption.innerHTML = `
-        ${indexHtml} <!-- Injected right above the main title -->
+      const descWrapper = document.querySelector(".lightbox-desc-wrapper");
+      
+      // If there is only ONE image, completely hide the caption box in the lightbox
+      if (galImages.length <= 1) {
+        galCaption.innerHTML = "";
+        if (descWrapper) descWrapper.style.display = "none";
+      } else {
+        // If there are multiple images, show the box and build the text
+        if (descWrapper) descWrapper.style.display = "block";
         
-        ${image.detailedDescription ? `<div class="caption-details">${image.detailedDescription}</div>` : ""}
-        
-        ${collectionsHTML ? `<div class="caption-collections">${collectionsHTML}</div>` : ""}
-      `;
+        let collectionsHTML = "";
+        if (image.collections && image.collections.length > 0) {
+          const links = image.collections
+            .map((c) => `<a href="${c.url}">${c.name}</a>`)
+            .join(", ");
+          collectionsHTML = `In collections: ${links}`;
+        }
+
+        let indexHtml = `<div class="caption-index">${galCurrentIndex + 1} / ${galImages.length}</div>`;
+
+        galCaption.innerHTML = `
+          ${indexHtml}
+          ${image.detailedDescription ? `<div class="caption-details">${image.detailedDescription}</div>` : ""}
+          ${collectionsHTML ? `<div class="caption-collections">${collectionsHTML}</div>` : ""}
+        `;
+      }
     }
     // --- END NEW CAPTION LOGIC ---
 
@@ -288,13 +293,15 @@ window.addEventListener("load", () => {
     const centerGroup = document.querySelector(".lightbox-center-group");
     const activeImg = document.querySelector(".lightbox-image.active");
 
-    if (
-      !descWrapper ||
-      !centerGroup ||
-      !activeImg ||
-      activeImg.naturalHeight === 0
-    )
+    // NEW: If there is only 1 image, abort the math so the image stays perfectly vertically centered!
+    if (galImages.length <= 1) {
+      if (descWrapper) descWrapper.style.marginTop = "0px";
       return;
+    }
+
+    if (!descWrapper || !centerGroup || !activeImg || activeImg.naturalHeight === 0) return;
+    
+    // ... the rest of the function stays exactly the same ...
 
     const groupHeight = centerGroup.getBoundingClientRect().height;
 
@@ -415,7 +422,7 @@ window.addEventListener("load", () => {
         
         <div style="
           text-align: left; 
-          margin-top: 1.2rem;   
+          margin-top: 1rem;   
           margin-bottom: 0.5rem; 
         ">
           <h2 style="
@@ -515,15 +522,17 @@ window.addEventListener("load", () => {
     if (isStacked && imgCount > 0) {
       if (imgCount === 1) {
         // --- 1. SINGLE IMAGE OVERRIDE ---
-        // Adjust this percentage! 82vh means the image will never take up more than 82% of the screen height.
-        // Short images will stay their natural size.
-        let singleMaxHeight = "81vh";
+        let singleMaxHeight = "72vh"; // Reduced slightly to ensure the text below fits on screen
+        const img = location.images[0];
+        const captionText = img.detailedDescription || img.caption || "";
 
         justifiedHtml = `
-          <div class="justified-gallery single-override">
+          <div class="justified-gallery single-override" style="display: flex; flex-direction: column;">
             <div class="justified-item" data-index="0" style="width: 100%;">
-              <img src="${location.images[0].src}" alt="${location.images[0].caption || location.name}" style="width: 100%; height: auto; max-height: ${singleMaxHeight}; object-fit: cover; object-position: center; display: block;">
+              <img src="${img.src}" alt="${img.caption || location.name}" style="width: 100%; height: auto; max-height: ${singleMaxHeight}; object-fit: cover; object-position: center; display: block;">
             </div>
+            <!-- INJECT THE DESCRIPTION BELOW THE IMAGE -->
+            ${captionText ? `<div style="margin-top: 1.5rem; font-family: var(--font-sans); font-size: 0.95rem; color: #4a4a4a; line-height: 1.6;">${captionText}</div>` : ""}
           </div>
         `;
       } else if (imgCount === 2) {
@@ -548,7 +557,7 @@ window.addEventListener("load", () => {
       } else if (imgCount === 3) {
         // --- 3. EXACTLY THREE IMAGES ---
         // Slightly taller so the 3 images have room to breathe
-        let targetHeight = "39vh";
+        let targetHeight = "37vh";
         let minHeight = "120px";
 
         justifiedHtml = `
@@ -621,7 +630,7 @@ window.addEventListener("load", () => {
         
         <div style="
           text-align: left; 
-          margin-top: 1.2rem;   
+          margin-top: 1rem;   
           margin-bottom: 0.5rem; 
         ">
           <h2 style="
@@ -705,7 +714,7 @@ window.addEventListener("load", () => {
 
           imgs[0].style.width = "100%";
           imgs[0].style.height = "auto";
-          imgs[0].style.maxHeight = "39vh";
+          imgs[0].style.maxHeight = "36vh";
           imgs[0].style.objectFit = "cover";
 
           // Image 2: Exact same constraints
@@ -715,7 +724,7 @@ window.addEventListener("load", () => {
 
           imgs[1].style.width = "100%";
           imgs[1].style.height = "auto";
-          imgs[1].style.maxHeight = "39vh";
+          imgs[1].style.maxHeight = "36vh";
           imgs[1].style.objectFit = "cover";
         }
       };
@@ -887,9 +896,6 @@ window.addEventListener("load", () => {
     // 4. Add the individual marker to the CLUSTER GROUP instead of the map
     markers.addLayer(marker);
   });
-
-  // 5. Finally, add the entire cluster group to the map AFTER the loop finishes
-  map.addLayer(markers);
 
   // 5. Finally, add the entire cluster group to the map AFTER the loop finishes
   map.addLayer(markers);

@@ -235,7 +235,7 @@ full_width: true
   <div style="max-width: 1000px; margin: 0 auto; padding: 0 2rem; text-align: center;">
     
     <p style="font-family: var(--font-sans); font-size: 0.75rem; color: #666666; text-transform: uppercase; letter-spacing: 0.15em; margin: 0;">
-      &copy; 2026 Gleda Ho. All rights reserved.
+      &copy; 2026 Gleda Ho. 
     </p>
     
   </div>
