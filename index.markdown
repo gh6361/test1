@@ -83,7 +83,8 @@ full_width: true
       </a>
 
       <!-- COLLECTION CARD 2 -->
-      <a href="/collections/finland" style="position: relative; display: block; aspect-ratio: 4 / 4; text-decoration: none; overflow: hidden; transition: transform 0.3s ease, box-shadow 0.3s ease;" onmouseover="this.style.transform='translateY(-5px)'; this.style.boxShadow='0 10px 20px rgba(0,0,0,0.1)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none';">
+      <!-- COLLECTION CARD 2 -->
+      <a href="{{ '/collections/finland/' | relative_url }}" style="position: relative; display: block; aspect-ratio: 4 / 4; text-decoration: none; overflow: hidden; transition: transform 0.3s ease, box-shadow 0.3s ease;" onmouseover="this.style.transform='translateY(-5px)'; this.style.boxShadow='0 10px 20px rgba(0,0,0,0.1)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none';">
         <img src="{{ '/assets/images/car4.jpg' | relative_url }}" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; display: block; z-index: 1;">
         <div style="position: absolute; bottom: 0; left: 0; width: 100%; height: 60%; background: linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0) 100%); z-index: 2; pointer-events: none;"></div>
         <div style="position: absolute; bottom: 0; left: 0; width: 100%; padding: 1.5rem; box-sizing: border-box; z-index: 3; text-align: left;">

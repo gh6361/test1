@@ -9,7 +9,6 @@ export const oodi = {
   images: [
     {
       src: `../assets/images/finland/oodi/reduced-.jpg`,
-      date: "October 2023",
       detailedDescription: "The Helsinki Central Library, named 'Oodi' after \
       a lyrical poem ('ode'), was the flagship project to celebrate \
       Finland's 100<sup>th</sup> year of independence. It opened on the eve of its \
@@ -18,7 +17,6 @@ export const oodi = {
     },
     {
       src: `../assets/images/finland/oodi/reduced--4.jpg`,
-      date: "October 2023",
       detailedDescription: "Oodi is composed of three floors. The first floor is for \
       meeting, the second floor is for creating, and the third floor is for reading. \
       The Urban Workshop, located on the second floor, has 3D printers, a laser cutter, \
@@ -27,7 +25,6 @@ export const oodi = {
     },
     {
       src: `../assets/images/finland/oodi/reduced--2.jpg`,
-      date: "October 2023",
       detailedDescription: "The third floor &mdash; a 'dedicated Book Heaven' &mdash; contains \
       books in 22 languages. Integrating nature into the design, the ceiling resembles clouds, \
       and there are even nine real bucida buceras trees! To the left of the image is the Citizen's \

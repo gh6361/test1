@@ -1,0 +1,344 @@
+---
+layout: default
+---
+
+<article style="width: 100%; max-width: calc(1270px); margin: 0 auto; padding: 6rem 2rem; text-align: center; box-sizing: border-box;">
+  
+  <!-- 1. EDITORIAL HEADER -->
+  <header style="margin-bottom: 4rem;">
+    <h1 style="font-family: var(--font-sans); font-weight: 700; font-size: clamp(2.5rem, 5vw, 4rem); letter-spacing: 0.02em; color: #1c1c1c; text-transform: uppercase; margin: 0 0 1rem 0;">
+      {{ page.title }}
+    </h1>
+    {% if page.description %}
+    <p style="font-family: var(--font-sans); font-size: 1.1rem; color: #666666; max-width: 650px; margin: 0 auto 3rem auto; line-height: 1.6;">
+      {{ page.description }}
+    </p>
+    {% endif %}
+    {% if page.meta_details %}
+    <div style="font-family: var(--font-sans); font-size: 0.75rem; color: #999999; text-transform: uppercase; letter-spacing: 0.15em; line-height: 2;">
+      {% for detail in page.meta_details %}
+        <div>{{ detail }}</div>
+      {% endfor %}
+    </div>
+    {% endif %}
+  </header>
+
+  <!-- 2. DYNAMIC ALGORITHM GALLERY -->
+  <div id="dynamic-gallery" style="display: flex; flex-direction: column; gap: 0.5rem;"></div>
+
+</article>
+
+<!-- 3. FOOTER SECTION -->
+<footer style="background-color: #ffffff; width: 100%; padding: 4rem 0 3rem 0; border-top: 1px solid #e5e5e5; margin-top: 4rem;">
+  <div style="max-width: 1000px; margin: 0 auto; padding: 0 2rem; text-align: center;">
+    <p style="font-family: var(--font-sans); font-size: 0.75rem; color: #666666; text-transform: uppercase; letter-spacing: 0.15em; margin: 0;">
+      &copy; 2026 Gleda Ho.
+    </p>
+  </div>
+</footer>
+
+<!-- 4. STANDARD GALLERY LIGHTBOX -->
+<div id="lightbox" class="lightbox hidden">
+  <div class="lightbox-main">
+    
+    <button id="lightbox-close" class="lightbox-control">&times;</button>
+    <button id="lightbox-prev" class="lightbox-arrow">‹</button>
+    <button id="lightbox-next" class="lightbox-arrow">›</button>
+
+    <div class="lightbox-center-group">
+      <div class="lightbox-img-wrapper">
+        <img id="lightbox-image-a" class="lightbox-image active" src="" alt="">
+        <img id="lightbox-image-b" class="lightbox-image" src="" alt="">
+      </div>
+      
+      <div class="lightbox-desc-wrapper">
+        <div id="lightbox-caption" style="font-family: var(--font-sans); font-size: 0.95rem; line-height: 1.6; color: #ffffff; text-align: left;"></div>
+      </div>
+    </div>
+    
+    <div id="lightbox-thumbnails" class="lightbox-thumbnails"></div>
+
+  </div>
+</div>
+
+<!-- 5. MASTER SCRIPT (Algorithm + Advanced Lightbox) -->
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const container = document.getElementById('dynamic-gallery');
+    const gap = 8; 
+
+    // --- GATHER IMAGES & DATA ---
+    const imagesData = [
+      {% for image in page.images %}
+        { 
+          src: "{{ image.src | relative_url }}", 
+          origIdx: {{ forloop.index0 }},
+          detailedDescription: {{ image.detailedDescription | default: "" | jsonify }}
+        }{% unless forloop.last %},{% endunless %}
+      {% endfor %}
+    ];
+
+    // --- LIGHTBOX LOGIC ---
+    const colOverlay = document.getElementById("lightbox");
+    const colImgA = document.getElementById("lightbox-image-a");
+    const colImgB = document.getElementById("lightbox-image-b");
+    const colCaption = document.getElementById("lightbox-caption");
+    const descWrapper = document.querySelector(".lightbox-desc-wrapper");
+    const centerGroup = document.querySelector(".lightbox-center-group");
+    const thumbContainer = document.getElementById("lightbox-thumbnails");
+    
+    let colCurrentIdx = 0;
+    let colActiveImg = colImgA;
+    let colInactiveImg = colImgB;
+
+    function alignCaptionToImageTop() {
+      if (imagesData.length <= 1) {
+        if (descWrapper) descWrapper.style.marginTop = "0px";
+        return;
+      }
+
+      if (!descWrapper || !centerGroup || !colInactiveImg || colInactiveImg.naturalHeight === 0) return;
+      
+      const groupHeight = centerGroup.getBoundingClientRect().height;
+      const computed = window.getComputedStyle(colInactiveImg);
+      const maxHeight = parseFloat(computed.maxHeight) || window.innerHeight;
+      const maxWidth = parseFloat(computed.maxWidth) || window.innerWidth;
+
+      let minRenderedHeight = maxHeight;
+
+      imagesData.forEach((imgData) => {
+        const tempImg = new Image();
+        tempImg.src = imgData.src;
+
+        if (tempImg.naturalHeight > 0) {
+          const ratio = tempImg.naturalWidth / tempImg.naturalHeight;
+          const containerRatio = maxWidth / maxHeight;
+          let renderedHeight = maxHeight;
+          if (ratio > containerRatio) {
+            renderedHeight = maxWidth / ratio; 
+          }
+          if (renderedHeight < minRenderedHeight) {
+            minRenderedHeight = renderedHeight;
+          }
+        }
+      });
+
+      let marginNeeded = (groupHeight - minRenderedHeight) / 2;
+      if (marginNeeded < 0) marginNeeded = 0;
+      descWrapper.style.marginTop = `${marginNeeded}px`;
+    }
+
+    window.addEventListener("resize", alignCaptionToImageTop);
+
+    function renderCollectionImage(index) {
+      if (imagesData.length === 0) return;
+      colCurrentIdx = (index + imagesData.length) % imagesData.length;
+      const imgData = imagesData[colCurrentIdx];
+
+      [colActiveImg, colInactiveImg] = [colInactiveImg, colActiveImg];
+      colInactiveImg.src = imgData.src;
+      
+      if (colCaption) {
+        let indexHtml = `<div class="caption-index" style="font-size: 0.75rem; letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 0.5rem; color: #999;">${colCurrentIdx + 1} / ${imagesData.length}</div>`;
+        
+        colCaption.innerHTML = `
+          ${indexHtml}
+          ${imgData.detailedDescription ? `<div class="caption-details">${imgData.detailedDescription}</div>` : ""}
+        `;
+      }
+
+      requestAnimationFrame(() => {
+        colActiveImg.classList.remove("active");
+        colInactiveImg.classList.add("active");
+
+        if (thumbContainer) {
+          const thumbs = thumbContainer.querySelectorAll(".lb-thumb");
+          thumbs.forEach((t) => t.classList.remove("active"));
+          const activeThumb = thumbContainer.querySelector(`.lb-thumb[data-index="${colCurrentIdx}"]`);
+          if (activeThumb) activeThumb.classList.add("active");
+        }
+
+        const triggerAlignment = () => {
+          setTimeout(alignCaptionToImageTop, 50);
+        };
+
+        if (colInactiveImg.complete && colInactiveImg.naturalHeight > 0) {
+          triggerAlignment();
+        } else {
+          colInactiveImg.onload = triggerAlignment;
+        }
+      });
+    }
+
+    window.openCollectionLightbox = function(index) {
+      if (!colOverlay) return;
+      
+      const siteNav = document.querySelector(".editorial-header");
+      if (siteNav) siteNav.style.display = "none";
+
+      if (imagesData.length <= 1) {
+        colOverlay.classList.add("single-mode");
+        colOverlay.classList.remove("has-thumbnails");
+        if (thumbContainer) thumbContainer.innerHTML = "";
+      } else {
+        colOverlay.classList.remove("single-mode");
+        colOverlay.classList.add("has-thumbnails");
+        if (thumbContainer) {
+          thumbContainer.innerHTML = imagesData.map((img, idx) => `
+            <img src="${img.src}" class="lb-thumb ${idx === index ? "active" : ""}" data-index="${idx}" alt="thumbnail">
+          `).join("");
+
+          thumbContainer.querySelectorAll(".lb-thumb").forEach((thumb) => {
+            thumb.addEventListener("click", (e) => {
+              const clickedIdx = parseInt(e.target.dataset.index, 10);
+              renderCollectionImage(clickedIdx);
+            });
+          });
+        }
+      }
+
+      colOverlay.classList.remove("hidden");
+      renderCollectionImage(index);
+    };
+
+    window.closeCollectionLightbox = function() {
+      if (!colOverlay) return;
+      colOverlay.classList.add("hidden");
+      const siteNav = document.querySelector(".editorial-header");
+      if (siteNav) siteNav.style.display = "";
+    };
+
+    window.nextCollectionImage = function() { renderCollectionImage(colCurrentIdx + 1); };
+    window.prevCollectionImage = function() { renderCollectionImage(colCurrentIdx - 1); };
+
+    document.addEventListener("keydown", (event) => {
+      if (colOverlay && !colOverlay.classList.contains("hidden")) {
+        if (event.key === "ArrowLeft") window.prevCollectionImage();
+        if (event.key === "ArrowRight") window.nextCollectionImage();
+        if (event.key === "Escape") window.closeCollectionLightbox();
+      }
+    });
+
+    const btnClose = document.getElementById("lightbox-close");
+    const btnPrev = document.getElementById("lightbox-prev");
+    const btnNext = document.getElementById("lightbox-next");
+    if (btnClose) btnClose.addEventListener("click", window.closeCollectionLightbox);
+    if (btnPrev) btnPrev.addEventListener("click", window.prevCollectionImage);
+    if (btnNext) btnNext.addEventListener("click", window.nextCollectionImage);
+
+
+    // --- DYNAMIC GALLERY ALGORITHM ---
+    Promise.all(imagesData.map(img => {
+      return new Promise((resolve) => {
+        const image = new Image();
+        image.src = img.src;
+        image.onload = () => {
+          img.ratio = image.naturalWidth / image.naturalHeight;
+          img.isPortrait = img.ratio < 1; 
+          resolve(img);
+        };
+        image.onerror = () => {
+          img.ratio = 1.5; 
+          img.isPortrait = false;
+          resolve(img);
+        };
+      });
+    })).then((loadedImages) => {
+      renderDynamicGallery(loadedImages);
+      window.addEventListener('resize', () => renderDynamicGallery(loadedImages));
+    });
+
+    function renderDynamicGallery(images) {
+      container.innerHTML = '';
+      const containerWidth = container.getBoundingClientRect().width;
+      const isMobile = window.innerWidth <= 768; 
+
+      let i = 0;
+      let isFirstRow = true; 
+      
+      while (i < images.length) {
+        let groupSize = 3; 
+        const remaining = images.length - i;
+        let isFinalEditorialRow = false; 
+
+        if (isMobile) {
+          groupSize = window.innerWidth <= 480 ? 1 : 2;
+          if (groupSize > remaining) groupSize = remaining;
+        } else {
+          if (remaining >= 4) {
+            let portraitCount = 0;
+            for (let j = 0; j < 4; j++) {
+              if (images[i + j].isPortrait) portraitCount++;
+            }
+            if (portraitCount >= 2) {
+              groupSize = 4;
+            }
+          } else if (remaining === 3) {
+            groupSize = 3;
+          } else if (remaining === 2) {
+            groupSize = 2;
+            isFinalEditorialRow = true;
+          } else {
+            groupSize = 1;
+            isFinalEditorialRow = true;
+          }
+        }
+
+        const group = images.slice(i, i + groupSize);
+        i += groupSize;
+
+        const totalGap = (groupSize - 1) * gap;
+        const availableWidth = containerWidth - totalGap;
+        const sumRatios = group.reduce((sum, img) => sum + img.ratio, 0);
+
+        let rowHeight = availableWidth / sumRatios;
+
+        if (isFinalEditorialRow && rowHeight > 850) {
+            rowHeight = 850; 
+        }
+
+        const rowDiv = document.createElement('div');
+        rowDiv.style.display = 'flex';
+        rowDiv.style.gap = gap + 'px';
+        rowDiv.style.width = '100%';
+        rowDiv.style.height = rowHeight + 'px'; 
+
+        if (isFinalEditorialRow && !isFirstRow) {
+          rowDiv.style.marginTop = '2rem'; 
+        }
+
+        group.forEach(img => {
+          const imgWrapper = document.createElement('div');
+          
+          if (isFinalEditorialRow && groupSize === 1) {
+            imgWrapper.style.flex = '1 1 100%';
+          } else {
+            imgWrapper.style.flex = `${img.ratio} 1 0%`;
+          }
+          
+          imgWrapper.style.cursor = 'pointer';
+          imgWrapper.style.overflow = 'hidden';
+          imgWrapper.style.position = 'relative';
+          
+          imgWrapper.onclick = () => window.openCollectionLightbox(img.origIdx);
+
+          const imgEl = document.createElement('img');
+          imgEl.src = img.src;
+          imgEl.style.width = '100%';
+          imgEl.style.height = '100%';
+          imgEl.style.objectFit = 'cover';
+          imgEl.style.display = 'block';
+          imgEl.style.transition = 'transform 0.4s ease, filter 0.4s ease';
+          imgEl.onmouseover = () => { imgEl.style.transform = 'scale(1.03)'; imgEl.style.filter = 'brightness(0.85)'; };
+          imgEl.onmouseout = () => { imgEl.style.transform = 'scale(1)'; imgEl.style.filter = 'brightness(1)'; };
+
+          imgWrapper.appendChild(imgEl);
+          rowDiv.appendChild(imgWrapper);
+        });
+
+        container.appendChild(rowDiv);
+        isFirstRow = false; 
+      }
+    }
+  });
+</script>
