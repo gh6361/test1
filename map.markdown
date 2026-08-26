@@ -14,17 +14,32 @@ header: solid
   
   /* Force hide your default footer if it tries to render on this page */
   footer, .editorial-footer { display: none !important; }
+
+  /* --- DYNAMIC SIDEBAR PADDING --- */
+  .sidebar-dynamic-padding {
+    padding-left: 2rem !important; 
+    padding-right: 2rem !important; 
+  }
+  @media (max-width: 1300px) {
+    .sidebar-dynamic-padding { padding-left: 1.5rem !important; padding-right: 1.5rem !important; }
+  }
+  @media (max-width: 1050px) {
+    .sidebar-dynamic-padding { padding-left: 0.7rem !important; padding-right: 0.75rem !important; } 
+  }
+  @media (max-width: 900px) {
+    .sidebar-dynamic-padding { padding-left: 0.7rem !important; padding-right: 0.7rem !important; } 
+  }
 </style>
 
 <!-- THE MAP CONTAINER -->
 <!-- CHANGED: Added display: flex !important; to enable flexible layouts -->
-<div class="map-page" style="position: fixed !important; top: 68px !important; left: 0 !important; right: 0 !important; height: calc(100vh - 68px) !important; z-index: 10 !important; background-color: #3f464d; display: flex !important; flex-direction: row !important; flex-wrap: nowrap !important;">
+<div class="map-page" style="position: fixed !important; top: 62px !important; left: 0 !important; right: 0 !important; height: calc(100vh - 62px) !important; z-index: 10 !important; background-color: #3f464d; display: flex !important; flex-direction: row !important; flex-wrap: nowrap !important;">
   
   <!-- Sidebar -->
   <!-- CHANGED: Replaced absolute positioning with flex: 0 0 40%. Added min/max widths so it doesn't get awkwardly small or huge. -->
-  <aside class="map-sidebar" style="flex: 0 0 38.2% !important; min-width: 280px !important; max-width: 800px !important; height: 100% !important; margin: 0 !important; background-color: #f7f7f7 !important; z-index: 1000 !important; overflow-y: auto !important;">
+  <aside class="map-sidebar" style="flex: 0 0 38.2% !important; min-width: 350px !important; max-width: 800px !important; height: 100% !important; margin: 0 !important; background-color: #f7f7f7 !important; z-index: 1000 !important; overflow-y: auto !important;">
     
-    <div id="location-panel" style="padding: 1rem 0.5rem; color: #1c1c1c;">
+    <div id="location-panel" class="sidebar-dynamic-padding" style="padding-top: 0.5rem; padding-bottom: 2rem; color: #1c1c1c;">
       <h2 style="color: #1c1c1c; margin-top: 0 !important; margin-bottom: 1rem;">Travel Map</h2>
       <p style="font-family: var(--font-sans); line-height: 1.6;">Click a marker to see details about each place.</p>
       <p class="map-panel-note" style="opacity: 0.7; font-size: 0.85em; margin-top: 2rem; border-top: 1px solid rgba(28, 28, 28, 0.2); padding-top: 1rem;">Use the buttons to open a gallery or a single photo.</p>
@@ -71,4 +86,4 @@ header: solid
 <script>
   window.siteBaseUrl = "{{ site.baseurl }}";
 </script>
-<script type="module" src="{{ '/assets/js/map.js' | relative_url }}?v=3"></script>
+<script type="module" src="{{ '/assets/js/map.js' | relative_url }}?v=7"></script>

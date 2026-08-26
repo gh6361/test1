@@ -47,7 +47,97 @@
 
   <body>
     <!-- THE NAVIGATION BAR -->
-    <!-- Removed fixed-top and the conditional header-solid logic -->
+    <style>
+      /* =========================================
+     NAVBAR HOVER DROPDOWN
+  ========================================= */
+      .nav-dropdown {
+        position: relative;
+        display: flex;
+        align-items: center;
+        /* Forces this wrapper to span the exact height of your navbar */
+        height: 62px;
+      }
+
+      /* The Dropdown Box */
+      .nav-dropdown-menu {
+        position: absolute;
+        /* Because the wrapper is 62px tall, 100% is perfectly flush with the bottom edge! */
+        top: 103%;
+        left: 50%;
+        transform: translateX(-50%); /* Keeps it centered */
+        background-color: #ffffff;
+        min-width: 150px;
+        padding: 0.5rem 0;
+        border: 1px solid #e5e5e5;
+        border-top: none; /* Merges seamlessly with the navbar */
+        box-shadow: none;
+
+        display: flex;
+        flex-direction: column;
+
+        /* Start hidden */
+        opacity: 0;
+        visibility: hidden;
+        transition:
+          opacity 0.25s ease,
+          visibility 0.25s ease;
+        z-index: 2000;
+      }
+
+      /* The Reveal (Just a clean fade-in now so it stays locked to the edge) */
+      .nav-dropdown:hover .nav-dropdown-menu {
+        opacity: 1;
+        visibility: visible;
+      }
+
+      /* The Links Inside */
+      .nav-dropdown-item {
+        display: block;
+        padding: 0.4rem 1.5rem;
+        font-family: var(--font-sans) !important;
+        font-size: 0.85rem !important;
+        color: var(--text-dark, #1c1c1c) !important;
+        text-transform: none !important;
+        letter-spacing: 0.1em !important;
+        text-decoration: none !important;
+        border-bottom: none !important;
+        text-align: left;
+        transition: opacity 0.2s ease;
+      }
+
+      .nav-dropdown-item:hover {
+        opacity: 0.5;
+      }
+
+      /* The subtle partial-width line at the top */
+      .nav-dropdown-menu::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 50%;
+        transform: translateX(-50%); /* Keeps the line perfectly centered */
+        width: 38%; /* Adjust this percentage to make the line wider or shorter! */
+        height: 5px;
+        background-color: #e5e5e5; /* Matches your border color */
+      }
+      /* The elegant downward chevron arrow */
+      .nav-dropdown .nav-link::after {
+        content: "";
+        display: inline-block;
+        margin-left: 8px;
+        width: 6px;
+        height: 6px;
+        /* Draws just the bottom and right edges of a square */
+        border-right: 1.5px solid currentColor;
+        border-bottom: 1.5px solid currentColor;
+        /* Tilts the square 45 degrees to make it point down */
+        transform: translateY(-2px) rotate(45deg);
+        transition: transform 0.3s ease;
+      }
+
+    </style>
+
     <nav class="navbar editorial-header">
       <div
         class="container d-flex flex-row justify-content-between align-items-center"
@@ -56,10 +146,38 @@
           >Gleda Ho</a
         >
 
-        <div class="navbar-nav d-flex flex-row gap-4">
-          <a class="nav-link" href="{{ '/collections/' | relative_url }}"
-            >Collections</a
-          >
+        <div class="navbar-nav d-flex flex-row gap-4 align-items-center">
+          <!-- DROPDOWN WRAPPER -->
+          <div class="nav-dropdown">
+            <a class="nav-link" href="{{ '/collections/' | relative_url }}"
+              >Collections</a
+            >
+
+            <!-- THE MENU -->
+            <div class="nav-dropdown-menu">
+              <a
+                href="{{ '/collections/iceland/' | relative_url }}"
+                class="nav-dropdown-item"
+                >Iceland</a
+              >
+              <a
+                href="{{ '/collections/finland/' | relative_url }}"
+                class="nav-dropdown-item"
+                >Finland</a
+              >
+              <a
+                href="{{ '/collections/guatemala/' | relative_url }}"
+                class="nav-dropdown-item"
+                >Guatemala</a
+              >
+              <a
+                href="{{ '/collections/ireland/' | relative_url }}"
+                class="nav-dropdown-item"
+                >Ireland</a
+              >
+            </div>
+          </div>
+
           <a class="nav-link" href="{{ '/map/' | relative_url }}">Map</a>
           <a class="nav-link" href="{{ '/about/' | relative_url }}">About</a>
         </div>

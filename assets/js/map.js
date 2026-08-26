@@ -152,7 +152,7 @@ window.addEventListener("load", () => {
     // --- NEW CAPTION HTML INJECTION ---
     if (galCaption) {
       const descWrapper = document.querySelector(".lightbox-desc-wrapper");
-      
+
       // If there is only ONE image, completely hide the caption box in the lightbox
       if (galImages.length <= 1) {
         galCaption.innerHTML = "";
@@ -160,7 +160,7 @@ window.addEventListener("load", () => {
       } else {
         // If there are multiple images, show the box and build the text
         if (descWrapper) descWrapper.style.display = "block";
-        
+
         let collectionsHTML = "";
         if (image.collections && image.collections.length > 0) {
           const links = image.collections
@@ -299,8 +299,14 @@ window.addEventListener("load", () => {
       return;
     }
 
-    if (!descWrapper || !centerGroup || !activeImg || activeImg.naturalHeight === 0) return;
-    
+    if (
+      !descWrapper ||
+      !centerGroup ||
+      !activeImg ||
+      activeImg.naturalHeight === 0
+    )
+      return;
+
     // ... the rest of the function stays exactly the same ...
 
     const groupHeight = centerGroup.getBoundingClientRect().height;
@@ -418,7 +424,7 @@ window.addEventListener("load", () => {
 
     // 4. Render the panel using your exact title wrapper from renderPanel
     panel.innerHTML = `
-      <div style="padding: 0 1.5rem;"> 
+      <div style="padding: 0;"> 
         
         <div style="
           text-align: left; 
@@ -517,104 +523,6 @@ window.addEventListener("load", () => {
     const isStacked = location.mode === "stacked";
     const imgCount = location.images ? location.images.length : 0;
 
-    // 1. Build Justified Gallery HTML with Dynamic Overrides
-    let justifiedHtml = "";
-    if (isStacked && imgCount > 0) {
-      if (imgCount === 1) {
-        // --- 1. SINGLE IMAGE OVERRIDE ---
-        let singleMaxHeight = "72vh"; // Reduced slightly to ensure the text below fits on screen
-        const img = location.images[0];
-        const captionText = img.detailedDescription || img.caption || "";
-
-        justifiedHtml = `
-          <div class="justified-gallery single-override" style="display: flex; flex-direction: column;">
-            <div class="justified-item" data-index="0" style="width: 100%;">
-              <img src="${img.src}" alt="${img.caption || location.name}" style="width: 100%; height: auto; max-height: ${singleMaxHeight}; object-fit: cover; object-position: center; display: block;">
-            </div>
-            <!-- INJECT THE DESCRIPTION BELOW THE IMAGE -->
-            ${captionText ? `<div style="margin-top: 1.5rem; font-family: var(--font-sans); font-size: 0.95rem; color: #4a4a4a; line-height: 1.6;">${captionText}</div>` : ""}
-          </div>
-        `;
-      } else if (imgCount === 2) {
-        // --- 2. TWO IMAGES OVERRIDE ---
-        // Set your desired minimum height here!
-        let targetHeight = "39vh";
-        let minHeight = "250px";
-
-        justifiedHtml = `
-          <div class="justified-gallery duo-override">
-            ${location.images
-              .map(
-                (img, idx) => `
-              <div class="justified-item" data-index="${idx}" style="min-height: ${minHeight};">
-                <img src="${img.src}" alt="${img.caption || location.name}">
-              </div>
-            `,
-              )
-              .join("")}
-          </div>
-        `;
-      } else if (imgCount === 3) {
-        // --- 3. EXACTLY THREE IMAGES ---
-        // Slightly taller so the 3 images have room to breathe
-        let targetHeight = "37vh";
-        let minHeight = "120px";
-
-        justifiedHtml = `
-          <div class="justified-gallery">
-            ${location.images
-              .map(
-                (img, idx) => `
-              <div class="justified-item" data-index="${idx}" style="height: ${targetHeight}; min-height: ${minHeight};">
-                <img src="${img.src}" alt="${img.caption || location.name}">
-              </div>
-            `,
-              )
-              .join("")}
-          </div>
-        `;
-      } else if (imgCount === 4) {
-        // --- 4. EXACTLY FOUR IMAGES ---
-        // Standard grid sizing
-        let targetHeight = "25vh";
-        let minHeight = "90px";
-
-        justifiedHtml = `
-          <div class="justified-gallery">
-            ${location.images
-              .map(
-                (img, idx) => `
-              <div class="justified-item" data-index="${idx}" style="height: ${targetHeight}; min-height: ${minHeight};">
-                <img src="${img.src}" alt="${img.caption || location.name}">
-              </div>
-            `,
-              )
-              .join("")}
-          </div>
-        `;
-      } else {
-        // --- 5. FIVE OR MORE IMAGES (Dense Grid) ---
-        // Lowered to 12vh! This forces more images per row, stopping the "super wide" stretching.
-        let targetHeight = "18vh";
-        let minHeight = "60px";
-
-        justifiedHtml = `
-          <div class="justified-gallery dense-override">
-            ${location.images
-              .map(
-                (img, idx) => `
-              <div class="justified-item" data-index="${idx}" style="height: ${targetHeight}; min-height: ${minHeight};">
-                <img src="${img.src}" alt="${img.caption || location.name}">
-              </div>
-            `,
-              )
-              .join("")}
-          </div>
-        `;
-      }
-    }
-
-    // Check if the name contains a colon, and split it if it does!
     let mainTitle = location.name;
     let subTitle = "";
 
@@ -624,134 +532,187 @@ window.addEventListener("load", () => {
       subTitle = parts[1].trim();
     }
 
-    // 2. Build the sidebar panel
+    // 1. Build the sidebar panel base HTML (Now includes fluid CSS styles!)
     panel.innerHTML = `
-      <div style="padding: 0 1.5rem;"> <!-- NEW: Master wrapper that adds left/right padding to everything -->
+      <style>
+        .sb-dynamic-row {
+          display: flex;
+          flex-direction: row;
+          gap: 6px;
+          width: 100%;
+        }
+        .sb-dynamic-item {
+          position: relative;
+          overflow: hidden;
+          cursor: zoom-in;
+        }
+        .sb-dynamic-item img {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+          display: block;
+          transition: opacity 0.2s ease;
+        }
+        .sb-dynamic-item:hover img {
+          opacity: 0.8;
+        }
         
-        <div style="
-          text-align: left; 
-          margin-top: 1rem;   
-          margin-bottom: 0.5rem; 
-        ">
-          <h2 style="
-            margin: 0; 
-            color: #1c1c1c; 
-            font-weight: 600 !important; 
-            white-space: normal;
-            font-size: 1.9rem; 
-            line-height: 1.1;
-          ">${mainTitle}</h2>
-          
+        /* Mobile override: Stack everything smoothly on small screens */
+        @media (max-width: 1050px) {
+          .sb-dynamic-row {
+            flex-direction: column !important;
+          }
+          .sb-dynamic-item {
+            flex: none !important;
+            width: 100% !important;
+            aspect-ratio: auto !important; /* Disables the strict grid ratio */
+          }
+          .sb-dynamic-item img {
+            height: auto !important; /* Lets the image breathe naturally */
+            max-height: 70vh;        /* Prevents extreme vertical stretching */
+          }
+        }
+      </style>
+
+      <div style="padding: 0;"> 
+        <div style="text-align: left; margin-top: 1rem; margin-bottom: 0.5rem;">
+          <h2 style="margin: 0; color: #1c1c1c; font-weight: 600 !important; white-space: normal; font-size: 1.9rem; line-height: 1.1;">
+            ${mainTitle}
+          </h2>
           ${
             subTitle
-              ? `
-            <div style="
-              font-family: var(--font-sans); 
-              font-size: 0.75rem; 
-              color: var(--text-body); 
-              text-transform: uppercase; 
-              letter-spacing: 0.15em; 
-              margin-top: 0.9rem;
-              margin-bottom: 1.2rem;
-              margin-left: 0rem; 
-              line-height: 1.2;
-            ">${subTitle}</div>
-          `
+              ? `<div style="font-family: var(--font-sans); font-size: 0.75rem; color: var(--text-body); text-transform: uppercase; letter-spacing: 0.15em; margin-top: 0.9rem; margin-bottom: 1.2rem; margin-left: 0rem; line-height: 1.2;">${subTitle}</div>`
               : ""
           }
         </div>
         
-        ${isStacked ? justifiedHtml : ""}
-        
-      </div> <!-- NEW: Closes the master padding wrapper -->
+        <div id="sidebar-dynamic-gallery" style="display: flex; flex-direction: column; gap: 6px; margin-top: 1rem; margin-bottom: 2rem;"></div>
+      </div>
     `;
 
-    // 3. Post-Render Script for 2-Image Vertical Override
-    if (isStacked && imgCount === 2) {
-      const duoWrapper = panel.querySelector(".duo-override");
-      const imgs = duoWrapper.querySelectorAll("img");
+    const galleryContainer = panel.querySelector('#sidebar-dynamic-gallery');
 
-      const applyOrientation = () => {
-        // Fallback check to ensure the browser actually sees the dimensions
-        if (!imgs[0].naturalWidth || !imgs[1].naturalWidth) return;
-
-        const ratio1 = imgs[0].naturalHeight / imgs[0].naturalWidth;
-        const ratio2 = imgs[1].naturalHeight / imgs[1].naturalWidth;
-
-        // 1. Force the wrapper to use CSS Grid instead of Flexbox
-        duoWrapper.style.display = "grid";
-        duoWrapper.style.gap = "12px";
-
-        if (ratio1 > 1 && ratio2 > 1) {
-          // --- BOTH VERTICAL ---
-          const minRatio = Math.min(ratio1, ratio2);
-
-          // MATH: If Target Height = 250px, how wide does the image need to be?
-          const minWidthPx = 250 / minRatio;
-
-          // Tell the Grid to stack them into 1 column if the screen can't fit both side-by-side
-          duoWrapper.style.gridTemplateColumns =
-            "repeat(auto-fit, minmax(min(100%, " + minWidthPx + "px), 1fr))";
-
-          // Apply the aspect ratios and let Grid handle the height automatically
-          imgs[0].parentElement.style.aspectRatio = "1 / " + minRatio;
-          imgs[0].parentElement.style.height = "auto";
-
-          imgs[1].parentElement.style.aspectRatio = "1 / " + minRatio;
-          imgs[1].parentElement.style.height = "auto";
-        } else {
-          // --- NOT BOTH VERTICAL (e.g., Landscape or Mixed) ---
-
-          // Switch to Flexbox for a guaranteed vertical stack
-          duoWrapper.style.display = "flex";
-          duoWrapper.style.flexDirection = "column";
-          duoWrapper.style.gap = "12px";
-
-          // Image 1: Force auto-height so it shrinks proportionally, capped at 39vh
-          imgs[0].parentElement.style.width = "100%";
-          imgs[0].parentElement.style.height = "auto";
-          imgs[0].parentElement.style.minHeight = "0px";
-
-          imgs[0].style.width = "100%";
-          imgs[0].style.height = "auto";
-          imgs[0].style.maxHeight = "36vh";
-          imgs[0].style.objectFit = "cover";
-
-          // Image 2: Exact same constraints
-          imgs[1].parentElement.style.width = "100%";
-          imgs[1].parentElement.style.height = "auto";
-          imgs[1].parentElement.style.minHeight = "0px";
-
-          imgs[1].style.width = "100%";
-          imgs[1].style.height = "auto";
-          imgs[1].style.maxHeight = "36vh";
-          imgs[1].style.objectFit = "cover";
-        }
-      };
-
-      // Wrap the loading check in a Promise so it strictly waits for physical rendering
-      Promise.all(
-        Array.from(imgs).map((img) => {
-          if (img.complete && img.naturalHeight !== 0) return Promise.resolve();
-          return new Promise((resolve) => {
-            img.addEventListener("load", resolve);
-            img.addEventListener("error", resolve); // Resolves on error so the layout doesn't hang
-          });
-        }),
-      ).then(() => {
-        applyOrientation();
-      });
-    }
-
-    // 4. Hook up Lightbox triggers for every thumbnail
     if (isStacked && imgCount > 0) {
-      const galleryItems = panel.querySelectorAll(".justified-item");
+      
+      const imagesData = location.images.map((img, index) => ({
+        src: img.src,
+        caption: img.detailedDescription || img.caption || "",
+        origIdx: index
+      }));
 
-      galleryItems.forEach((item) => {
-        item.addEventListener("click", () => {
-          const idx = parseInt(item.dataset.index, 10);
-          openGalleryLightbox(location.images, idx);
+      Promise.all(imagesData.map(img => {
+        return new Promise((resolve) => {
+          const image = new Image();
+          image.src = img.src;
+          image.onload = () => {
+            img.ratio = image.naturalWidth / image.naturalHeight;
+            resolve(img);
+          };
+          image.onerror = () => {
+            img.ratio = 1.5; 
+            resolve(img);
+          };
         });
+      })).then((loadedImages) => {
+        
+        const n = loadedImages.length;
+        const layoutGroups = [];
+        let i = 0;
+
+        // --- ORIGINAL EDITORIAL GROUPING LOGIC ---
+        if (n === 1) {
+          layoutGroups.push([loadedImages[0]]);
+        } else if (n === 2) {
+          if (loadedImages[0].ratio < 1 && loadedImages[1].ratio < 1) {
+            layoutGroups.push([loadedImages[0], loadedImages[1]]);
+          } else {
+            layoutGroups.push([loadedImages[0]]);
+            layoutGroups.push([loadedImages[1]]);
+          }
+        } else if (n === 3) {
+          // If the first image is WIDER than the last image
+          if (loadedImages[0].ratio > loadedImages[2].ratio) {
+            layoutGroups.push([loadedImages[0]]);
+            layoutGroups.push([loadedImages[1], loadedImages[2]]);
+          } 
+          // If the last image is WIDER (or if they are perfectly equal)
+          else {
+            layoutGroups.push([loadedImages[0], loadedImages[1]]);
+            layoutGroups.push([loadedImages[2]]);
+          }
+        } else if (n === 4) {
+          layoutGroups.push([loadedImages[0], loadedImages[1]]);
+          layoutGroups.push([loadedImages[2], loadedImages[3]]);
+        } else if (n === 5) {
+          layoutGroups.push([loadedImages[0], loadedImages[1]]);
+          layoutGroups.push([loadedImages[2], loadedImages[3]]);
+          layoutGroups.push([loadedImages[4]]);
+        } else {
+          while (i < n) {
+            const remaining = n - i;
+            let groupSize = 2; 
+            
+            if (remaining >= 3) {
+              let hasPortrait = false;
+              for(let j = 0; j < 3; j++) {
+                if (loadedImages[i + j].ratio < 1) hasPortrait = true;
+              }
+              groupSize = hasPortrait ? 3 : 2;
+            } else {
+              groupSize = remaining; 
+            }
+            
+            layoutGroups.push(loadedImages.slice(i, i + groupSize));
+            i += groupSize;
+          }
+        }
+
+        // --- BUILD FLUID HTML ROWS ---
+        layoutGroups.forEach(group => {
+          const rowDiv = document.createElement('div');
+          rowDiv.className = 'sb-dynamic-row';
+
+          group.forEach(img => {
+            const imgWrapper = document.createElement('div');
+            imgWrapper.className = 'sb-dynamic-item';
+            
+            if (group.length === 1) {
+              imgWrapper.style.flex = '1 1 100%';
+              // Single images don't strictly enforce an aspect ratio height 
+              // so they behave naturally and don't get too tall.
+            } else {
+              imgWrapper.style.flex = `${img.ratio} 1 0%`;
+              // This CSS command mathematically forces the rows to perfectly 
+              // sync their heights at any window width!
+              imgWrapper.style.aspectRatio = `${img.ratio}`; 
+            }
+            
+            imgWrapper.onclick = () => openGalleryLightbox(location.images, img.origIdx);
+
+            const imgEl = document.createElement('img');
+            imgEl.src = img.src;
+            if (group.length === 1) {
+              imgEl.style.maxHeight = '72vh';
+            }
+            
+            imgWrapper.appendChild(imgEl);
+            rowDiv.appendChild(imgWrapper);
+          });
+
+          galleryContainer.appendChild(rowDiv);
+        });
+
+        // Re-inject the description below the image if it is the only one in the collection
+        if (n === 1 && loadedImages[0].caption) {
+          const captionDiv = document.createElement('div');
+          captionDiv.style.marginTop = '1.5rem';
+          captionDiv.style.fontFamily = 'var(--font-sans)';
+          captionDiv.style.fontSize = '0.95rem';
+          captionDiv.style.color = '#4a4a4a';
+          captionDiv.style.lineHeight = '1.6';
+          captionDiv.innerHTML = loadedImages[0].caption;
+          galleryContainer.appendChild(captionDiv);
+        }
       });
     }
   }
