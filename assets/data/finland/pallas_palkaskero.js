@@ -8,6 +8,15 @@ export const pallas_palkaskero = {
   mode: "stacked",
   images: [
     {
+      src: `../assets/images/finland/pallas_palkaskero/reduced-6268.jpg`,
+      caption: "Open skies over Reykjavik.",
+      location: "Downtown Reykjavik, Iceland",
+      date: "October 2023",
+      detailedDescription: "The Palkaskero Fell can be reached by the Palkaskeron \
+      kierros Trail, a 6.1 km circle trail. The rocky fell summit lies around 700 m \
+      above sea level.",
+    },
+    {
       src: `../assets/images/finland/pallas_palkaskero/reduced-6204.jpg`,
       caption: "Open skies over Reykjavik.",
       location: "Downtown Reykjavik, Iceland",
@@ -69,18 +78,11 @@ export const pallas_palkaskero = {
       detailedDescription: "Open fell country.",
     },
     {
-      src: `../assets/images/finland/pallas_palkaskero/reduced-6268.jpg`,
-      caption: "Open skies over Reykjavik.",
-      location: "Downtown Reykjavik, Iceland",
-      date: "October 2023",
-      detailedDescription: "The summit is around 700 m above sea level.",
-    },
-    {
       src: `../assets/images/finland/pallas_palkaskero/reduced-6280.jpg`,
       caption: "Open skies over Reykjavik.",
       location: "Downtown Reykjavik, Iceland",
       date: "October 2023",
-      detailedDescription: "The descent from Palkaskero, overlooking Pallasjärvi.",
+      detailedDescription: "The descent from Palkaskero, overlooking Pallasjärvi Lake.",
     },
     {
       src: `../assets/images/finland/pallas_palkaskero/reduced-6292.jpg`,

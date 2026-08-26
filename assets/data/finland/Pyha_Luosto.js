@@ -8,6 +8,15 @@ export const Pyha_Luosto = {
   mode: "stacked",
   images: [
     {
+      src: `../assets/images/finland/Pyha_Luosto/reduced-6163.jpg`,
+      date: "October 2023",
+      detailedDescription: "The Tunturiaapa Nature Trail goes through both \
+      old-growth forest and the open Tunturiaapa aapa mire. The trees in the \
+      old-growth forest are generally over 250 years, although some are up to 400 \
+      years old. In contrast, an aapa mire is a fen-type peatland. The image \
+      depicts a forested part of the trail.",
+    },
+    {
       src: `../assets/images/finland/Pyha_Luosto/reduced-6088-2.jpg`,
       date: "October 2023",
       detailedDescription: "The name of the national park 'Pyhä-Luosto' \
@@ -17,15 +26,6 @@ export const Pyha_Luosto = {
       as it was sacred to the local Forest Sámi. The 35 km chain of fells is a \
       remnant of one of the oldest mountain ranges in the world, formed around \
       2 billion years ago."
-    },
-    {
-      src: `../assets/images/finland/Pyha_Luosto/reduced-6163.jpg`,
-      date: "October 2023",
-      detailedDescription: "The Tunturiaapa Nature Trail goes through both \
-      old-growth forest and the open Tunturiaapa aapa mire. The trees in the \
-      old-growth forest are generally over 250 years, although some are up to 400 \
-      years old. In contrast, an aapa mire is a fen-type peatland. The image \
-      depicts a forested part of the trail.",
     },
   ]
 };

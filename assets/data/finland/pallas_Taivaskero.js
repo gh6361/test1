@@ -8,6 +8,15 @@ export const pallas_Taivaskero = {
   mode: "stacked",
   images: [
     {
+      src: `../assets/images/finland/pallas_taivaskero/reduced-5922.jpg`,
+      caption: "Open skies over Reykjavik.",
+      location: "Downtown Reykjavik, Iceland",
+      date: "October 2023",
+      detailedDescription: "The Taivaskero Fell can be reached by the Taivaskeron \
+      kierros Trail, a 8.2 km circle trail. The boulder-covered fell summit lies \
+      807 m above sea level and rewards hikers with soaring views.",
+    },
+    {
       src: `../assets/images/finland/pallas_taivaskero/reduced-5956.jpg`,
       caption: "Open skies over Reykjavik.",
       location: "Downtown Reykjavik, Iceland",
@@ -26,15 +35,6 @@ export const pallas_Taivaskero = {
       historically used by reindeer herders working out on the fells.",
     },
     {
-      src: `../assets/images/finland/pallas_taivaskero/reduced-5922.jpg`,
-      caption: "Open skies over Reykjavik.",
-      location: "Downtown Reykjavik, Iceland",
-      date: "October 2023",
-      detailedDescription: "A sign at the summit of the hike. <em>Taivas</em> translates from \
-      Finnish as <em>sky/heaven</em>, while <em>kero</em> is of Sámi origin and describes \
-      the summit of a fell.",
-    },
-    {
       src: `../assets/images/finland/pallas_taivaskero/reduced-5867.jpg`,
       caption: "Open skies over Reykjavik.",
       location: "Downtown Reykjavik, Iceland",
@@ -46,8 +46,9 @@ export const pallas_Taivaskero = {
       caption: "Open skies over Reykjavik.",
       location: "Downtown Reykjavik, Iceland",
       date: "October 2023",
-      detailedDescription: "View from the summit, which lies 807 m above \
-      sea level.",
+      detailedDescription: "Panoramic views from the summit of the hike. <em>Taivas</em> translates from \
+      Finnish as <em>sky/heaven</em>, while <em>kero</em> is of Sámi origin and describes \
+      the summit of a fell.",
     },
     {
       src: `../assets/images/finland/pallas_taivaskero/reduced-5932.jpg`,
@@ -72,7 +73,7 @@ export const pallas_Taivaskero = {
       location: "Downtown Reykjavik, Iceland",
       date: "October 2023",
       detailedDescription: "The purest air in the world is measured in Pallas-Yllästunturi \
-      National Park. The research station in the park conducts much research on climate change.",
+      National Park, at the nearby Sammaltunturi weather station.",
     },
     {
       src: `../assets/images/finland/pallas_taivaskero/reduced-5966.jpg`,
@@ -86,8 +87,8 @@ export const pallas_Taivaskero = {
       caption: "Open skies over Reykjavik.",
       location: "Downtown Reykjavik, Iceland",
       date: "October 2023",
-      detailedDescription: "Pallastunturi is also a ski area in winter, as hinted by the ski \
-      lift in the image.",
+      detailedDescription: "Pallastunturi is also a ski area in winter. The trail can only be used \
+      during the snow-free season.",
     },
   ]
 };
