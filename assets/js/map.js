@@ -73,7 +73,6 @@ window.addEventListener("load", () => {
     startZoom = urlParams.has("zoom") ? parseInt(urlParams.get("zoom"), 10) : 6;
   }
 
-  // Initialize map with fractional zooming for a perfect, fluid fit
   const map = L.map(mapEl, {
     zoomControl: false,
     zoomSnap: 0.1,
@@ -84,7 +83,9 @@ window.addEventListener("load", () => {
     worldCopyJump: true,
   });
 
-  // Apply the starting view instantly before drawing any tiles!
+  // NEW: force Leaflet to re-measure the container immediately
+  map.invalidateSize();
+
   if (startCenter && startZoom) {
     map.setView(startCenter, startZoom);
   } else {
@@ -590,31 +591,31 @@ window.addEventListener("load", () => {
       </div>
     `;
 
-    const galleryContainer = panel.querySelector('#sidebar-dynamic-gallery');
+    const galleryContainer = panel.querySelector("#sidebar-dynamic-gallery");
 
     if (isStacked && imgCount > 0) {
-      
       const imagesData = location.images.map((img, index) => ({
         src: img.src,
         caption: img.detailedDescription || img.caption || "",
-        origIdx: index
+        origIdx: index,
       }));
 
-      Promise.all(imagesData.map(img => {
-        return new Promise((resolve) => {
-          const image = new Image();
-          image.src = img.src;
-          image.onload = () => {
-            img.ratio = image.naturalWidth / image.naturalHeight;
-            resolve(img);
-          };
-          image.onerror = () => {
-            img.ratio = 1.5; 
-            resolve(img);
-          };
-        });
-      })).then((loadedImages) => {
-        
+      Promise.all(
+        imagesData.map((img) => {
+          return new Promise((resolve) => {
+            const image = new Image();
+            image.src = img.src;
+            image.onload = () => {
+              img.ratio = image.naturalWidth / image.naturalHeight;
+              resolve(img);
+            };
+            image.onerror = () => {
+              img.ratio = 1.5;
+              resolve(img);
+            };
+          });
+        }),
+      ).then((loadedImages) => {
         const n = loadedImages.length;
         const layoutGroups = [];
         let i = 0;
@@ -634,7 +635,7 @@ window.addEventListener("load", () => {
           if (loadedImages[0].ratio > loadedImages[2].ratio) {
             layoutGroups.push([loadedImages[0]]);
             layoutGroups.push([loadedImages[1], loadedImages[2]]);
-          } 
+          }
           // If the last image is WIDER (or if they are perfectly equal)
           else {
             layoutGroups.push([loadedImages[0], loadedImages[1]]);
@@ -650,51 +651,52 @@ window.addEventListener("load", () => {
         } else {
           while (i < n) {
             const remaining = n - i;
-            let groupSize = 2; 
-            
+            let groupSize = 2;
+
             if (remaining >= 3) {
               let hasPortrait = false;
-              for(let j = 0; j < 3; j++) {
+              for (let j = 0; j < 3; j++) {
                 if (loadedImages[i + j].ratio < 1) hasPortrait = true;
               }
               groupSize = hasPortrait ? 3 : 2;
             } else {
-              groupSize = remaining; 
+              groupSize = remaining;
             }
-            
+
             layoutGroups.push(loadedImages.slice(i, i + groupSize));
             i += groupSize;
           }
         }
 
         // --- BUILD FLUID HTML ROWS ---
-        layoutGroups.forEach(group => {
-          const rowDiv = document.createElement('div');
-          rowDiv.className = 'sb-dynamic-row';
+        layoutGroups.forEach((group) => {
+          const rowDiv = document.createElement("div");
+          rowDiv.className = "sb-dynamic-row";
 
-          group.forEach(img => {
-            const imgWrapper = document.createElement('div');
-            imgWrapper.className = 'sb-dynamic-item';
-            
+          group.forEach((img) => {
+            const imgWrapper = document.createElement("div");
+            imgWrapper.className = "sb-dynamic-item";
+
             if (group.length === 1) {
-              imgWrapper.style.flex = '1 1 100%';
-              // Single images don't strictly enforce an aspect ratio height 
+              imgWrapper.style.flex = "1 1 100%";
+              // Single images don't strictly enforce an aspect ratio height
               // so they behave naturally and don't get too tall.
             } else {
               imgWrapper.style.flex = `${img.ratio} 1 0%`;
-              // This CSS command mathematically forces the rows to perfectly 
+              // This CSS command mathematically forces the rows to perfectly
               // sync their heights at any window width!
-              imgWrapper.style.aspectRatio = `${img.ratio}`; 
+              imgWrapper.style.aspectRatio = `${img.ratio}`;
             }
-            
-            imgWrapper.onclick = () => openGalleryLightbox(location.images, img.origIdx);
 
-            const imgEl = document.createElement('img');
+            imgWrapper.onclick = () =>
+              openGalleryLightbox(location.images, img.origIdx);
+
+            const imgEl = document.createElement("img");
             imgEl.src = img.src;
             if (group.length === 1) {
-              imgEl.style.maxHeight = '72vh';
+              imgEl.style.maxHeight = "72vh";
             }
-            
+
             imgWrapper.appendChild(imgEl);
             rowDiv.appendChild(imgWrapper);
           });
@@ -704,12 +706,12 @@ window.addEventListener("load", () => {
 
         // Re-inject the description below the image if it is the only one in the collection
         if (n === 1 && loadedImages[0].caption) {
-          const captionDiv = document.createElement('div');
-          captionDiv.style.marginTop = '1.5rem';
-          captionDiv.style.fontFamily = 'var(--font-sans)';
-          captionDiv.style.fontSize = '0.95rem';
-          captionDiv.style.color = '#4a4a4a';
-          captionDiv.style.lineHeight = '1.6';
+          const captionDiv = document.createElement("div");
+          captionDiv.style.marginTop = "1.5rem";
+          captionDiv.style.fontFamily = "var(--font-sans)";
+          captionDiv.style.fontSize = "0.95rem";
+          captionDiv.style.color = "#4a4a4a";
+          captionDiv.style.lineHeight = "1.6";
           captionDiv.innerHTML = loadedImages[0].caption;
           galleryContainer.appendChild(captionDiv);
         }
@@ -735,14 +737,18 @@ window.addEventListener("load", () => {
 
   // 1. Create the Cluster Group BEFORE the loop begins
   const markers = L.markerClusterGroup({
-    showCoverageOnHover: false, // Hides the default bounding box outline
-    maxClusterRadius: 30, // Distance in pixels before pins collapse into a circle
-    zoomToBoundsOnClick: false, // --- NEW: Disables the default robotic zoom ---
+    showCoverageOnHover: false,
+    maxClusterRadius: 30,
+    zoomToBoundsOnClick: false,
+
+    // NEW: Forces Leaflet to keep "lonely" pins alive even if they are on another continent!
+    removeOutsideVisibleBounds: false,
+
     iconCreateFunction: function (cluster) {
       const count = cluster.getChildCount();
       return L.divIcon({
         html: `<div class="custom-cluster-icon">${count}</div>`,
-        className: "", // Prevents Leaflet's default cluster styles from interfering
+        className: "",
         iconSize: L.point(36, 36),
       });
     },
@@ -784,9 +790,19 @@ window.addEventListener("load", () => {
     });
   });
 
+  // 1. Create a holding array for markers that need clustering
+  const markerArray = [];
+
+  // --- NEW: Count how many locations are in each country ---
+  const countryCounts = {};
+  locations.forEach((loc) => {
+    const c = loc.country || "Other";
+    countryCounts[c] = (countryCounts[c] || 0) + 1;
+  });
+
   // 2. Loop through your locations
   locations.forEach((location) => {
-    // IMPORTANT: Create the marker, but do NOT chain `.addTo(map)` here!
+    // IMPORTANT: Create the marker
     const marker = L.marker(location.coords, { icon: smallIcon });
     location.markerInstance = marker;
 
@@ -801,13 +817,11 @@ window.addEventListener("load", () => {
       tooltipImageSrc = location.previewImage;
     }
 
-    // Split the title just like in the sidebar
     let hoverTitle = location.name;
     if (location.name.includes(":")) {
       hoverTitle = location.name.split(":")[0].trim();
     }
 
-    // Define the HTML for the tooltip
     const hoverContent = `
       <div style="
         width: max-content; 
@@ -823,7 +837,6 @@ window.addEventListener("load", () => {
       </div>
     `;
 
-    // Attach it to the Leaflet marker
     marker.bindTooltip(hoverContent, {
       direction: "bottom",
       offset: [0, 5],
@@ -831,11 +844,10 @@ window.addEventListener("load", () => {
       opacity: 1,
     });
 
-    // 3. Handle the click event (Drastically simplified!)
+    // 3. Handle the click event
     marker.on("click", () => {
       marker.closeTooltip();
 
-      // Remove color change from the previous marker
       if (activeMarker && activeMarker !== marker) {
         const prevElement = activeMarker.getElement();
         if (prevElement) {
@@ -843,25 +855,31 @@ window.addEventListener("load", () => {
         }
       }
 
-      // Set this marker as active and apply the color-change class
       activeMarker = marker;
       const currentElement = marker.getElement();
       if (currentElement) {
         currentElement.classList.add("marker-active");
       }
 
-      // Render the sidebar
       renderPanel(location);
     });
 
-    // 4. Add the individual marker to the CLUSTER GROUP instead of the map
-    markers.addLayer(marker);
+    // --- 4. HYBRID ADD ---
+    // If it is the only location in the country, glue it securely to the base map.
+    // If there are multiple, send them to the cluster array!
+    const c = location.country || "Other";
+    if (countryCounts[c] === 1) {
+      marker.addTo(map);
+    } else {
+      markerArray.push(marker);
+    }
   });
 
-  // 5. Finally, add the entire cluster group to the map AFTER the loop finishes
+  // 5. Finally, bulk-add the clustered array and add the cluster group to the map
+  markers.addLayers(markerArray);
   map.addLayer(markers);
 
-  // --- NEW PLACEMENT: Render the sidebar now that the pins are ready! ---
+  // Render the sidebar now that the pins are ready!
   renderDefaultPanel();
 
   /* --- EVENT LISTENERS --- */

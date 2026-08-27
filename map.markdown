@@ -2,7 +2,6 @@
 layout: default
 title: Travel Map
 permalink: /map/
-load_map_js: true
 full_width: true
 header: solid
 ---
@@ -86,4 +85,4 @@ header: solid
 <script>
   window.siteBaseUrl = "{{ site.baseurl }}";
 </script>
-<script type="module" src="{{ '/assets/js/map.js' | relative_url }}?v=7"></script>
+<script type="module" src="{{ '/assets/js/map.js' | relative_url }}?v=18"></script>
