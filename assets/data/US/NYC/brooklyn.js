@@ -9,35 +9,24 @@ export const brooklyn = {
   images: [
     {
       src: `../assets/images/US/NYC/brooklyn1.jpg`,
-      detailedDescription: "The Helsinki Central Library, named 'Oodi' after \
-      a lyrical poem ('ode'), was the flagship project to celebrate \
-      Finland's 100<sup>th</sup> year of independence. It opened on the eve of its \
-      Independence Day on December 5, 2018, and in 2019 it won the coveted \
-      Public Library of the Year award.",
+      detailedDescription: "Brooklyn Bridge (closer) and Manhattan \
+      Bridge (further), viewed from Brooklyn Bridge Park. Both bridges span \
+      the East River, connecting Manhattan and Brooklyn.",
     },
     {
       src: `../assets/images/US/NYC/brooklyn2.jpg`,
-      detailedDescription: "The Helsinki Central Library, named 'Oodi' after \
-      a lyrical poem ('ode'), was the flagship project to celebrate \
-      Finland's 100<sup>th</sup> year of independence. It opened on the eve of its \
-      Independence Day on December 5, 2018, and in 2019 it won the coveted \
-      Public Library of the Year award.",
+      detailedDescription: "Two motion-blurred figures against the \
+      glowing Manhattan skyline.",
     },
     {
       src: `../assets/images/US/NYC/brooklyn3.jpg`,
-      detailedDescription: "The Helsinki Central Library, named 'Oodi' after \
-      a lyrical poem ('ode'), was the flagship project to celebrate \
-      Finland's 100<sup>th</sup> year of independence. It opened on the eve of its \
-      Independence Day on December 5, 2018, and in 2019 it won the coveted \
-      Public Library of the Year award.",
+      detailedDescription: "Brooklyn Bridge and Manhattan in the \
+      background...",
     },
     {
       src: `../assets/images/US/NYC/brooklyn4.jpg`,
-      detailedDescription: "The Helsinki Central Library, named 'Oodi' after \
-      a lyrical poem ('ode'), was the flagship project to celebrate \
-      Finland's 100<sup>th</sup> year of independence. It opened on the eve of its \
-      Independence Day on December 5, 2018, and in 2019 it won the coveted \
-      Public Library of the Year award.",
+      detailedDescription: "Brooklyn Bridge and Manhattan in the \
+      background...",
     },
   ]
 };

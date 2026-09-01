@@ -9,27 +9,22 @@ export const highline = {
   images: [
     {
       src: `../assets/images/US/NYC/highline1.jpg`,
-      detailedDescription: "The Helsinki Central Library, named 'Oodi' after \
-      a lyrical poem ('ode'), was the flagship project to celebrate \
-      Finland's 100<sup>th</sup> year of independence. It opened on the eve of its \
-      Independence Day on December 5, 2018, and in 2019 it won the coveted \
-      Public Library of the Year award.",
+      detailedDescription: "Th High Line is a popular park built on a former \
+      elevated freight railway &mdash; indeed, old tracks can be seen to \
+      the left of this image. The park lies 30 ft above street level.",
     },
     {
       src: `../assets/images/US/NYC/highline2.jpg`,
-      detailedDescription: "The Helsinki Central Library, named 'Oodi' after \
-      a lyrical poem ('ode'), was the flagship project to celebrate \
-      Finland's 100<sup>th</sup> year of independence. It opened on the eve of its \
-      Independence Day on December 5, 2018, and in 2019 it won the coveted \
-      Public Library of the Year award.",
+      detailedDescription: "The line opened in 1934 and the last train ran in \
+      1980. Grasses, wildflowers, shrubs and trees gradually filled the space \
+      and ultimately led to the design of the park as it is today.",
     },
     {
       src: `../assets/images/US/NYC/hudsonyards_building.jpg`,
-      detailedDescription: "The Helsinki Central Library, named 'Oodi' after \
-      a lyrical poem ('ode'), was the flagship project to celebrate \
-      Finland's 100<sup>th</sup> year of independence. It opened on the eve of its \
-      Independence Day on December 5, 2018, and in 2019 it won the coveted \
-      Public Library of the Year award.",
+      detailedDescription: "A view of buildings taken from near the High Line \
+      in Hudson Yards, which is one of the newest parts of Manhattan and \
+      sits right beside the northern section of the High Line. The tower on the \
+      left of the image is The Spiral.",
     },
   ]
 };

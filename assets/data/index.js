@@ -12,7 +12,6 @@ import { katz } from './US/NYC/katz.js';
 import { brooklyn } from './US/NYC/brooklyn.js';
 import { honeycomb } from './US/NYC/honeycomb.js';
 import { times } from './US/NYC/times.js';
-import { E43 } from './US/NYC/E43.js';
 import { pallas_Taivaskero } from './finland/pallas_Taivaskero.js';
 import { pallas_palkaskero } from './finland/pallas_palkaskero.js';
 import { oodi } from './finland/oodi.js';
@@ -33,7 +32,6 @@ export const locations = [
   brooklyn,
   honeycomb,
   times,
-  E43,
   pallas_Taivaskero,
   pallas_palkaskero,
   oodi,

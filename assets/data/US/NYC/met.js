@@ -9,19 +9,20 @@ export const met = {
   images: [
     {
       src: `../assets/images/US/NYC/met1.jpg`,
-      detailedDescription: "The Helsinki Central Library, named 'Oodi' after \
-      a lyrical poem ('ode'), was the flagship project to celebrate \
-      Finland's 100<sup>th</sup> year of independence. It opened on the eve of its \
-      Independence Day on December 5, 2018, and in 2019 it won the coveted \
-      Public Library of the Year award.",
+      detailedDescription: "The Metropolitan Museum of Art, known simply \
+      as 'The Met', contains more than 1.5 million objects from over 5,000 \
+      years of global history. It was founded in 1870 and receives more \
+      than six million visitors every year. The photo depicts a corridor in \
+      the Egyptian galleries.",
     },
     {
       src: `../assets/images/US/NYC/met2.jpg`,
-      detailedDescription: "The Helsinki Central Library, named 'Oodi' after \
-      a lyrical poem ('ode'), was the flagship project to celebrate \
-      Finland's 100<sup>th</sup> year of independence. It opened on the eve of its \
-      Independence Day on December 5, 2018, and in 2019 it won the coveted \
-      Public Library of the Year award.",
+      detailedDescription: "'The Cat' by Swiss artist Alberto Giacometti \
+      (1901-1966). This object was \
+      on display in the Temple of Dendur, an actual Egyptian \
+      temple, presented by Egypt to the U.S. in 1965, dismantled, and shipped \
+      all the way to New York. Giacometti showed a lifelong fascination for \
+      ancient Egyptian art.",
     },
   ]
 };

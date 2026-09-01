@@ -9,35 +9,22 @@ export const katz = {
   images: [
     {
       src: `../assets/images/US/NYC/katz1.jpg`,
-      detailedDescription: "The Helsinki Central Library, named 'Oodi' after \
-      a lyrical poem ('ode'), was the flagship project to celebrate \
-      Finland's 100<sup>th</sup> year of independence. It opened on the eve of its \
-      Independence Day on December 5, 2018, and in 2019 it won the coveted \
-      Public Library of the Year award.",
+      detailedDescription: "Katz's Delicatessen is one of New York City's \
+      most iconic old-school Jewish delis. They are especially famous for their \
+      pastrami, and it is not unusual to walk past and see people queuing out \
+      onto the street.",
     },
     {
       src: `../assets/images/US/NYC/katz2.jpg`,
-      detailedDescription: "The Helsinki Central Library, named 'Oodi' after \
-      a lyrical poem ('ode'), was the flagship project to celebrate \
-      Finland's 100<sup>th</sup> year of independence. It opened on the eve of its \
-      Independence Day on December 5, 2018, and in 2019 it won the coveted \
-      Public Library of the Year award.",
+      detailedDescription: "... but no queue today!",
     },
     {
       src: `../assets/images/US/NYC/katz3.jpg`,
-      detailedDescription: "The Helsinki Central Library, named 'Oodi' after \
-      a lyrical poem ('ode'), was the flagship project to celebrate \
-      Finland's 100<sup>th</sup> year of independence. It opened on the eve of its \
-      Independence Day on December 5, 2018, and in 2019 it won the coveted \
-      Public Library of the Year award.",
+      detailedDescription: "A street view from nearby in nice lighting.",
     },
     {
       src: `../assets/images/US/NYC/katz4.jpg`,
-      detailedDescription: "The Helsinki Central Library, named 'Oodi' after \
-      a lyrical poem ('ode'), was the flagship project to celebrate \
-      Finland's 100<sup>th</sup> year of independence. It opened on the eve of its \
-      Independence Day on December 5, 2018, and in 2019 it won the coveted \
-      Public Library of the Year award.",
+      detailedDescription: "Bikes",
     },
   ]
 };

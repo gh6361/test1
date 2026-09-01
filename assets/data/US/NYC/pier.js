@@ -8,28 +8,19 @@ export const pier = {
   mode: "stacked",
   images: [
     {
-      src: `../assets/images/US/NYC/pier2.jpg`,
-      detailedDescription: "The Helsinki Central Library, named 'Oodi' after \
-      a lyrical poem ('ode'), was the flagship project to celebrate \
-      Finland's 100<sup>th</sup> year of independence. It opened on the eve of its \
-      Independence Day on December 5, 2018, and in 2019 it won the coveted \
-      Public Library of the Year award.",
-    },
-    {
       src: `../assets/images/US/NYC/pier3.jpg`,
-      detailedDescription: "The Helsinki Central Library, named 'Oodi' after \
-      a lyrical poem ('ode'), was the flagship project to celebrate \
-      Finland's 100<sup>th</sup> year of independence. It opened on the eve of its \
-      Independence Day on December 5, 2018, and in 2019 it won the coveted \
-      Public Library of the Year award.",
+      detailedDescription: "Opening between 2023-24, Pier 97 is one of the newest \
+      public spaces in the Hudson River Park. The pier was originally built in \
+      1921 and 1934 and served as a hub for the Swedish America Line.",
     },
     {
       src: `../assets/images/US/NYC/pier1.jpg`,
-      detailedDescription: "The Helsinki Central Library, named 'Oodi' after \
-      a lyrical poem ('ode'), was the flagship project to celebrate \
-      Finland's 100<sup>th</sup> year of independence. It opened on the eve of its \
-      Independence Day on December 5, 2018, and in 2019 it won the coveted \
-      Public Library of the Year award.",
+      detailedDescription: "Artful shade structures in the park.",
+    },
+    {
+      src: `../assets/images/US/NYC/pier2.jpg`,
+      detailedDescription: "The 120-foot-long synthetic turf field under \
+      evening lights.",
     },
   ]
 };

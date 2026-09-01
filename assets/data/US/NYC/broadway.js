@@ -9,11 +9,12 @@ export const broadway = {
   images: [
     {
       src: `../assets/images/US/NYC/broadway.jpg`,
-      detailedDescription: "The Helsinki Central Library, named 'Oodi' after \
-      a lyrical poem ('ode'), was the flagship project to celebrate \
-      Finland's 100<sup>th</sup> year of independence. It opened on the eve of its \
-      Independence Day on December 5, 2018, and in 2019 it won the coveted \
-      Public Library of the Year award.",
+      detailedDescription: " A street-level view of the Belasco Theatre \
+      (to the right) and the surrounding Broadway Theater District. The \
+      theatre was named after David Belasco, a legendary producer/director \
+      who actually lived in a duplex apartment above the theatre. The play \
+      'Never Happy Ending', about two robots living in futurstic-Seoul, \
+      was running at the time the photo was taken.",
     },
   ]
 };
