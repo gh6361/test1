@@ -9,7 +9,7 @@ export const pier = {
   images: [
     {
       src: `../assets/images/US/NYC/pier3.jpg`,
-      detailedDescription: "Opening between 2023-24, Pier 97 is one of the newest \
+      detailedDescription: "Opened between 2023-24, Pier 97 is one of the newest \
       public spaces in the Hudson River Park. The pier was originally built in \
       1921 and 1934 and served as a hub for the Swedish America Line.",
     },

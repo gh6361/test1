@@ -20,11 +20,11 @@ export const katz = {
     },
     {
       src: `../assets/images/US/NYC/katz3.jpg`,
-      detailedDescription: "A street view from nearby in nice lighting.",
+      detailedDescription: "Looking west on East Houston Street...",
     },
     {
       src: `../assets/images/US/NYC/katz4.jpg`,
-      detailedDescription: "Bikes",
+      detailedDescription: "",
     },
   ]
 };

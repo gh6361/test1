@@ -980,6 +980,20 @@ a:hover {
 /* Force cursor to stay normal since UI never fades */
 .lightbox { cursor: default !important; }
 
+/* --- Detached Global Image Counter --- */
+#lightbox-global-counter {
+  position: absolute;
+  bottom: 105px; 
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: var(--font-sans);
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.25em;
+  color: #999; 
+  z-index: 1000;
+}
+
 /* --- THE MAP TILES (Editorial Muted Filter) --- */
 /* This applies a soft, warm, desaturated look to the default map */
 .leaflet-tile-pane {
@@ -1079,7 +1093,6 @@ nav.header-solid .nav-link:hover {
 
 /* =========================================
    SMALL SCREEN OVERRIDES 
-   (Only for shrinking text/padding on small screens)
 ========================================= */
 @media (max-width: 1200px), (max-height: 800px) {
   
@@ -1098,5 +1111,62 @@ nav.header-solid .nav-link:hover {
     font-size: 0.55rem !important;
     margin-bottom: 0.5rem !important; 
   }
+
+} /* <-- THIS IS THE BRACKET THAT WAS SWALLOWING YOUR CSS! */
+
+
+/* =========================================
+   THE BOTTOM ANCHOR (OUTSIDE THE MEDIA QUERY)
+========================================= */
+
+/* Parent Group */
+.lightbox-center-group {
+  display: flex;
+  align-items: center; 
+  justify-content: center;
+  width: 100%;
+  height: 100vh; 
+  gap: var(--desc-gap); 
+  /* Animates the gap so the image smoothly glides to the center */
+  transition: gap 0.4s cubic-bezier(0.4, 0, 0.2, 1); 
 }
+
+.lightbox-center-group.no-caption {
+  gap: 0 !important;
+}
+
+/* 1. Base Wrapper (Top Anchored for JS Math) */
+.lightbox-desc-wrapper {
+  width: calc(23.6vw - var(--desc-gap)); 
+  flex-shrink: 0;
+  background-color: #f0efed; 
+  padding: 1.5rem;
+  border-radius: 2px;
+  color: #1c1c1c;
+  
+  /* Restored: Anchors to the top so JS can push it down */
+  align-self: flex-start; 
+  margin-top: 0px; 
+  
+  max-height: 74vh; 
+  overflow: hidden; 
+  
+  /* Added margin-top to the smooth transitions */
+  transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1), 
+              padding 0.4s cubic-bezier(0.4, 0, 0.2, 1), 
+              margin-top 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+              opacity 0.2s ease; 
+}
+
+/* 2. Fluid Collapse State */
+.lightbox-center-group .lightbox-desc-wrapper.caption-collapsed {
+  width: 0 !important;
+  min-width: 0 !important;
+  padding-left: 0 !important; 
+  padding-right: 0 !important;
+  margin-top: 0 !important; /* Destroys the ghost margin */
+  opacity: 0 !important;
+  border: none !important;
+}
+
 

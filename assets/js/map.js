@@ -23,6 +23,7 @@ window.addEventListener("load", () => {
   let galCurrentIndex = 0;
   let galActive = galImageA;
   let galInactive = galImageB;
+  let galleryTopGapLock = null; // <-- NEW: Stores the calculated gap for the whole stack
 
   if (!mapEl || !panel || typeof L === "undefined") return;
 
@@ -122,20 +123,37 @@ window.addEventListener("load", () => {
     L.DomEvent.disableClickPropagation(div);
     L.DomEvent.disableScrollPropagation(div);
 
+    // Tracker to remember what button you clicked last (defaults to world)
+    let lastRegion = "world";
+
     const buttons = div.querySelectorAll("button");
     buttons.forEach((btn) => {
       btn.addEventListener("click", (e) => {
-        const region = e.target.dataset.region;
-        if (regionBounds[region]) {
-          mapInstance.flyToBounds(regionBounds[region], {
-            duration: 1.5,
-            padding: [20, 20],
-          });
+        const targetRegion = e.target.dataset.region;
+        
+        if (regionBounds[targetRegion]) {
+          
+          // If moving to OR from the World view, do the smooth animated flight
+          if (lastRegion === "world" || targetRegion === "world") {
+            mapInstance.flyToBounds(regionBounds[targetRegion], {
+              duration: 0.7,
+              padding: [20, 20],
+            });
+          } else {
+            // If moving continent-to-continent, teleport instantly (animate: false)
+            mapInstance.fitBounds(regionBounds[targetRegion], {
+              animate: false,
+              padding: [20, 20],
+            });
+          }
+
+          // Update the tracker so it remembers where you are for the next click
+          lastRegion = targetRegion;
         }
       });
     });
 
-    return div; // Correctly placed inside the function block
+    return div; 
   };
 
   regionControl.addTo(map);
@@ -150,74 +168,87 @@ window.addEventListener("load", () => {
 
     const image = galImages[galCurrentIndex];
 
-    // --- NEW CAPTION HTML INJECTION ---
-    if (galCaption) {
+    // 1. Tell the browser exactly what to do WHEN the download finishes FIRST
+    galInactive.onload = () => {
       const descWrapper = document.querySelector(".lightbox-desc-wrapper");
+      const centerGroup = document.querySelector(".lightbox-center-group");
 
-      // If there is only ONE image, completely hide the caption box in the lightbox
+      let counterEl = document.getElementById("lightbox-global-counter");
+      if (!counterEl && galOverlay) {
+        counterEl = document.createElement("div");
+        counterEl.id = "lightbox-global-counter";
+        galOverlay.appendChild(counterEl);
+      }
+
       if (galImages.length <= 1) {
-        galCaption.innerHTML = "";
         if (descWrapper) descWrapper.style.display = "none";
+        if (counterEl) counterEl.style.display = "none";
+        if (galCaption) galCaption.innerHTML = "";
       } else {
-        // If there are multiple images, show the box and build the text
-        if (descWrapper) descWrapper.style.display = "block";
+        if (descWrapper) descWrapper.style.display = "";
 
-        let collectionsHTML = "";
-        if (image.collections && image.collections.length > 0) {
-          const links = image.collections
-            .map((c) => `<a href="${c.url}">${c.name}</a>`)
-            .join(", ");
-          collectionsHTML = `In collections: ${links}`;
+        if (counterEl) {
+          counterEl.style.display = "block";
+          counterEl.innerHTML = `${galCurrentIndex + 1} / ${galImages.length}`;
         }
 
-        let indexHtml = `<div class="caption-index">${galCurrentIndex + 1} / ${galImages.length}</div>`;
+        const hasDesc = !!image.detailedDescription;
+        const hasCol = image.collections && image.collections.length > 0;
 
-        galCaption.innerHTML = `
-          ${indexHtml}
-          ${image.detailedDescription ? `<div class="caption-details">${image.detailedDescription}</div>` : ""}
-          ${collectionsHTML ? `<div class="caption-collections">${collectionsHTML}</div>` : ""}
-        `;
+        // The layout shifts *only* after the new image is ready
+        if (!hasDesc && !hasCol) {
+          if (descWrapper) descWrapper.classList.add("caption-collapsed");
+          if (centerGroup) centerGroup.classList.add("no-caption");
+          if (galCaption) galCaption.innerHTML = "";
+        } else {
+          if (descWrapper) descWrapper.classList.remove("caption-collapsed");
+          if (centerGroup) centerGroup.classList.remove("no-caption");
+
+          let collectionsHTML = "";
+          if (hasCol) {
+            const links = image.collections
+              .map((c) => `<a href="${c.url}">${c.name}</a>`)
+              .join(", ");
+            collectionsHTML = `In collections: ${links}`;
+          }
+
+          if (galCaption) {
+            galCaption.innerHTML = `
+              ${hasDesc ? `<div class="caption-details">${image.detailedDescription}</div>` : ""}
+              ${collectionsHTML ? `<div class="caption-collections">${collectionsHTML}</div>` : ""}
+            `;
+          }
+        }
       }
-    }
-    // --- END NEW CAPTION LOGIC ---
 
+      galOverlay.classList.remove("hidden");
+
+      // Trigger the opacity crossfade
+      requestAnimationFrame(() => {
+        galActive.classList.remove("active");
+        galInactive.classList.add("active");
+        swapGalImages();
+
+        const thumbs = document.querySelectorAll(".lb-thumb");
+        if (thumbs.length > 0) {
+          thumbs.forEach((t) => t.classList.remove("active"));
+          const activeThumb = document.querySelector(
+            `.lb-thumb[data-index="${galCurrentIndex}"]`,
+          );
+          if (activeThumb) activeThumb.classList.add("active");
+        }
+
+        // --- RESTORED: FIRE THE MATH ---
+        // A tiny 50ms delay ensures the browser has painted the image's new dimensions
+        setTimeout(alignCaptionToImageTop, 50);
+      });
+    };
+
+    // 2. Trigger the download SECOND. 
+    // Clearing the src first forces the browser to reliably fire the onload event.
+    galInactive.src = "";
     galInactive.src = image.src;
     galInactive.alt = image.caption || `Image ${galCurrentIndex + 1}`;
-
-    galOverlay.classList.remove("hidden");
-
-    requestAnimationFrame(() => {
-      galActive.classList.remove("active");
-      galInactive.classList.add("active");
-      swapGalImages();
-
-      // --- NEW: Update active thumbnail border ---
-      const thumbs = document.querySelectorAll(".lb-thumb");
-      if (thumbs.length > 0) {
-        thumbs.forEach((t) => t.classList.remove("active"));
-        const activeThumb = document.querySelector(
-          `.lb-thumb[data-index="${galCurrentIndex}"]`,
-        );
-        if (activeThumb) activeThumb.classList.add("active");
-      }
-
-      // --- BULLETPROOF ALIGNMENT TRIGGER ---
-      // A small helper function that adds a tiny 50-millisecond delay.
-      // This forces the JavaScript to wait until the browser has physically
-      // painted the image to the screen BEFORE trying to measure it!
-      const triggerAlignment = () => {
-        setTimeout(alignCaptionToImageTop, 50);
-      };
-
-      // Check if the image is already fully loaded (e.g., from cache or resize)
-      if (galActive.complete && galActive.naturalHeight > 0) {
-        triggerAlignment();
-      } else {
-        // If it's a fresh load (first click), wait for the exact millisecond
-        // the file finishes downloading, THEN fire our delayed trigger.
-        galActive.onload = triggerAlignment;
-      }
-    });
   }
 
   function openGalleryLightbox(images, startIndex) {
@@ -272,6 +303,8 @@ window.addEventListener("load", () => {
     if (galImageB) galImageB.src = "";
     if (galCaption) galCaption.textContent = "";
     galImages = [];
+    
+    galleryTopGapLock = null; // <-- NEW: Reset the lock for the next location!
 
     // --- BRING THE NAVBAR BACK ---
     const siteNav = document.querySelector(".editorial-header");
@@ -288,69 +321,7 @@ window.addEventListener("load", () => {
     renderGalImage(galCurrentIndex - 1);
   }
 
-  // CONSTANT HEIGHT LOGIC (Locks to the top edge of the shortest photo)
-  function alignCaptionToImageTop() {
-    const descWrapper = document.querySelector(".lightbox-desc-wrapper");
-    const centerGroup = document.querySelector(".lightbox-center-group");
-    const activeImg = document.querySelector(".lightbox-image.active");
-
-    // NEW: If there is only 1 image, abort the math so the image stays perfectly vertically centered!
-    if (galImages.length <= 1) {
-      if (descWrapper) descWrapper.style.marginTop = "0px";
-      return;
-    }
-
-    if (
-      !descWrapper ||
-      !centerGroup ||
-      !activeImg ||
-      activeImg.naturalHeight === 0
-    )
-      return;
-
-    // ... the rest of the function stays exactly the same ...
-
-    const groupHeight = centerGroup.getBoundingClientRect().height;
-
-    // 1. Read the live CSS constraints to mathematically check the gallery
-    const computed = window.getComputedStyle(activeImg);
-    const maxHeight = parseFloat(computed.maxHeight) || window.innerHeight;
-    const maxWidth = parseFloat(computed.maxWidth) || window.innerWidth;
-
-    // Start with the maximum possible height
-    let minRenderedHeight = maxHeight;
-
-    // 2. Loop through the gallery array to find the absolute shortest image height
-    galImages.forEach((imgData) => {
-      const tempImg = new Image();
-      tempImg.src = imgData.src;
-
-      // If the browser already knows the dimensions
-      if (tempImg.naturalHeight > 0) {
-        const ratio = tempImg.naturalWidth / tempImg.naturalHeight;
-        const containerRatio = maxWidth / maxHeight;
-
-        let renderedHeight = maxHeight;
-        if (ratio > containerRatio) {
-          renderedHeight = maxWidth / ratio; // Image is limited by width
-        }
-
-        if (renderedHeight < minRenderedHeight) {
-          minRenderedHeight = renderedHeight;
-        }
-      }
-    });
-
-    // 3. Because the images are vertically centered, the distance from the top
-    // of the container down to the shortest image is half the remaining space.
-    let marginNeeded = (groupHeight - minRenderedHeight) / 2;
-    if (marginNeeded < 0) marginNeeded = 0;
-
-    descWrapper.style.marginTop = `${marginNeeded}px`;
-  }
-
-  // Keep it perfectly aligned if the user resizes the window
-  window.addEventListener("resize", alignCaptionToImageTop);
+  
 
   function renderDefaultPanel() {
     // 1. Group locations by Country
@@ -455,8 +426,6 @@ window.addEventListener("load", () => {
 
     // 5. Attach click events
     const links = panel.querySelectorAll(".sidebar-loc-link");
-    // ... keep your existing click event logic down below! ...
-    // ... keep the rest of your link event listener code exactly the same ...
     links.forEach((link) => {
       link.addEventListener("click", (e) => {
         const idx = parseInt(e.target.dataset.index, 10);
@@ -465,15 +434,10 @@ window.addEventListener("load", () => {
 
         if (targetMarker) {
           const targetLatLng = targetMarker.getLatLng();
-
-          // --- SET DEFAULT ZOOM ---
           let targetZoom = 6;
-
-          // Ask Leaflet what is currently visible
           const visibleParent = markers.getVisibleParent(targetMarker);
 
           if (visibleParent && visibleParent !== targetMarker) {
-            // MAGIC: Find the exact zoom level where this specific marker breaks out of its cluster!
             if (
               targetMarker.__parent &&
               typeof targetMarker.__parent._zoom === "number"
@@ -484,41 +448,94 @@ window.addEventListener("load", () => {
               targetZoom = 15;
             }
           }
-
           if (targetZoom < 6) targetZoom = 6;
 
-          if (
-            map.getZoom() === targetZoom &&
-            map.getCenter().equals(targetLatLng)
-          ) {
-            markers.zoomToShowLayer(targetMarker, () =>
-              targetMarker.fire("click"),
-            );
+          const currentZoom = map.getZoom();
+          const drasticZoomThreshold = 5; // Uses the exact same logic as your clusters!
+
+          // If we are already exactly where we need to be
+          if (currentZoom === targetZoom && map.getCenter().equals(targetLatLng)) {
+            markers.zoomToShowLayer(targetMarker, () => targetMarker.fire("click"));
             return;
           }
 
-          // --- NEW: DYNAMIC FLIGHT DURATION ---
-          // If zooming in past level 10, slow it down to 1.6s for a smoother cinematic dive.
-          // Otherwise, stick to the brisk 1.2s flight.
-          const flightDuration = targetZoom > 7 ? 1.7 : 1.0;
-
-          // Execute ONE beautiful, continuous flight to the exact necessary zoom
-          map.flyTo(targetLatLng, targetZoom, {
-            animate: true,
-            duration: flightDuration,
-            easeLinearity: 1,
-          });
-
-          // Wait for the continuous flight to finish...
-          map.once("moveend", () => {
-            markers.zoomToShowLayer(targetMarker, () => {
-              targetMarker.fire("click");
+          // THE FIX: Instant teleport if the zoom jump is too large
+          if (Math.abs(targetZoom - currentZoom) >= drasticZoomThreshold) {
+            map.setView(targetLatLng, targetZoom, { animate: false });
+            // A tiny 50ms delay gives the un-animated map time to physically paint the pins
+            setTimeout(() => {
+              markers.zoomToShowLayer(targetMarker, () => targetMarker.fire("click"));
+            }, 50);
+          } else {
+            // Otherwise, smooth cinematic dive
+            const flightDuration = targetZoom > 5 ? 1 : 0.7;
+            map.flyTo(targetLatLng, targetZoom, {
+              animate: true,
+              duration: flightDuration,
+              easeLinearity: 1,
             });
-          });
+            map.once("moveend", () => {
+              markers.zoomToShowLayer(targetMarker, () => targetMarker.fire("click"));
+            });
+          }
         }
       });
     });
   }
+
+  // --- NEW: CONSTANT ANCHOR MATH (WITH DOWNWARD OFFSET) ---
+  function alignCaptionToImageTop() {
+    const descWrapper = document.querySelector(".lightbox-desc-wrapper");
+    if (!descWrapper) return;
+
+    if (descWrapper.classList.contains("caption-collapsed") || galImages.length <= 1) {
+      descWrapper.style.marginTop = "0px";
+      return;
+    }
+
+    if (galleryTopGapLock !== null) {
+      descWrapper.style.marginTop = `${galleryTopGapLock}px`;
+      return;
+    }
+
+    const windowW = window.innerWidth;
+    const windowH = window.innerHeight;
+    const maxW = (windowW * 0.764) - 140; 
+    const maxH = windowH - 270;
+
+    let shortestRenderedHeight = maxH;
+
+    galImages.forEach(imgObj => {
+      const temp = new Image();
+      temp.src = imgObj.src;
+      
+      if (temp.complete && temp.naturalHeight > 0) {
+        const ratio = temp.naturalWidth / temp.naturalHeight;
+        const renderedHeight = Math.min(maxH, maxW / ratio);
+        
+        if (renderedHeight < shortestRenderedHeight) {
+          shortestRenderedHeight = renderedHeight;
+        }
+      }
+    });
+
+    // 1. Find the exact top edge
+    const exactTopEdge = (windowH - shortestRenderedHeight) / 2;
+    
+    // 2. Add the downward push (0.04 = 4vh)
+    const downwardPush = windowH * 0.01; 
+    
+    // 3. Combine them and lock it in
+    galleryTopGapLock = exactTopEdge + downwardPush;
+    
+    descWrapper.style.marginTop = `${Math.max(0, galleryTopGapLock)}px`;
+  }
+
+  // Clear the lock when the screen resizes so it can recalculate perfectly
+  window.addEventListener("resize", () => {
+    galleryTopGapLock = null;
+    alignCaptionToImageTop();
+  });
 
   function renderPanel(location) {
     const isStacked = location.mode === "stacked";
@@ -740,9 +757,11 @@ window.addEventListener("load", () => {
     showCoverageOnHover: false,
     maxClusterRadius: 30,
     zoomToBoundsOnClick: false,
-
-    // NEW: Forces Leaflet to keep "lonely" pins alive even if they are on another continent!
     removeOutsideVisibleBounds: false,
+    
+    // The Kill Switches
+    disableClusteringAtZoom: 15, 
+    spiderfyOnMaxZoom: false, // <-- NEW: Completely disables the spider web fallback!
 
     iconCreateFunction: function (cluster) {
       const count = cluster.getChildCount();
@@ -759,16 +778,15 @@ window.addEventListener("load", () => {
     const cluster = event.layer;
     const bounds = cluster.getBounds();
     const targetCenter = bounds.getCenter();
+    const count = cluster.getChildCount();
 
     let currentZoom = map.getZoom();
     let targetZoom = currentZoom;
-    const maxZoom = 15; // The absolute maximum you'll allow it to zoom
+    
+    const maxZoom = 15; 
+    const desiredPixelSpread = count > 2 ? 250 : 50; 
+    const drasticZoomThreshold = 5; 
 
-    // How wide (in pixels) do you want the group of pins to be spread out on screen?
-    // 100 is a great starting point for a neat, tight grouping.
-    const desiredPixelSpread = 110;
-
-    // Look ahead to find the perfect zoom level to achieve that spread
     for (let z = currentZoom; z <= maxZoom; z++) {
       const corner1 = map.project(bounds.getSouthWest(), z);
       const corner2 = map.project(bounds.getNorthEast(), z);
@@ -778,16 +796,24 @@ window.addEventListener("load", () => {
         targetZoom = z;
         break;
       }
-
       if (z === maxZoom) targetZoom = maxZoom;
     }
 
-    // Execute the flight directly to the center at our newly calculated, controlled zoom
-    map.flyTo(targetCenter, targetZoom, {
-      animate: true,
-      duration: 1.0,
-      easeLinearity: 0.25,
-    });
+    // THE FIX: If the math tells it to stay on the exact same zoom level, 
+    // force it to zoom in by at least 1 step (up to the max) so the click always works!
+    if (targetZoom <= currentZoom) {
+      targetZoom = Math.min(currentZoom + 3, maxZoom);
+    }
+
+    if (Math.abs(targetZoom - currentZoom) >= drasticZoomThreshold) {
+      map.setView(targetCenter, targetZoom, { animate: false });
+    } else {
+      map.flyTo(targetCenter, targetZoom, {
+        animate: true,
+        duration: 0.7,
+        easeLinearity: 0.25,
+      });
+    }
   });
 
   // 1. Create a holding array for markers that need clustering
