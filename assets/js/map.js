@@ -130,19 +130,18 @@ window.addEventListener("load", () => {
     buttons.forEach((btn) => {
       btn.addEventListener("click", (e) => {
         const targetRegion = e.target.dataset.region;
-        
+
         if (regionBounds[targetRegion]) {
-          
-          // If moving to OR from the World view, do the smooth animated flight
+          // First/Default case: moving to OR from the World view is an instant jump
           if (lastRegion === "world" || targetRegion === "world") {
-            mapInstance.flyToBounds(regionBounds[targetRegion], {
-              duration: 0.7,
+            mapInstance.fitBounds(regionBounds[targetRegion], {
+              animate: false,
               padding: [20, 20],
             });
           } else {
-            // If moving continent-to-continent, teleport instantly (animate: false)
-            mapInstance.fitBounds(regionBounds[targetRegion], {
-              animate: false,
+            // Moving continent-to-continent animates smoothly
+            mapInstance.flyToBounds(regionBounds[targetRegion], {
+              duration: 0.7,
               padding: [20, 20],
             });
           }
@@ -153,7 +152,7 @@ window.addEventListener("load", () => {
       });
     });
 
-    return div; 
+    return div;
   };
 
   regionControl.addTo(map);
@@ -244,7 +243,7 @@ window.addEventListener("load", () => {
       });
     };
 
-    // 2. Trigger the download SECOND. 
+    // 2. Trigger the download SECOND.
     // Clearing the src first forces the browser to reliably fire the onload event.
     galInactive.src = "";
     galInactive.src = image.src;
@@ -303,7 +302,7 @@ window.addEventListener("load", () => {
     if (galImageB) galImageB.src = "";
     if (galCaption) galCaption.textContent = "";
     galImages = [];
-    
+
     galleryTopGapLock = null; // <-- NEW: Reset the lock for the next location!
 
     // --- BRING THE NAVBAR BACK ---
@@ -320,8 +319,6 @@ window.addEventListener("load", () => {
     if (galImages.length <= 1) return;
     renderGalImage(galCurrentIndex - 1);
   }
-
-  
 
   function renderDefaultPanel() {
     // 1. Group locations by Country
@@ -454,8 +451,13 @@ window.addEventListener("load", () => {
           const drasticZoomThreshold = 5; // Uses the exact same logic as your clusters!
 
           // If we are already exactly where we need to be
-          if (currentZoom === targetZoom && map.getCenter().equals(targetLatLng)) {
-            markers.zoomToShowLayer(targetMarker, () => targetMarker.fire("click"));
+          if (
+            currentZoom === targetZoom &&
+            map.getCenter().equals(targetLatLng)
+          ) {
+            markers.zoomToShowLayer(targetMarker, () =>
+              targetMarker.fire("click"),
+            );
             return;
           }
 
@@ -464,7 +466,9 @@ window.addEventListener("load", () => {
             map.setView(targetLatLng, targetZoom, { animate: false });
             // A tiny 50ms delay gives the un-animated map time to physically paint the pins
             setTimeout(() => {
-              markers.zoomToShowLayer(targetMarker, () => targetMarker.fire("click"));
+              markers.zoomToShowLayer(targetMarker, () =>
+                targetMarker.fire("click"),
+              );
             }, 50);
           } else {
             // Otherwise, smooth cinematic dive
@@ -475,7 +479,9 @@ window.addEventListener("load", () => {
               easeLinearity: 1,
             });
             map.once("moveend", () => {
-              markers.zoomToShowLayer(targetMarker, () => targetMarker.fire("click"));
+              markers.zoomToShowLayer(targetMarker, () =>
+                targetMarker.fire("click"),
+              );
             });
           }
         }
@@ -488,7 +494,10 @@ window.addEventListener("load", () => {
     const descWrapper = document.querySelector(".lightbox-desc-wrapper");
     if (!descWrapper) return;
 
-    if (descWrapper.classList.contains("caption-collapsed") || galImages.length <= 1) {
+    if (
+      descWrapper.classList.contains("caption-collapsed") ||
+      galImages.length <= 1
+    ) {
       descWrapper.style.marginTop = "0px";
       return;
     }
@@ -500,19 +509,19 @@ window.addEventListener("load", () => {
 
     const windowW = window.innerWidth;
     const windowH = window.innerHeight;
-    const maxW = (windowW * 0.764) - 140; 
+    const maxW = windowW * 0.764 - 140;
     const maxH = windowH - 270;
 
     let shortestRenderedHeight = maxH;
 
-    galImages.forEach(imgObj => {
+    galImages.forEach((imgObj) => {
       const temp = new Image();
       temp.src = imgObj.src;
-      
+
       if (temp.complete && temp.naturalHeight > 0) {
         const ratio = temp.naturalWidth / temp.naturalHeight;
         const renderedHeight = Math.min(maxH, maxW / ratio);
-        
+
         if (renderedHeight < shortestRenderedHeight) {
           shortestRenderedHeight = renderedHeight;
         }
@@ -521,13 +530,13 @@ window.addEventListener("load", () => {
 
     // 1. Find the exact top edge
     const exactTopEdge = (windowH - shortestRenderedHeight) / 2;
-    
+
     // 2. Add the downward push (0.04 = 4vh)
-    const downwardPush = windowH * 0.01; 
-    
+    const downwardPush = windowH * 0.01;
+
     // 3. Combine them and lock it in
     galleryTopGapLock = exactTopEdge + downwardPush;
-    
+
     descWrapper.style.marginTop = `${Math.max(0, galleryTopGapLock)}px`;
   }
 
@@ -550,49 +559,49 @@ window.addEventListener("load", () => {
       subTitle = parts[1].trim();
     }
 
-    // 1. Build the sidebar panel base HTML (Now includes fluid CSS styles!)
+    // 1. Build the sidebar panel base HTML (Now includes the squeeze wrapper!)
     panel.innerHTML = `
       <style>
-        .sb-dynamic-row {
-          display: flex;
-          flex-direction: row;
-          gap: 6px;
-          width: 100%;
+        .sb-dynamic-row { display: flex; flex-direction: row; gap: 6px; width: 100%; }
+        .sb-dynamic-item { position: relative; overflow: hidden; cursor: zoom-in; }
+        .sb-dynamic-item img { width: 100%; height: 100%; object-fit: cover; display: block; transition: opacity 0.2s ease; }
+        .sb-dynamic-item:hover img { opacity: 0.8; }
+
+        /* --- NEW: CUSTOM INSTANT TOOLTIP --- */
+        .sb-hover-tooltip {
+          position: absolute;
+          bottom: 1px;
+          left: 1px;
+          right: 1px;
+          background: rgba(28, 28, 28, 0.6);
+          color: #ffffff;
+          padding: 8px 12px;
+          border-radius: 0px;
+          font-family: var(--font-sans);
+          font-size: 0.75rem;
+          line-height: 1.4;
+          opacity: 0;
+          pointer-events: none;
+          transform: translateY(4px);
+          transition: opacity 0.2s ease, transform 0.2s ease;
+          z-index: 10;
         }
-        .sb-dynamic-item {
-          position: relative;
-          overflow: hidden;
-          cursor: zoom-in;
-        }
-        .sb-dynamic-item img {
-          width: 100%;
-          height: 100%;
-          object-fit: cover;
-          display: block;
-          transition: opacity 0.2s ease;
-        }
-        .sb-dynamic-item:hover img {
-          opacity: 0.8;
+        .sb-dynamic-item:hover .sb-hover-tooltip {
+          opacity: 1;
+          transform: translateY(0);
         }
         
-        /* Mobile override: Stack everything smoothly on small screens */
+        /* Mobile override */
         @media (max-width: 1050px) {
-          .sb-dynamic-row {
-            flex-direction: column !important;
-          }
-          .sb-dynamic-item {
-            flex: none !important;
-            width: 100% !important;
-            aspect-ratio: auto !important; /* Disables the strict grid ratio */
-          }
-          .sb-dynamic-item img {
-            height: auto !important; /* Lets the image breathe naturally */
-            max-height: 70vh;        /* Prevents extreme vertical stretching */
-          }
+          .sb-dynamic-row { flex-direction: column !important; }
+          .sb-dynamic-item { flex: none !important; width: 100% !important; aspect-ratio: auto !important; }
+          .sb-dynamic-item img { height: auto !important; max-height: 70vh; }
         }
       </style>
 
-      <div style="padding: 0;"> 
+      <!-- NEW: The wrapper we will mathematically squeeze for single images -->
+      <div id="sidebar-content-wrapper" style="padding: 0; margin: 0 auto; width: 100%; transition: max-width 0.3s ease; box-sizing: border-box;"> 
+        
         <div style="text-align: left; margin-top: 1rem; margin-bottom: 0.5rem;">
           <h2 style="margin: 0; color: #1c1c1c; font-weight: 600 !important; white-space: normal; font-size: 1.9rem; line-height: 1.1;">
             ${mainTitle}
@@ -605,6 +614,7 @@ window.addEventListener("load", () => {
         </div>
         
         <div id="sidebar-dynamic-gallery" style="display: flex; flex-direction: column; gap: 6px; margin-top: 1rem; margin-bottom: 2rem;"></div>
+      
       </div>
     `;
 
@@ -659,8 +669,12 @@ window.addEventListener("load", () => {
             layoutGroups.push([loadedImages[2]]);
           }
         } else if (n === 4) {
-          layoutGroups.push([loadedImages[0], loadedImages[1]]);
-          layoutGroups.push([loadedImages[2], loadedImages[3]]);
+          // Row 1: One image
+          layoutGroups.push([loadedImages[0]]);
+          // Row 2: Two images side-by-side
+          layoutGroups.push([loadedImages[1], loadedImages[2]]);
+          // Row 3: One image
+          layoutGroups.push([loadedImages[3]]);
         } else if (n === 5) {
           layoutGroups.push([loadedImages[0], loadedImages[1]]);
           layoutGroups.push([loadedImages[2], loadedImages[3]]);
@@ -696,12 +710,8 @@ window.addEventListener("load", () => {
 
             if (group.length === 1) {
               imgWrapper.style.flex = "1 1 100%";
-              // Single images don't strictly enforce an aspect ratio height
-              // so they behave naturally and don't get too tall.
             } else {
               imgWrapper.style.flex = `${img.ratio} 1 0%`;
-              // This CSS command mathematically forces the rows to perfectly
-              // sync their heights at any window width!
               imgWrapper.style.aspectRatio = `${img.ratio}`;
             }
 
@@ -710,31 +720,127 @@ window.addEventListener("load", () => {
 
             const imgEl = document.createElement("img");
             imgEl.src = img.src;
-            if (group.length === 1) {
+            if (n === 1) {
+              imgEl.style.maxHeight = "60vh";
+            } else if (group.length === 1) {
               imgEl.style.maxHeight = "72vh";
             }
 
             imgWrapper.appendChild(imgEl);
+
+            // --- NEW: DYNAMIC WORD-COUNT CAPTION & FAST TOOLTIP ---
+            if (img.caption && n > 1) {
+              const tempDiv = document.createElement("div");
+              tempDiv.innerHTML = img.caption;
+              let plainText = tempDiv.textContent || tempDiv.innerText || "";
+              plainText = plainText.replace(/\s+/g, " ").trim();
+
+              // Determine the exact word limit based on total gallery size (n)
+              const wordLimit = n >= 5 ? 20 : 60;
+
+              const words = plainText.split(" ");
+              const shortText =
+                words.length > wordLimit
+                  ? words.slice(0, wordLimit).join(" ") + "..."
+                  : plainText;
+
+              if (shortText) {
+                // 1. Inject the fast CSS tooltip
+                const customTooltip = document.createElement("div");
+                customTooltip.className = "sb-hover-tooltip";
+                customTooltip.textContent = shortText;
+                imgWrapper.appendChild(customTooltip);
+
+                // 2. Document Icon Overlay
+                const iconOverlay = document.createElement("div");
+                iconOverlay.innerHTML = `
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                    <polyline points="14 2 14 8 20 8"></polyline>
+                    <line x1="16" y1="13" x2="8" y2="13"></line>
+                    <line x1="16" y1="17" x2="8" y2="17"></line>
+                    <polyline points="10 9 9 9 8 9"></polyline>
+                  </svg>
+                `;
+                Object.assign(iconOverlay.style, {
+                  position: "absolute",
+                  top: "6px",
+                  right: "6px",
+                  backgroundColor: "rgba(0, 0, 0, 0.4)",
+                  color: "#ffffff",
+                  padding: "5px",
+                  borderRadius: "2px",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  pointerEvents: "none",
+                });
+
+                imgWrapper.appendChild(iconOverlay);
+              }
+            }
+            // --- END NEW LOGIC ---
+
             rowDiv.appendChild(imgWrapper);
           });
 
           galleryContainer.appendChild(rowDiv);
         });
 
-        // Re-inject the description below the image if it is the only one in the collection
+        // Re-inject the description below the image
         if (n === 1 && loadedImages[0].caption) {
           const captionDiv = document.createElement("div");
-          captionDiv.style.marginTop = "1.5rem";
+          captionDiv.style.marginTop = "1.2rem";
           captionDiv.style.fontFamily = "var(--font-sans)";
-          captionDiv.style.fontSize = "0.95rem";
-          captionDiv.style.color = "#4a4a4a";
+          captionDiv.style.fontSize = "0.85rem";
+          captionDiv.style.color = "#000000";
           captionDiv.style.lineHeight = "1.6";
           captionDiv.innerHTML = loadedImages[0].caption;
           galleryContainer.appendChild(captionDiv);
         }
+
+        // --- NEW: TRIGGER THE SQUEEZE IF IT IS A SINGLE IMAGE ---
+        if (n === 1) {
+          const wrapper = panel.querySelector("#sidebar-content-wrapper");
+          if (wrapper) {
+            wrapper.classList.add("single-image-mode");
+            wrapper.dataset.ratio = loadedImages[0].ratio; // Save ratio for resize math
+            squeezeSidebarSingleImage(); // Snap it inward immediately!
+          }
+        }
       });
     }
   }
+
+  // --- UPDATED: SMART SINGLE IMAGE MARGIN SQUEEZE ---
+  function squeezeSidebarSingleImage() {
+    const wrapper = document.querySelector(
+      "#sidebar-content-wrapper.single-image-mode",
+    );
+    if (!wrapper) return;
+
+    // 1. Clear any previous squeeze so we can measure the natural layout
+    wrapper.style.maxWidth = "100%";
+
+    const maxH = window.innerHeight * 0.6;
+    const ratio = parseFloat(wrapper.dataset.ratio);
+
+    if (ratio) {
+      // 2. Measure the default width the panel gives us
+      const defaultWidth = wrapper.getBoundingClientRect().width;
+
+      // 3. Calculate how tall the image WOULD be if it took up that full width
+      const projectedHeight = defaultWidth / ratio;
+
+      // 4. If it breaks the 60vh ceiling, recalculate the width to force the margins inward
+      if (projectedHeight > maxH) {
+        const squeezedWidth = maxH * ratio;
+        wrapper.style.maxWidth = `${squeezedWidth}px`;
+      }
+    }
+  }
+
+  window.addEventListener("resize", squeezeSidebarSingleImage);
 
   /* --- MARKER & TOOLTIP LOGIC --- */
   const smallIcon = L.icon({
@@ -758,9 +864,9 @@ window.addEventListener("load", () => {
     maxClusterRadius: 30,
     zoomToBoundsOnClick: false,
     removeOutsideVisibleBounds: false,
-    
+
     // The Kill Switches
-    disableClusteringAtZoom: 15, 
+    disableClusteringAtZoom: 15,
     spiderfyOnMaxZoom: false, // <-- NEW: Completely disables the spider web fallback!
 
     iconCreateFunction: function (cluster) {
@@ -782,10 +888,10 @@ window.addEventListener("load", () => {
 
     let currentZoom = map.getZoom();
     let targetZoom = currentZoom;
-    
-    const maxZoom = 15; 
-    const desiredPixelSpread = count > 2 ? 250 : 50; 
-    const drasticZoomThreshold = 5; 
+
+    const maxZoom = 15;
+    const desiredPixelSpread = count > 2 ? 250 : 50;
+    const drasticZoomThreshold = 5;
 
     for (let z = currentZoom; z <= maxZoom; z++) {
       const corner1 = map.project(bounds.getSouthWest(), z);
@@ -799,7 +905,7 @@ window.addEventListener("load", () => {
       if (z === maxZoom) targetZoom = maxZoom;
     }
 
-    // THE FIX: If the math tells it to stay on the exact same zoom level, 
+    // THE FIX: If the math tells it to stay on the exact same zoom level,
     // force it to zoom in by at least 1 step (up to the max) so the click always works!
     if (targetZoom <= currentZoom) {
       targetZoom = Math.min(currentZoom + 3, maxZoom);

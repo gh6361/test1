@@ -1,7 +1,7 @@
 // data/US/NYC/met.js
 
 export const met = {
-  name: "The Metropolitan Museum of Art: New York City, U.S.",
+  name: "Inside The Met: New York City, U.S.",
   country: "United States",
   coords: [40.77944405155032, -73.96326257640942],
   description: "A cold, bright stop with open skies and coastal views.",

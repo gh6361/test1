@@ -32,7 +32,7 @@ header: solid
 
 <!-- THE MAP CONTAINER -->
 <!-- CHANGED: Added display: flex !important; to enable flexible layouts -->
-<div class="map-page" style="position: fixed !important; top: 62px !important; left: 0 !important; right: 0 !important; height: calc(100vh - 62px) !important; z-index: 10 !important; background-color: #3f464d; display: flex !important; flex-direction: row !important; flex-wrap: nowrap !important;">
+<div class="map-page" style="position: fixed !important; top: 68px !important; left: 0 !important; right: 0 !important; height: calc(100vh - 68px) !important; z-index: 10 !important; background-color: #3f464d; display: flex !important; flex-direction: row !important; flex-wrap: nowrap !important;">
   
   <!-- Sidebar -->
   <!-- CHANGED: Replaced absolute positioning with flex: 0 0 40%. Added min/max widths so it doesn't get awkwardly small or huge. -->

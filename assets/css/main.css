@@ -658,18 +658,23 @@ a:hover {
   max-width: 1200px;
   margin: 0 auto;
   padding: 0 24px;
-}
-
-.location-cover {
-  margin-bottom: 2rem;
+  /* Animates the margin shift when the screen resizes */
+  transition: max-width 0.3s ease; 
+  box-sizing: border-box;
 }
 
 .location-cover img {
   display: block;
   width: 100%;
   height: auto;
+  max-height: 60vh;       /* The vertical ceiling */
+  object-fit: contain;    /* Prevents distortion */
   border-radius: 0;
   box-shadow: none;
+}
+
+.location-cover {
+  margin-bottom: 2rem;
 }
 
 .location-header {
@@ -770,7 +775,7 @@ a:hover {
 :root {
   /* 1. Experiment with your distance here! */
   /* The caption width will automatically calculate itself to preserve your symmetry */
-  --desc-gap: 1.5vw; 
+  --desc-gap: 0.1vw; 
 }
 
 /* =========================================
@@ -835,7 +840,7 @@ a:hover {
   background-color: #ffffff; 
   padding: 1.5rem;
   border-radius: 2px;
-  color: #1c1c1c;
+  color: #000000;
   
   align-self: flex-start; 
   
@@ -902,15 +907,6 @@ a:hover {
   color: var(--text-dark); /* Tie back to your root variable */
 }
 
-/* Image Index Counter (Subtle Overline) */
-.caption-index {
-  font-family: var(--font-sans);
-  font-size: 0.6rem; /* Deliberately tiny */
-  text-transform: uppercase;
-  letter-spacing: 0.25em; /* Extremely wide tracking for elegance */
-  color: #999; /* A soft, quiet gray so it recedes into the background */
-  margin-bottom: 0.5rem; /* Pushes the main title down slightly */
-}
 
 /* 3. Detailed Description (Clean, readable paragraph) */
 .caption-details {
@@ -990,7 +986,7 @@ a:hover {
   font-size: 0.65rem;
   text-transform: uppercase;
   letter-spacing: 0.25em;
-  color: #999; 
+  color: #272727; 
   z-index: 1000;
 }
 
@@ -1170,3 +1166,19 @@ nav.header-solid .nav-link:hover {
 }
 
 
+/* =========================================
+   SINGLE IMAGE LIGHTBOX EXPANSION
+========================================= */
+/* When there is no caption or thumbnails, let the image fill the empty space */
+.lightbox.single-mode .lightbox-image {
+  max-width: 80vw !important;
+  max-height: 80vh !important; 
+}
+
+/* On specifically smaller/mobile screens, reduce the margins even further */
+@media (max-width: 900px) {
+  .lightbox.single-mode .lightbox-image {
+    max-width: 95vw !important;
+    max-height: 90vh !important;
+  }
+}
