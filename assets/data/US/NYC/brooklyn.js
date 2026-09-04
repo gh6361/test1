@@ -15,18 +15,11 @@ export const brooklyn = {
     },
     {
       src: `../assets/images/US/NYC/brooklyn2.jpg`,
-      detailedDescription: "Two motion-blurred figures against the \
-      glowing Manhattan skyline.",
+      detailedDescription: "",
     },
     {
       src: `../assets/images/US/NYC/brooklyn3.jpg`,
-      detailedDescription: "Brooklyn Bridge and Manhattan in the \
-      background...",
-    },
-    {
-      src: `../assets/images/US/NYC/brooklyn4.jpg`,
-      detailedDescription: "Brooklyn Bridge and Manhattan in the \
-      background...",
+      detailedDescription: "",
     },
   ]
 };

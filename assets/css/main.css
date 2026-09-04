@@ -752,7 +752,7 @@ a:hover {
 .lightbox {
   position: fixed;
   inset: 0;
-  background: rgba(240, 239, 237, 0.97); 
+  background: rgba(247, 246, 244, 0.97); 
   display: flex;
   align-items: stretch;
   justify-content: stretch;
@@ -1135,7 +1135,7 @@ nav.header-solid .nav-link:hover {
 .lightbox-desc-wrapper {
   width: calc(23.6vw - var(--desc-gap)); 
   flex-shrink: 0;
-  background-color: #f0efed; 
+  background-color: #F7F6F4F7; 
   padding: 1.5rem;
   border-radius: 2px;
   color: #1c1c1c;

@@ -9,11 +9,11 @@ export const lincoln = {
   images: [
     {
       src: `../assets/images/US/NYC/lincoln1.jpg`,
-      detailedDescription: "Reflections",
+      detailedDescription: "",
     },
     {
       src: `../assets/images/US/NYC/lincoln2.jpg`,
-      detailedDescription: "Symmetry",
+      detailedDescription: "",
     },
   ]
 };

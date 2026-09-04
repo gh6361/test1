@@ -8,10 +8,13 @@ export const honeycomb = {
   mode: "stacked",
   images: [
     {
-      src: `../assets/images/US/NYC/honeycomb2.jpg`,
+      src: `../assets/images/US/NYC/honeycomb4.jpg`,
       detailedDescription: "Vessel (the honeycomb-like structure to the \
-      left of the image) is perhaps the most recognisable object at Hudson \
-      Yards.",
+      right of the image) is perhaps the most recognisable object at Hudson \
+      Yards. It serves as the centrepiece of the Hudson Yards Public \
+      Square and Gardens. Together with the High Line and Hudson Park & \
+      Boulevard, it is the largest network of public open space built in Manhattan \
+      since Central Park.",
     },
     {
       src: `../assets/images/US/NYC/honeycomb1.jpg`,
@@ -27,11 +30,8 @@ export const honeycomb = {
       across 16 stories. More than 2 million people visit every year.",
     },
     {
-      src: `../assets/images/US/NYC/honeycomb4.jpg`,
-      detailedDescription: "Vessel serves as the centrepiece of the Hudson Yards Public \
-      Square and Gardens. Together with the High Line and Hudson Park & \
-      Boulevard, it is the largest network of public open space built in Manhattan \
-      since Central Park",
+      src: `../assets/images/US/NYC/honeycomb2.jpg`,
+      detailedDescription: "",
     },
     {
       src: `../assets/images/US/NYC/hudsonyards_flag.jpg`,

@@ -12,11 +12,11 @@ export const katz = {
       detailedDescription: "Katz's Delicatessen is one of New York City's \
       most iconic old-school Jewish delis. They are especially famous for their \
       pastrami, and it is not unusual to walk past and see people queuing out \
-      onto the street.",
+      onto the street (...but no queue today!).",
     },
     {
       src: `../assets/images/US/NYC/katz2.jpg`,
-      detailedDescription: "... but no queue today!",
+      detailedDescription: "",
     },
     {
       src: `../assets/images/US/NYC/katz3.jpg`,

@@ -9,8 +9,6 @@ export const pallas_palkaskero = {
   images: [
     {
       src: `../assets/images/finland/pallas_palkaskero/reduced-6268.jpg`,
-      caption: "Open skies over Reykjavik.",
-      location: "Downtown Reykjavik, Iceland",
       date: "October 2023",
       detailedDescription: "The Palkaskero Fell can be reached by the Palkaskeron \
       kierros Trail, a 6.1 km circle trail. The rocky fell summit lies around 700 m \
@@ -18,78 +16,50 @@ export const pallas_palkaskero = {
     },
     {
       src: `../assets/images/finland/pallas_palkaskero/reduced-6204.jpg`,
-      caption: "Open skies over Reykjavik.",
-      location: "Downtown Reykjavik, Iceland",
       date: "October 2023",
-      detailedDescription: "Pallas-Yllästunturi National Park contains reindeer husbandry \
-      areas. Reindeer herders work in these areas seasonally.",
+      detailedDescription: "Well, hello there!",
     },
     {
       src: `../assets/images/finland/pallas_palkaskero/reduced-6198.jpg`,
-      caption: "Open skies over Reykjavik.",
-      location: "Downtown Reykjavik, Iceland",
       date: "October 2023",
-      detailedDescription: "The reindeer are semi-domesticated and belong to their owners.",
+      detailedDescription: "Pallas-Yllästunturi National Park contains reindeer husbandry \
+      areas. The reindeer are semi-domesticated and belong to their owners who \
+      work in these areas seasonally.",
     },
     {
       src: `../assets/images/finland/pallas_palkaskero/reduced-6189.jpg`,
-      caption: "Open skies over Reykjavik.",
-      location: "Downtown Reykjavik, Iceland",
-      date: "October 2023",
-      detailedDescription: "The national park is an important grazing, calving \
-      &mdash; and resting! &mdash; area.",
+      detailedDescription: "",
     },
     {
       src: `../assets/images/finland/pallas_palkaskero/reduced-6229.jpg`,
-      caption: "Open skies over Reykjavik.",
-      location: "Downtown Reykjavik, Iceland",
-      date: "October 2023",
-      detailedDescription: "The path leading to the summit of the Palkaskero hike.",
+      detailedDescription: "",
     },
     {
+      src: `../assets/images/finland/pallas_palkaskero/reduced-6239.jpg`,
+      detailedDescription: "",
+    },
+    {
+      src: `../assets/images/finland/pallas_palkaskero/reduced-6244.jpg`,
+      detailedDescription: "",
+    },
+    {
+      src: `../assets/images/finland/pallas_palkaskero/reduced-6248.jpg`,
+      detailedDescription: "",
+    },
+    
+    {
       src: `../assets/images/finland/pallas_palkaskero/reduced-6235.jpg`,
-      caption: "Open skies over Reykjavik.",
-      location: "Downtown Reykjavik, Iceland",
-      date: "October 2023",
       detailedDescription: "The entire hike is above the tree line, as above a certain \
       elevation the conditions are too harsh for a normal forest to grow.",
     },
     {
-      src: `../assets/images/finland/pallas_palkaskero/reduced-6239.jpg`,
-      caption: "Open skies over Reykjavik.",
-      location: "Downtown Reykjavik, Iceland",
-      date: "October 2023",
-      detailedDescription: "Although the Palkaskero hike is less travelled than its neighbour \
-      Taivaskero, the views are no less breathtaking!",
-    },
-    {
-      src: `../assets/images/finland/pallas_palkaskero/reduced-6244.jpg`,
-      caption: "Open skies over Reykjavik.",
-      location: "Downtown Reykjavik, Iceland",
-      date: "October 2023",
-      detailedDescription: "Notice the stark contrast between the treeless fell top \
-      and the forest below.",
-    },
-    {
-      src: `../assets/images/finland/pallas_palkaskero/reduced-6248.jpg`,
-      caption: "Open skies over Reykjavik.",
-      location: "Downtown Reykjavik, Iceland",
-      date: "October 2023",
-      detailedDescription: "Open fell country.",
-    },
-    {
       src: `../assets/images/finland/pallas_palkaskero/reduced-6280.jpg`,
-      caption: "Open skies over Reykjavik.",
-      location: "Downtown Reykjavik, Iceland",
       date: "October 2023",
       detailedDescription: "The descent from Palkaskero, overlooking Pallasjärvi Lake.",
     },
     {
       src: `../assets/images/finland/pallas_palkaskero/reduced-6292.jpg`,
-      caption: "Open skies over Reykjavik.",
-      location: "Downtown Reykjavik, Iceland",
-      date: "October 2023",
-      detailedDescription: "Such lovely spot to stop for a rest...",
+      detailedDescription: "",
     },
   ]
 };

@@ -27,7 +27,7 @@ export const swing = {
     {
       src: `../assets/images/finland/swing/reduced-6153.jpg`,
       date: "October 2023",
-      detailedDescription: "Just messing around or intentional juxtaposition?",
+      detailedDescription: "",
     },
   ]
 };

@@ -39,9 +39,7 @@ header: solid
   <aside class="map-sidebar" style="flex: 0 0 38.2% !important; min-width: 350px !important; max-width: 800px !important; height: 100% !important; margin: 0 !important; background-color: #f7f7f7 !important; z-index: 1000 !important; overflow-y: auto !important;">
     
     <div id="location-panel" class="sidebar-dynamic-padding" style="padding-top: 0.5rem; padding-bottom: 2rem; color: #1c1c1c;">
-      <h2 style="color: #1c1c1c; margin-top: 0 !important; margin-bottom: 1rem;">Travel Map</h2>
-      <p style="font-family: var(--font-sans); line-height: 1.6;">Click a marker to see details about each place.</p>
-      <p class="map-panel-note" style="opacity: 0.7; font-size: 0.85em; margin-top: 2rem; border-top: 1px solid rgba(28, 28, 28, 0.2); padding-top: 1rem;">Use the buttons to open a gallery or a single photo.</p>
+      
     </div>
   </aside>
 

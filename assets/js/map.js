@@ -573,12 +573,12 @@ window.addEventListener("load", () => {
           bottom: 1px;
           left: 1px;
           right: 1px;
-          background: rgba(28, 28, 28, 0.6);
+          background: rgba(28, 28, 28, 0.75);
           color: #ffffff;
           padding: 8px 12px;
           border-radius: 0px;
           font-family: var(--font-sans);
-          font-size: 0.75rem;
+          font-size: 0.73rem;
           line-height: 1.4;
           opacity: 0;
           pointer-events: none;
@@ -736,7 +736,7 @@ window.addEventListener("load", () => {
               plainText = plainText.replace(/\s+/g, " ").trim();
 
               // Determine the exact word limit based on total gallery size (n)
-              const wordLimit = n >= 5 ? 20 : 60;
+              const wordLimit = n >= 5 ? 20 : 70;
 
               const words = plainText.split(" ");
               const shortText =

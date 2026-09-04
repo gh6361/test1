@@ -15,12 +15,11 @@ export const pier = {
     },
     {
       src: `../assets/images/US/NYC/pier1.jpg`,
-      detailedDescription: "Artful shade structures in the park.",
+      detailedDescription: "",
     },
     {
       src: `../assets/images/US/NYC/pier2.jpg`,
-      detailedDescription: "The 120-foot-long synthetic turf field under \
-      evening lights.",
+      detailedDescription: "",
     },
   ]
 };
