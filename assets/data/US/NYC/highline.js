@@ -3,6 +3,7 @@
 export const highline = {
   name: "The High Line: Hudson Yards, New York City, U.S.",
   country: "United States",
+  state: "New York",
   coords: [40.75395839420786, -74.00497803866077],
   description: "A cold, bright stop with open skies and coastal views.",
   mode: "stacked",

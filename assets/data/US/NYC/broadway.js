@@ -3,6 +3,7 @@
 export const broadway = {
   name: "Belasco Theatre: New York City, U.S.",
   country: "United States",
+  state: "New York",
   coords: [40.75643974744477, -73.98372777787014],
   description: "A cold, bright stop with open skies and coastal views.",
   mode: "stacked",

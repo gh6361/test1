@@ -3,6 +3,7 @@
 export const honeycomb = {
   name: "Vessel: Hudson Yards, New York City, U.S.",
   country: "United States",
+  state: "New York",
   coords: [40.75374225276031, -74.00204641486499],
   description: "A cold, bright stop with open skies and coastal views.",
   mode: "stacked",

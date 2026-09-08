@@ -3,6 +3,7 @@
 export const dog = {
   name: "DOG in NYC: New York City, U.S.",
   country: "United States",
+  state: "New York",
   coords: [40.772533653677094, -73.9824713530654],
   description: "A cold, bright stop with open skies and coastal views.",
   mode: "stacked",

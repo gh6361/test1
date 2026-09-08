@@ -3,6 +3,7 @@
 export const brooklyn = {
   name: "Brooklyn Bridge: New York City, U.S.",
   country: "United States",
+  state: "New York",
   coords: [40.703159160068424, -73.99634027974847],
   description: "A cold, bright stop with open skies and coastal views.",
   mode: "stacked",

@@ -24,6 +24,7 @@ window.addEventListener("load", () => {
   let galActive = galImageA;
   let galInactive = galImageB;
   let galleryTopGapLock = null; // <-- NEW: Stores the calculated gap for the whole stack
+  let galleryResizeObserver = null; // <-- NEW: Tracks image area
 
   if (!mapEl || !panel || typeof L === "undefined") return;
 
@@ -132,14 +133,23 @@ window.addEventListener("load", () => {
         const targetRegion = e.target.dataset.region;
 
         if (regionBounds[targetRegion]) {
-          // First/Default case: moving to OR from the World view is an instant jump
-          if (lastRegion === "world" || targetRegion === "world") {
+          const currentZoom = mapInstance.getZoom();
+
+          // Determine if the user is manually zoomed in or clicked an index pin (zoom > 4)
+          const isZoomedIn = currentZoom > 4;
+
+          // Determine if we are moving to or from the World view
+          const isWorldTransition =
+            lastRegion === "world" || targetRegion === "world";
+
+          if (isZoomedIn || !isWorldTransition) {
+            // INSTANT JUMP: If already zoomed in OR moving Region-to-Region
             mapInstance.fitBounds(regionBounds[targetRegion], {
               animate: false,
               padding: [20, 20],
             });
           } else {
-            // Moving continent-to-continent animates smoothly
+            // SMOOTH FLIGHT: Only if zoomed out AND transitioning between World <-> Region
             mapInstance.flyToBounds(regionBounds[targetRegion], {
               duration: 0.7,
               padding: [20, 20],
@@ -321,25 +331,26 @@ window.addEventListener("load", () => {
   }
 
   function renderDefaultPanel() {
-    // 1. Group locations by Country
+    // 1. Group locations by Country AND State
     const groupedLocations = {};
 
     locations.forEach((loc, index) => {
-      // Default to "Other" if you forget to add a country tag
       const country = loc.country || "Other";
+      // Look for a state tag, default to "NONE" if missing
+      const state = loc.state || "NONE";
 
-      // Simply use the default name logic (stripping out anything after a colon)
       const displayName = loc.name.includes(":")
         ? loc.name.split(":")[0].trim()
         : loc.name;
 
-      // Create the country group array if it doesn't exist yet
       if (!groupedLocations[country]) {
-        groupedLocations[country] = [];
+        groupedLocations[country] = {};
+      }
+      if (!groupedLocations[country][state]) {
+        groupedLocations[country][state] = [];
       }
 
-      // Push the item into its specific country group
-      groupedLocations[country].push({
+      groupedLocations[country][state].push({
         displayName: displayName,
         originalIndex: index,
       });
@@ -354,12 +365,13 @@ window.addEventListener("load", () => {
     let locationListHtml = "";
 
     sortedCountries.forEach((country) => {
-      // Sort the places alphabetically inside this specific country
-      groupedLocations[country].sort((a, b) =>
-        a.displayName.localeCompare(b.displayName),
-      );
+      // Enforce the strict "UNITED STATES" styling
+      const displayCountry =
+        country.toUpperCase() === "UNITED STATES" ||
+        country.toUpperCase() === "U.S."
+          ? "UNITED STATES"
+          : country;
 
-      // EXACT copy of your subtitle styling using a <div> to avoid global <h4> serif overrides!
       locationListHtml += `
         <li>
           <div style="
@@ -372,26 +384,54 @@ window.addEventListener("load", () => {
             margin-bottom: 0.9rem;
             margin-left: 0rem; 
             line-height: 1.2;
-          ">${country}</div>
-          <ul style="list-style-type: none; padding-left: 1rem; margin: 0; margin-bottom: 2rem; display: flex; flex-direction: column; gap: 0.25rem;">
+          ">${displayCountry}</div>
       `;
 
-      // Add all the places beneath the header
-      groupedLocations[country].forEach((item) => {
-        locationListHtml += `
+      // Sort states alphabetically within the country
+      const sortedStates = Object.keys(groupedLocations[country]).sort((a, b) =>
+        a.localeCompare(b),
+      );
+
+      sortedStates.forEach((state) => {
+        // Sort the places alphabetically inside this specific state
+        groupedLocations[country][state].sort((a, b) =>
+          a.displayName.localeCompare(b.displayName),
+        );
+
+        // If a state exists (i.e., not "NONE"), render a sub-header and indent slightly
+        if (state !== "NONE") {
+          locationListHtml += `
+            <div style="font-family: var(--font-sans); font-size: 0.65rem; color: rgba(28,28,28,0.5); text-transform: uppercase; letter-spacing: 0.1em; margin-top: 0.2rem; margin-bottom: 0.6rem; margin-left: 1rem;">
+              ${state}
+            </div>
+            <ul style="list-style-type: none; padding-left: 1.5rem; margin: 0; margin-bottom: 1.5rem; display: flex; flex-direction: column; gap: 0.25rem;">
+          `;
+        } else {
+          // Standard layout if there are no states attached to this country
+          locationListHtml += `
+            <ul style="list-style-type: none; padding-left: 1rem; margin: 0; margin-bottom: 2rem; display: flex; flex-direction: column; gap: 0.25rem;">
+          `;
+        }
+
+        groupedLocations[country][state].forEach((item) => {
+          locationListHtml += `
             <li class="sidebar-loc-link" data-index="${item.originalIndex}" style="font-size: 1rem; color: #1c1c1c;">
               ${item.displayName}
             </li>
+          `;
+        });
+
+        locationListHtml += `
+          </ul>
         `;
       });
 
       locationListHtml += `
-          </ul>
         </li>
       `;
     });
 
-    // 4. Render the panel using your exact title wrapper from renderPanel
+    // 4. Render the panel using your exact title wrapper
     panel.innerHTML = `
       <div style="padding: 0;"> 
         
@@ -409,7 +449,6 @@ window.addEventListener("load", () => {
             line-height: 1.1;
           ">Index</h2>
           
-          <!-- The subtle border requested, spaced perfectly below the title -->
           <div style="border-bottom: 1px solid #e2e0d8; margin-top: 1.2rem; margin-bottom: 1.5rem;"></div>
         </div>
         
@@ -448,9 +487,8 @@ window.addEventListener("load", () => {
           if (targetZoom < 6) targetZoom = 6;
 
           const currentZoom = map.getZoom();
-          const drasticZoomThreshold = 5; // Uses the exact same logic as your clusters!
+          const drasticZoomThreshold = 5;
 
-          // If we are already exactly where we need to be
           if (
             currentZoom === targetZoom &&
             map.getCenter().equals(targetLatLng)
@@ -461,17 +499,14 @@ window.addEventListener("load", () => {
             return;
           }
 
-          // THE FIX: Instant teleport if the zoom jump is too large
           if (Math.abs(targetZoom - currentZoom) >= drasticZoomThreshold) {
             map.setView(targetLatLng, targetZoom, { animate: false });
-            // A tiny 50ms delay gives the un-animated map time to physically paint the pins
             setTimeout(() => {
               markers.zoomToShowLayer(targetMarker, () =>
                 targetMarker.fire("click"),
               );
             }, 50);
           } else {
-            // Otherwise, smooth cinematic dive
             const flightDuration = targetZoom > 5 ? 1 : 0.7;
             map.flyTo(targetLatLng, targetZoom, {
               animate: true,
@@ -559,46 +594,45 @@ window.addEventListener("load", () => {
       subTitle = parts[1].trim();
     }
 
-    // 1. Build the sidebar panel base HTML (Now includes the squeeze wrapper!)
+    // 1. Build the sidebar panel base HTML
     panel.innerHTML = `
       <style>
         .sb-dynamic-row { display: flex; flex-direction: row; gap: 6px; width: 100%; }
-        .sb-dynamic-item { position: relative; overflow: hidden; cursor: zoom-in; }
+        
+        /* Container tracking for thumbnails */
+        .sb-dynamic-item { position: relative; overflow: hidden; cursor: zoom-in; container-type: inline-size; }
         .sb-dynamic-item img { width: 100%; height: 100%; object-fit: cover; display: block; transition: opacity 0.2s ease; }
         .sb-dynamic-item:hover img { opacity: 0.8; }
 
-        /* --- NEW: CUSTOM INSTANT TOOLTIP --- */
+        /* Tooltip Base */
         .sb-hover-tooltip {
-          position: absolute;
-          bottom: 1px;
-          left: 1px;
-          right: 1px;
-          background: rgba(28, 28, 28, 0.75);
-          color: #ffffff;
-          padding: 8px 12px;
-          border-radius: 0px;
-          font-family: var(--font-sans);
-          font-size: 0.73rem;
-          line-height: 1.4;
-          opacity: 0;
-          pointer-events: none;
-          transform: translateY(4px);
-          transition: opacity 0.2s ease, transform 0.2s ease;
-          z-index: 10;
+          position: absolute; bottom: 0px; left: 0px; right: 0px;
+          background: rgba(28, 28, 28, 0.75); color: #ffffff;
+          padding: 8px 12px; font-family: var(--font-sans);
+          font-size: 0.73rem; line-height: 1.4; opacity: 0;
+          pointer-events: none; transform: translateY(4px);
+          transition: opacity 0.2s ease, transform 0.2s ease; z-index: 10;
         }
         .sb-dynamic-item:hover .sb-hover-tooltip {
-          opacity: 1;
-          transform: translateY(0);
+          opacity: 1; transform: translateY(0);
         }
+
+        /* --- NEW: 4-TIER AREA-BASED TEXT SWAPPING --- */
+        .tt-small, .tt-medium-small, .tt-medium, .tt-large { display: none; } 
         
-        /* Mobile override */
+        /* The ResizeObserver assigns these classes based on area */
+        .box-small .tt-small { display: inline; }
+        .box-medium-small .tt-medium-small { display: inline; }
+        .box-medium .tt-medium { display: inline; }
+        .box-large .tt-large { display: inline; }
+
         @media (max-width: 1050px) {
           .sb-dynamic-row { flex-direction: column !important; }
           .sb-dynamic-item { flex: none !important; width: 100% !important; aspect-ratio: auto !important; }
           .sb-dynamic-item img { height: auto !important; max-height: 70vh; }
         }
       </style>
-
+      
       <!-- NEW: The wrapper we will mathematically squeeze for single images -->
       <div id="sidebar-content-wrapper" style="padding: 0; margin: 0 auto; width: 100%; transition: max-width 0.3s ease; box-sizing: border-box;"> 
         
@@ -608,7 +642,7 @@ window.addEventListener("load", () => {
           </h2>
           ${
             subTitle
-              ? `<div style="font-family: var(--font-sans); font-size: 0.75rem; color: var(--text-body); text-transform: uppercase; letter-spacing: 0.15em; margin-top: 0.9rem; margin-bottom: 1.2rem; margin-left: 0rem; line-height: 1.2;">${subTitle}</div>`
+              ? `<div style="font-family: var(--font-sans); font-size: 0.75rem; color: var(--text-body); text-transform: uppercase; letter-spacing: 0.15em; margin-top: 0.9rem; margin-bottom: 1.9rem; margin-left: 0rem; line-height: 1.2;">${subTitle}</div>`
               : ""
           }
         </div>
@@ -699,6 +733,30 @@ window.addEventListener("load", () => {
           }
         }
 
+        // --- INITIALIZE THE 4-TIER AREA OBSERVER ---
+        if (galleryResizeObserver) galleryResizeObserver.disconnect();
+        
+        galleryResizeObserver = new ResizeObserver((entries) => {
+          entries.forEach(entry => {
+            const area = entry.contentRect.width * entry.contentRect.height;
+            const target = entry.target;
+            
+            // Clear all sizing classes first
+            target.classList.remove("box-small", "box-medium-small", "box-medium", "box-large");
+            
+            // Apply the precise tier
+            if (area < 40000) {
+              target.classList.add("box-small");
+            } else if (area <= 60000) {
+              target.classList.add("box-medium-small");
+            } else if (area <= 80000) {
+              target.classList.add("box-medium");
+            } else {
+              target.classList.add("box-large");
+            }
+          });
+        });
+
         // --- BUILD FLUID HTML ROWS ---
         layoutGroups.forEach((group) => {
           const rowDiv = document.createElement("div");
@@ -707,6 +765,9 @@ window.addEventListener("load", () => {
           group.forEach((img) => {
             const imgWrapper = document.createElement("div");
             imgWrapper.className = "sb-dynamic-item";
+
+            // Tell the observer to monitor this specific image box
+            galleryResizeObserver.observe(imgWrapper);
 
             if (group.length === 1) {
               imgWrapper.style.flex = "1 1 100%";
@@ -728,30 +789,36 @@ window.addEventListener("load", () => {
 
             imgWrapper.appendChild(imgEl);
 
-            // --- NEW: DYNAMIC WORD-COUNT CAPTION & FAST TOOLTIP ---
+            // --- AREA-BASED CAPTION & FAST TOOLTIP ---
             if (img.caption && n > 1) {
               const tempDiv = document.createElement("div");
               tempDiv.innerHTML = img.caption;
               let plainText = tempDiv.textContent || tempDiv.innerText || "";
               plainText = plainText.replace(/\s+/g, " ").trim();
 
-              // Determine the exact word limit based on total gallery size (n)
-              const wordLimit = n >= 5 ? 20 : 70;
-
               const words = plainText.split(" ");
-              const shortText =
-                words.length > wordLimit
-                  ? words.slice(0, wordLimit).join(" ") + "..."
-                  : plainText;
+              
+              // Generate the 4 tiers (using 14 words for the new mid-tier)
+              const textSmall = words.length > 8 ? words.slice(0, 8).join(" ") + "..." : plainText;
+              const textMediumSmall = words.length > 40 ? words.slice(0, 40).join(" ") + "..." : plainText;
+              const textMedium = words.length > 40 ? words.slice(0, 40).join(" ") + "..." : plainText;
+              const textLarge = words.length > 70 ? words.slice(0, 70).join(" ") + "..." : plainText;
 
-              if (shortText) {
-                // 1. Inject the fast CSS tooltip
+              if (plainText) {
                 const customTooltip = document.createElement("div");
                 customTooltip.className = "sb-hover-tooltip";
-                customTooltip.textContent = shortText;
+                
+                // Inject all four spans; CSS will reveal the correct one!
+                customTooltip.innerHTML = `
+                  <span class="tt-small">${textSmall}</span>
+                  <span class="tt-medium-small">${textMediumSmall}</span>
+                  <span class="tt-medium">${textMedium}</span>
+                  <span class="tt-large">${textLarge}</span>
+                `;
+                
                 imgWrapper.appendChild(customTooltip);
 
-                // 2. Document Icon Overlay
+                // Document Icon Overlay
                 const iconOverlay = document.createElement("div");
                 iconOverlay.innerHTML = `
                   <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -763,17 +830,10 @@ window.addEventListener("load", () => {
                   </svg>
                 `;
                 Object.assign(iconOverlay.style, {
-                  position: "absolute",
-                  top: "6px",
-                  right: "6px",
-                  backgroundColor: "rgba(0, 0, 0, 0.4)",
-                  color: "#ffffff",
-                  padding: "5px",
-                  borderRadius: "2px",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  pointerEvents: "none",
+                  position: "absolute", top: "6px", right: "6px",
+                  backgroundColor: "rgba(0, 0, 0, 0.4)", color: "#ffffff",
+                  padding: "5px", borderRadius: "2px", display: "flex",
+                  alignItems: "center", justifyContent: "center", pointerEvents: "none",
                 });
 
                 imgWrapper.appendChild(iconOverlay);
@@ -783,7 +843,6 @@ window.addEventListener("load", () => {
 
             rowDiv.appendChild(imgWrapper);
           });
-
           galleryContainer.appendChild(rowDiv);
         });
 

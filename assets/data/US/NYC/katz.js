@@ -3,6 +3,7 @@
 export const katz = {
   name: "Katz's Delicatessen: New York City, U.S.",
   country: "United States",
+  state: "New York",
   coords: [40.72236240351658, -73.98735815329873],
   description: "A cold, bright stop with open skies and coastal views.",
   mode: "stacked",

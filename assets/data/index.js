@@ -1,6 +1,10 @@
 // data/index.js
 
 // 1. Import all your individual cities
+import { santabarbara } from './US/CA/santabarbara.js';
+import { sandstone } from './US/CA/sandstone.js';
+import { mandalay } from './US/CA/mandalay.js';
+import { meares } from './US/OR/meares.js';
 import { broadway } from './US/NYC/broadway.js';
 import { pigeon } from './US/NYC/pigeon.js';
 import { dog } from './US/NYC/dog.js';
@@ -21,6 +25,10 @@ import { swing } from './finland/swing.js'
 
 // 2. Export them as one combined array for your map to use
 export const locations = [
+  santabarbara,
+  sandstone,
+  mandalay,
+  meares,
   broadway,
   pigeon,
   dog,
