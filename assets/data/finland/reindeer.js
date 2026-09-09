@@ -10,8 +10,8 @@ export const reindeer = {
     {
       src: `../assets/images/finland/reindeer/reduced-6109.jpg`,
       date: "October 2023",
-      detailedDescription: "The reindeer in Finnish Lapland are semi-\
-      domesticated (a collar can be seen on the reinder second from the \
+      detailedDescription: "The reindeer in Finnish Lapland are semi-domesticated \
+      (a collar can be seen on the reinder second from the \
       right). Called reindeer husbandry, herding follows the seasons, and \
       generally for most of the year the reindeer are allowed to roam freely &mdash;\
       hence the not-uncommon encounters of reindeer <em>walking</em> the road. This was compounded by the \

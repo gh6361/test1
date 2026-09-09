@@ -10,7 +10,9 @@ export const mandalay = {
   images: [
     {
       src: `../assets/images/US/CA/mandalay/mandalay1.jpg`,
-      detailedDescription: "",
+      detailedDescription: "'olołkoy Beach Park, formerly known as Oxnard Beach Park, \
+      was named the number one Best Beach on the West Coast by USA Today's 10Best in \
+      their 2023, 2024 and 2025 Readers' Choice Awards. (Rightly so!)",
     },
     {
       src: `../assets/images/US/CA/mandalay/mandalay2.jpg`,

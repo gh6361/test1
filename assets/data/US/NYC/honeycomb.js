@@ -11,7 +11,7 @@ export const honeycomb = {
     {
       src: `../assets/images/US/NYC/honeycomb4.jpg`,
       detailedDescription: "Vessel (the honeycomb-like structure to the \
-      right of the image) is perhaps the most recognisable object at Hudson \
+      left of the image) is perhaps the most recognisable object at Hudson \
       Yards. It serves as the centrepiece of the Hudson Yards Public \
       Square and Gardens. Together with the High Line and Hudson Park & \
       Boulevard, it is the largest network of public open space built in Manhattan \

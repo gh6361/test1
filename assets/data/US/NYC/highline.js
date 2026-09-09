@@ -10,7 +10,7 @@ export const highline = {
   images: [
     {
       src: `../assets/images/US/NYC/highline1.jpg`,
-      detailedDescription: "Th High Line is a popular park built on a former \
+      detailedDescription: "The High Line is a popular park built on a former \
       elevated freight railway &mdash; indeed, old tracks can be seen to \
       the left of this image. The park lies 30 ft above street level.",
     },

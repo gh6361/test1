@@ -14,7 +14,7 @@ export const broadway = {
       (to the right) and the surrounding Broadway Theater District. The \
       theatre was named after David Belasco, a legendary producer/director \
       who actually lived in a duplex apartment above the theatre. The play \
-      'Never Happy Ending', about two robots living in futurstic-Seoul, \
+      'Never Happy Ending', about two robots living in futuristic-Seoul, \
       was running at the time the photo was taken.",
     },
   ]

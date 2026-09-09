@@ -19,12 +19,40 @@ window.addEventListener("load", () => {
   const galNext = document.getElementById("lightbox-next");
   const galCaption = document.getElementById("lightbox-caption");
 
+  // --- OPT: cache DOM lookups that were previously re-queried on every
+  // gallery render / resize event. These elements are static, so we only
+  // need to find them once. ---
+  const lightboxDescWrapper = document.querySelector(".lightbox-desc-wrapper");
+  const lightboxCenterGroup = document.querySelector(".lightbox-center-group");
+  const siteNavEl = document.querySelector(".editorial-header");
+  let lightboxCounterEl = document.getElementById("lightbox-global-counter");
+
+  // --- OPT: cache computed image aspect ratios so we don't spin up a new
+  // Image() object and recompute naturalWidth/naturalHeight every time
+  // alignCaptionToImageTop runs (it runs on every image swap AND on every
+  // resize event). ---
+  const imageRatioCache = new Map();
+
+  // --- OPT: small rAF-based debounce so rapid-fire resize events collapse
+  // into a single layout pass per frame instead of one per event. ---
+  function rafDebounce(fn) {
+    let scheduled = false;
+    return function (...args) {
+      if (scheduled) return;
+      scheduled = true;
+      requestAnimationFrame(() => {
+        scheduled = false;
+        fn.apply(this, args);
+      });
+    };
+  }
+
   let galImages = [];
   let galCurrentIndex = 0;
   let galActive = galImageA;
   let galInactive = galImageB;
-  let galleryTopGapLock = null; // <-- NEW: Stores the calculated gap for the whole stack
-  let galleryResizeObserver = null; // <-- NEW: Tracks image area
+  let galleryTopGapLock = null; // <-- Stores the calculated gap for the whole stack
+  let galleryResizeObserver = null; // <-- Tracks image area
 
   if (!mapEl || !panel || typeof L === "undefined") return;
 
@@ -48,15 +76,13 @@ window.addEventListener("load", () => {
     ],
   };
 
-  // --- NEW: Vertical-Only Limits ---
-  // Latitude is strictly capped at -90 (South Pole) and 90 (North Pole).
-  // Longitude is set to massive numbers so they can pan horizontally forever.
+  // --- Vertical-Only Limits ---
   const verticalBounds = [
     [-90, -10000],
     [90, 10000],
   ];
 
-  // --- NEW: CHECK URL BEFORE INITIALIZING MAP ---
+  // --- CHECK URL BEFORE INITIALIZING MAP ---
   const urlParams = new URLSearchParams(window.location.search);
   let startCenter = null;
   let startZoom = null;
@@ -85,7 +111,7 @@ window.addEventListener("load", () => {
     worldCopyJump: true,
   });
 
-  // NEW: force Leaflet to re-measure the container immediately
+  // force Leaflet to re-measure the container immediately
   map.invalidateSize();
 
   if (startCenter && startZoom) {
@@ -171,6 +197,28 @@ window.addEventListener("load", () => {
     [galActive, galInactive] = [galInactive, galActive];
   }
 
+  // --- OPT: helper that centralizes the target-zoom math shared by the
+  // sidebar-link click handler and the URL-param routing block below
+  // (previously duplicated verbatim in two places). ---
+  function computeTargetZoomForMarker(targetMarker) {
+    let targetZoom = 6;
+    const visibleParent = markers.getVisibleParent(targetMarker);
+
+    if (visibleParent && visibleParent !== targetMarker) {
+      if (
+        targetMarker.__parent &&
+        typeof targetMarker.__parent._zoom === "number"
+      ) {
+        const breakZoom = targetMarker.__parent._zoom + 1;
+        targetZoom = Math.min(breakZoom, 15);
+      } else {
+        targetZoom = 15;
+      }
+    }
+    if (targetZoom < 6) targetZoom = 6;
+    return targetZoom;
+  }
+
   function renderGalImage(index) {
     if (!galImages.length || !galInactive || !galActive) return;
     galCurrentIndex = (index + galImages.length) % galImages.length;
@@ -179,15 +227,16 @@ window.addEventListener("load", () => {
 
     // 1. Tell the browser exactly what to do WHEN the download finishes FIRST
     galInactive.onload = () => {
-      const descWrapper = document.querySelector(".lightbox-desc-wrapper");
-      const centerGroup = document.querySelector(".lightbox-center-group");
+      // OPT: reuse cached references instead of re-querying the DOM every call
+      const descWrapper = lightboxDescWrapper;
+      const centerGroup = lightboxCenterGroup;
 
-      let counterEl = document.getElementById("lightbox-global-counter");
-      if (!counterEl && galOverlay) {
-        counterEl = document.createElement("div");
-        counterEl.id = "lightbox-global-counter";
-        galOverlay.appendChild(counterEl);
+      if (!lightboxCounterEl && galOverlay) {
+        lightboxCounterEl = document.createElement("div");
+        lightboxCounterEl.id = "lightbox-global-counter";
+        galOverlay.appendChild(lightboxCounterEl);
       }
+      const counterEl = lightboxCounterEl;
 
       if (galImages.length <= 1) {
         if (descWrapper) descWrapper.style.display = "none";
@@ -247,7 +296,6 @@ window.addEventListener("load", () => {
           if (activeThumb) activeThumb.classList.add("active");
         }
 
-        // --- RESTORED: FIRE THE MATH ---
         // A tiny 50ms delay ensures the browser has painted the image's new dimensions
         setTimeout(alignCaptionToImageTop, 50);
       });
@@ -265,8 +313,7 @@ window.addEventListener("load", () => {
     galImages = images;
 
     // --- HIDE THE NAVBAR ---
-    const siteNav = document.querySelector(".editorial-header");
-    if (siteNav) siteNav.style.display = "none";
+    if (siteNavEl) siteNavEl.style.display = "none";
 
     const thumbContainer = document.getElementById("lightbox-thumbnails");
 
@@ -278,24 +325,27 @@ window.addEventListener("load", () => {
     } else {
       galOverlay.classList.remove("single-mode");
 
-      // --- NEW: Generate Thumbnails ---
+      // --- Generate Thumbnails ---
       galOverlay.classList.add("has-thumbnails");
       if (thumbContainer) {
-        thumbContainer.innerHTML = images
-          .map(
-            (img, idx) => `
-          <img src="${img.src}" class="lb-thumb ${idx === (startIndex || 0) ? "active" : ""}" data-index="${idx}" alt="thumbnail">
-        `,
-          )
-          .join("");
+        // OPT: build via array + join instead of repeated string concatenation
+        const thumbHtml = images.map(
+          (img, idx) =>
+            `<img src="${img.src}" class="lb-thumb ${idx === (startIndex || 0) ? "active" : ""}" data-index="${idx}" alt="thumbnail">`,
+        );
+        thumbContainer.innerHTML = thumbHtml.join("");
 
-        // Make them clickable
-        thumbContainer.querySelectorAll(".lb-thumb").forEach((thumb) => {
-          thumb.addEventListener("click", (e) => {
-            const clickedIdx = parseInt(e.target.dataset.index, 10);
+        // OPT: single delegated listener instead of one per thumbnail
+        thumbContainer.addEventListener(
+          "click",
+          (e) => {
+            const thumbEl = e.target.closest(".lb-thumb");
+            if (!thumbEl) return;
+            const clickedIdx = parseInt(thumbEl.dataset.index, 10);
             renderGalImage(clickedIdx);
-          });
-        });
+          },
+          { once: false },
+        );
       }
     }
 
@@ -313,11 +363,10 @@ window.addEventListener("load", () => {
     if (galCaption) galCaption.textContent = "";
     galImages = [];
 
-    galleryTopGapLock = null; // <-- NEW: Reset the lock for the next location!
+    galleryTopGapLock = null; // Reset the lock for the next location!
 
     // --- BRING THE NAVBAR BACK ---
-    const siteNav = document.querySelector(".editorial-header");
-    if (siteNav) siteNav.style.display = "";
+    if (siteNavEl) siteNavEl.style.display = "";
   }
 
   function nextGalImage() {
@@ -336,7 +385,6 @@ window.addEventListener("load", () => {
 
     locations.forEach((loc, index) => {
       const country = loc.country || "Other";
-      // Look for a state tag, default to "NONE" if missing
       const state = loc.state || "NONE";
 
       const displayName = loc.name.includes(":")
@@ -362,17 +410,18 @@ window.addEventListener("load", () => {
     );
 
     // 3. Generate the grouped HTML list
-    let locationListHtml = "";
+    // OPT: accumulate into an array and join once at the end instead of
+    // repeated += string concatenation (avoids intermediate string copies).
+    const htmlParts = [];
 
     sortedCountries.forEach((country) => {
-      // Enforce the strict "UNITED STATES" styling
       const displayCountry =
         country.toUpperCase() === "UNITED STATES" ||
         country.toUpperCase() === "U.S."
           ? "UNITED STATES"
           : country;
 
-      locationListHtml += `
+      htmlParts.push(`
         <li>
           <div style="
             font-family: var(--font-sans); 
@@ -381,152 +430,121 @@ window.addEventListener("load", () => {
             text-transform: uppercase; 
             letter-spacing: 0.15em; 
             margin-top: 0.9rem;
-            margin-bottom: 0.9rem;
+            margin-bottom: 1.1rem;
             margin-left: 0rem; 
             line-height: 1.2;
           ">${displayCountry}</div>
-      `;
+      `);
 
-      // Sort states alphabetically within the country
-      const sortedStates = Object.keys(groupedLocations[country]).sort((a, b) =>
-        a.localeCompare(b),
+      const sortedStates = Object.keys(groupedLocations[country]).sort(
+        (a, b) => {
+          if (a === "NONE") return -1;
+          if (b === "NONE") return 1;
+          return a.localeCompare(b);
+        },
       );
 
       sortedStates.forEach((state) => {
-        // Sort the places alphabetically inside this specific state
         groupedLocations[country][state].sort((a, b) =>
           a.displayName.localeCompare(b.displayName),
         );
 
-        // If a state exists (i.e., not "NONE"), render a sub-header and indent slightly
         if (state !== "NONE") {
-          locationListHtml += `
-            <div style="font-family: var(--font-sans); font-size: 0.65rem; color: rgba(28,28,28,0.5); text-transform: uppercase; letter-spacing: 0.1em; margin-top: 0.2rem; margin-bottom: 0.6rem; margin-left: 1rem;">
+          htmlParts.push(`
+            <div style="font-family: var(--font-sans); font-size: 0.65rem; color: rgba(28,28,28,0.5); text-transform: uppercase; letter-spacing: 0.1em; margin-top: 0.5rem; margin-bottom: 0.5rem; margin-left: 1rem;">
               ${state}
             </div>
-            <ul style="list-style-type: none; padding-left: 1.5rem; margin: 0; margin-bottom: 1.5rem; display: flex; flex-direction: column; gap: 0.25rem;">
-          `;
+            <ul style="list-style-type: none; padding-left: 1.5rem; margin: 0; margin-bottom: 1.2rem; display: flex; flex-direction: column; gap: 0.25rem;">
+          `);
         } else {
-          // Standard layout if there are no states attached to this country
-          locationListHtml += `
-            <ul style="list-style-type: none; padding-left: 1rem; margin: 0; margin-bottom: 2rem; display: flex; flex-direction: column; gap: 0.25rem;">
-          `;
+          htmlParts.push(`
+            <ul style="list-style-type: none; padding-left: 1rem; margin: 0; margin-bottom: 1.5rem; display: flex; flex-direction: column; gap: 0.25rem;">
+          `);
         }
 
         groupedLocations[country][state].forEach((item) => {
-          locationListHtml += `
+          htmlParts.push(`
             <li class="sidebar-loc-link" data-index="${item.originalIndex}" style="font-size: 1rem; color: #1c1c1c;">
               ${item.displayName}
             </li>
-          `;
+          `);
         });
 
-        locationListHtml += `
-          </ul>
-        `;
+        htmlParts.push(`</ul>`);
       });
 
-      locationListHtml += `
-        </li>
-      `;
+      htmlParts.push(`</li>`);
     });
 
-    // 4. Render the panel using your exact title wrapper
+    // 4. Render the panel
     panel.innerHTML = `
       <div style="padding: 0;"> 
-        
-        <div style="
-          text-align: left; 
-          margin-top: 1rem;   
-          margin-bottom: 0.5rem; 
-        ">
-          <h2 style="
-            margin: 0; 
-            color: #1c1c1c; 
-            font-weight: 600 !important; 
-            white-space: normal;
-            font-size: 1.9rem; 
-            line-height: 1.1;
-          ">Index</h2>
-          
+        <div style="text-align: left; margin-top: 1rem; margin-bottom: 0.5rem;">
+          <h2 style="margin: 0; color: #1c1c1c; font-weight: 600 !important; white-space: normal; font-size: 1.9rem; line-height: 1.1;">Index</h2>
           <div style="border-bottom: 1px solid #e2e0d8; margin-top: 1.2rem; margin-bottom: 1.5rem;"></div>
         </div>
         
-        <!-- The List -->
         <ul style="list-style-type: none; padding-left: 0; margin: 0;">
-          ${locationListHtml}
+          ${htmlParts.join("")}
         </ul>
-        
       </div>
     `;
 
     // 5. Attach click events
-    const links = panel.querySelectorAll(".sidebar-loc-link");
-    links.forEach((link) => {
-      link.addEventListener("click", (e) => {
-        const idx = parseInt(e.target.dataset.index, 10);
-        const targetLocation = locations[idx];
-        const targetMarker = targetLocation.markerInstance;
+    // OPT: one delegated listener on the panel instead of one per <li>
+    panel.addEventListener("click", (e) => {
+      const link = e.target.closest(".sidebar-loc-link");
+      if (!link || !panel.contains(link)) return;
 
-        if (targetMarker) {
-          const targetLatLng = targetMarker.getLatLng();
-          let targetZoom = 6;
-          const visibleParent = markers.getVisibleParent(targetMarker);
+      const idx = parseInt(link.dataset.index, 10);
+      const targetLocation = locations[idx];
+      const targetMarker = targetLocation.markerInstance;
 
-          if (visibleParent && visibleParent !== targetMarker) {
-            if (
-              targetMarker.__parent &&
-              typeof targetMarker.__parent._zoom === "number"
-            ) {
-              const breakZoom = targetMarker.__parent._zoom + 1;
-              targetZoom = Math.min(breakZoom, 15);
-            } else {
-              targetZoom = 15;
-            }
-          }
-          if (targetZoom < 6) targetZoom = 6;
+      if (targetMarker) {
+        const targetLatLng = targetMarker.getLatLng();
+        const visibleParent = markers.getVisibleParent(targetMarker);
+        let targetZoom = computeTargetZoomForMarker(targetMarker);
 
-          const currentZoom = map.getZoom();
-          const drasticZoomThreshold = 5;
+        const currentZoom = map.getZoom();
+        const drasticZoomThreshold = 5;
 
-          if (
-            currentZoom === targetZoom &&
-            map.getCenter().equals(targetLatLng)
-          ) {
+        if (
+          currentZoom === targetZoom &&
+          map.getCenter().equals(targetLatLng)
+        ) {
+          markers.zoomToShowLayer(targetMarker, () =>
+            targetMarker.fire("click"),
+          );
+          return;
+        }
+
+        if (Math.abs(targetZoom - currentZoom) >= drasticZoomThreshold) {
+          map.setView(targetLatLng, targetZoom, { animate: false });
+          setTimeout(() => {
             markers.zoomToShowLayer(targetMarker, () =>
               targetMarker.fire("click"),
             );
-            return;
-          }
-
-          if (Math.abs(targetZoom - currentZoom) >= drasticZoomThreshold) {
-            map.setView(targetLatLng, targetZoom, { animate: false });
-            setTimeout(() => {
-              markers.zoomToShowLayer(targetMarker, () =>
-                targetMarker.fire("click"),
-              );
-            }, 50);
-          } else {
-            const flightDuration = targetZoom > 5 ? 1 : 0.7;
-            map.flyTo(targetLatLng, targetZoom, {
-              animate: true,
-              duration: flightDuration,
-              easeLinearity: 1,
-            });
-            map.once("moveend", () => {
-              markers.zoomToShowLayer(targetMarker, () =>
-                targetMarker.fire("click"),
-              );
-            });
-          }
+          }, 50);
+        } else {
+          const flightDuration = targetZoom > 5 ? 1 : 0.7;
+          map.flyTo(targetLatLng, targetZoom, {
+            animate: true,
+            duration: flightDuration,
+            easeLinearity: 1,
+          });
+          map.once("moveend", () => {
+            markers.zoomToShowLayer(targetMarker, () =>
+              targetMarker.fire("click"),
+            );
+          });
         }
-      });
+      }
     });
   }
 
-  // --- NEW: CONSTANT ANCHOR MATH (WITH DOWNWARD OFFSET) ---
+  // --- CONSTANT ANCHOR MATH (WITH DOWNWARD OFFSET) ---
   function alignCaptionToImageTop() {
-    const descWrapper = document.querySelector(".lightbox-desc-wrapper");
+    const descWrapper = lightboxDescWrapper;
     if (!descWrapper) return;
 
     if (
@@ -550,13 +568,24 @@ window.addEventListener("load", () => {
     let shortestRenderedHeight = maxH;
 
     galImages.forEach((imgObj) => {
-      const temp = new Image();
-      temp.src = imgObj.src;
+      // OPT: use a cached ratio when we've already measured this image once,
+      // instead of constructing a new Image() and re-reading natural
+      // dimensions on every single call (this runs on every image swap and
+      // every resize event).
+      let ratio = imageRatioCache.get(imgObj.src);
 
-      if (temp.complete && temp.naturalHeight > 0) {
-        const ratio = temp.naturalWidth / temp.naturalHeight;
+      if (ratio === undefined) {
+        const temp = new Image();
+        temp.src = imgObj.src;
+
+        if (temp.complete && temp.naturalHeight > 0) {
+          ratio = temp.naturalWidth / temp.naturalHeight;
+          imageRatioCache.set(imgObj.src, ratio);
+        }
+      }
+
+      if (ratio) {
         const renderedHeight = Math.min(maxH, maxW / ratio);
-
         if (renderedHeight < shortestRenderedHeight) {
           shortestRenderedHeight = renderedHeight;
         }
@@ -566,7 +595,7 @@ window.addEventListener("load", () => {
     // 1. Find the exact top edge
     const exactTopEdge = (windowH - shortestRenderedHeight) / 2;
 
-    // 2. Add the downward push (0.04 = 4vh)
+    // 2. Add the downward push (0.01 = 1vh)
     const downwardPush = windowH * 0.01;
 
     // 3. Combine them and lock it in
@@ -576,10 +605,14 @@ window.addEventListener("load", () => {
   }
 
   // Clear the lock when the screen resizes so it can recalculate perfectly
-  window.addEventListener("resize", () => {
-    galleryTopGapLock = null;
-    alignCaptionToImageTop();
-  });
+  // OPT: debounced via rAF so a drag-resize doesn't run this on every event
+  window.addEventListener(
+    "resize",
+    rafDebounce(() => {
+      galleryTopGapLock = null;
+      alignCaptionToImageTop();
+    }),
+  );
 
   function renderPanel(location) {
     const isStacked = location.mode === "stacked";
@@ -617,7 +650,7 @@ window.addEventListener("load", () => {
           opacity: 1; transform: translateY(0);
         }
 
-        /* --- NEW: 4-TIER AREA-BASED TEXT SWAPPING --- */
+        /* --- 4-TIER AREA-BASED TEXT SWAPPING --- */
         .tt-small, .tt-medium-small, .tt-medium, .tt-large { display: none; } 
         
         /* The ResizeObserver assigns these classes based on area */
@@ -633,7 +666,6 @@ window.addEventListener("load", () => {
         }
       </style>
       
-      <!-- NEW: The wrapper we will mathematically squeeze for single images -->
       <div id="sidebar-content-wrapper" style="padding: 0; margin: 0 auto; width: 100%; transition: max-width 0.3s ease; box-sizing: border-box;"> 
         
         <div style="text-align: left; margin-top: 1rem; margin-bottom: 0.5rem;">
@@ -668,6 +700,9 @@ window.addEventListener("load", () => {
             image.src = img.src;
             image.onload = () => {
               img.ratio = image.naturalWidth / image.naturalHeight;
+              // OPT: feed the ratio we just computed into the shared cache
+              // so alignCaptionToImageTop doesn't need to remeasure it later.
+              imageRatioCache.set(img.src, img.ratio);
               resolve(img);
             };
             image.onerror = () => {
@@ -692,22 +727,16 @@ window.addEventListener("load", () => {
             layoutGroups.push([loadedImages[1]]);
           }
         } else if (n === 3) {
-          // If the first image is WIDER than the last image
           if (loadedImages[0].ratio > loadedImages[2].ratio) {
             layoutGroups.push([loadedImages[0]]);
             layoutGroups.push([loadedImages[1], loadedImages[2]]);
-          }
-          // If the last image is WIDER (or if they are perfectly equal)
-          else {
+          } else {
             layoutGroups.push([loadedImages[0], loadedImages[1]]);
             layoutGroups.push([loadedImages[2]]);
           }
         } else if (n === 4) {
-          // Row 1: One image
           layoutGroups.push([loadedImages[0]]);
-          // Row 2: Two images side-by-side
           layoutGroups.push([loadedImages[1], loadedImages[2]]);
-          // Row 3: One image
           layoutGroups.push([loadedImages[3]]);
         } else if (n === 5) {
           layoutGroups.push([loadedImages[0], loadedImages[1]]);
@@ -735,16 +764,19 @@ window.addEventListener("load", () => {
 
         // --- INITIALIZE THE 4-TIER AREA OBSERVER ---
         if (galleryResizeObserver) galleryResizeObserver.disconnect();
-        
+
         galleryResizeObserver = new ResizeObserver((entries) => {
-          entries.forEach(entry => {
+          entries.forEach((entry) => {
             const area = entry.contentRect.width * entry.contentRect.height;
             const target = entry.target;
-            
-            // Clear all sizing classes first
-            target.classList.remove("box-small", "box-medium-small", "box-medium", "box-large");
-            
-            // Apply the precise tier
+
+            target.classList.remove(
+              "box-small",
+              "box-medium-small",
+              "box-medium",
+              "box-large",
+            );
+
             if (area < 40000) {
               target.classList.add("box-small");
             } else if (area <= 60000) {
@@ -758,6 +790,11 @@ window.addEventListener("load", () => {
         });
 
         // --- BUILD FLUID HTML ROWS ---
+        // OPT: build rows in a document fragment and append once, instead of
+        // appending each row directly to the live gallery container (fewer
+        // reflow-triggering DOM insertions).
+        const fragment = document.createDocumentFragment();
+
         layoutGroups.forEach((group) => {
           const rowDiv = document.createElement("div");
           rowDiv.className = "sb-dynamic-row";
@@ -766,7 +803,6 @@ window.addEventListener("load", () => {
             const imgWrapper = document.createElement("div");
             imgWrapper.className = "sb-dynamic-item";
 
-            // Tell the observer to monitor this specific image box
             galleryResizeObserver.observe(imgWrapper);
 
             if (group.length === 1) {
@@ -797,28 +833,37 @@ window.addEventListener("load", () => {
               plainText = plainText.replace(/\s+/g, " ").trim();
 
               const words = plainText.split(" ");
-              
-              // Generate the 4 tiers (using 14 words for the new mid-tier)
-              const textSmall = words.length > 8 ? words.slice(0, 8).join(" ") + "..." : plainText;
-              const textMediumSmall = words.length > 40 ? words.slice(0, 40).join(" ") + "..." : plainText;
-              const textMedium = words.length > 40 ? words.slice(0, 40).join(" ") + "..." : plainText;
-              const textLarge = words.length > 70 ? words.slice(0, 70).join(" ") + "..." : plainText;
+
+              const textSmall =
+                words.length > 8
+                  ? words.slice(0, 8).join(" ") + "..."
+                  : plainText;
+              const textMediumSmall =
+                words.length > 40
+                  ? words.slice(0, 40).join(" ") + "..."
+                  : plainText;
+              const textMedium =
+                words.length > 40
+                  ? words.slice(0, 40).join(" ") + "..."
+                  : plainText;
+              const textLarge =
+                words.length > 70
+                  ? words.slice(0, 70).join(" ") + "..."
+                  : plainText;
 
               if (plainText) {
                 const customTooltip = document.createElement("div");
                 customTooltip.className = "sb-hover-tooltip";
-                
-                // Inject all four spans; CSS will reveal the correct one!
+
                 customTooltip.innerHTML = `
                   <span class="tt-small">${textSmall}</span>
                   <span class="tt-medium-small">${textMediumSmall}</span>
                   <span class="tt-medium">${textMedium}</span>
                   <span class="tt-large">${textLarge}</span>
                 `;
-                
+
                 imgWrapper.appendChild(customTooltip);
 
-                // Document Icon Overlay
                 const iconOverlay = document.createElement("div");
                 iconOverlay.innerHTML = `
                   <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -830,21 +875,30 @@ window.addEventListener("load", () => {
                   </svg>
                 `;
                 Object.assign(iconOverlay.style, {
-                  position: "absolute", top: "6px", right: "6px",
-                  backgroundColor: "rgba(0, 0, 0, 0.4)", color: "#ffffff",
-                  padding: "5px", borderRadius: "2px", display: "flex",
-                  alignItems: "center", justifyContent: "center", pointerEvents: "none",
+                  position: "absolute",
+                  top: "6px",
+                  right: "6px",
+                  backgroundColor: "rgba(0, 0, 0, 0.4)",
+                  color: "#ffffff",
+                  padding: "5px",
+                  borderRadius: "2px",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  pointerEvents: "none",
                 });
 
                 imgWrapper.appendChild(iconOverlay);
               }
             }
-            // --- END NEW LOGIC ---
+            // --- END LOGIC ---
 
             rowDiv.appendChild(imgWrapper);
           });
-          galleryContainer.appendChild(rowDiv);
+          fragment.appendChild(rowDiv);
         });
+
+        galleryContainer.appendChild(fragment);
 
         // Re-inject the description below the image
         if (n === 1 && loadedImages[0].caption) {
@@ -858,7 +912,7 @@ window.addEventListener("load", () => {
           galleryContainer.appendChild(captionDiv);
         }
 
-        // --- NEW: TRIGGER THE SQUEEZE IF IT IS A SINGLE IMAGE ---
+        // --- TRIGGER THE SQUEEZE IF IT IS A SINGLE IMAGE ---
         if (n === 1) {
           const wrapper = panel.querySelector("#sidebar-content-wrapper");
           if (wrapper) {
@@ -871,7 +925,7 @@ window.addEventListener("load", () => {
     }
   }
 
-  // --- UPDATED: SMART SINGLE IMAGE MARGIN SQUEEZE ---
+  // --- SMART SINGLE IMAGE MARGIN SQUEEZE ---
   function squeezeSidebarSingleImage() {
     const wrapper = document.querySelector(
       "#sidebar-content-wrapper.single-image-mode",
@@ -899,7 +953,8 @@ window.addEventListener("load", () => {
     }
   }
 
-  window.addEventListener("resize", squeezeSidebarSingleImage);
+  // OPT: debounced via rAF, same rationale as the gallery resize listener
+  window.addEventListener("resize", rafDebounce(squeezeSidebarSingleImage));
 
   /* --- MARKER & TOOLTIP LOGIC --- */
   const smallIcon = L.icon({
@@ -914,7 +969,6 @@ window.addEventListener("load", () => {
     className: "interactive-marker",
   });
 
-  // --- NEW: Add this line back in! ---
   let activeMarker = null;
 
   // 1. Create the Cluster Group BEFORE the loop begins
@@ -924,9 +978,8 @@ window.addEventListener("load", () => {
     zoomToBoundsOnClick: false,
     removeOutsideVisibleBounds: false,
 
-    // The Kill Switches
     disableClusteringAtZoom: 15,
-    spiderfyOnMaxZoom: false, // <-- NEW: Completely disables the spider web fallback!
+    spiderfyOnMaxZoom: false,
 
     iconCreateFunction: function (cluster) {
       const count = cluster.getChildCount();
@@ -938,7 +991,7 @@ window.addEventListener("load", () => {
     },
   });
 
-  // --- NEW: Controlled "Spread" Zoom ---
+  // --- Controlled "Spread" Zoom ---
   markers.on("clusterclick", function (event) {
     const cluster = event.layer;
     const bounds = cluster.getBounds();
@@ -964,8 +1017,6 @@ window.addEventListener("load", () => {
       if (z === maxZoom) targetZoom = maxZoom;
     }
 
-    // THE FIX: If the math tells it to stay on the exact same zoom level,
-    // force it to zoom in by at least 1 step (up to the max) so the click always works!
     if (targetZoom <= currentZoom) {
       targetZoom = Math.min(currentZoom + 3, maxZoom);
     }
@@ -984,7 +1035,7 @@ window.addEventListener("load", () => {
   // 1. Create a holding array for markers that need clustering
   const markerArray = [];
 
-  // --- NEW: Count how many locations are in each country ---
+  // --- Count how many locations are in each country ---
   const countryCounts = {};
   locations.forEach((loc) => {
     const c = loc.country || "Other";
@@ -993,7 +1044,6 @@ window.addEventListener("load", () => {
 
   // 2. Loop through your locations
   locations.forEach((location) => {
-    // IMPORTANT: Create the marker
     const marker = L.marker(location.coords, { icon: smallIcon });
     location.markerInstance = marker;
 
@@ -1056,8 +1106,6 @@ window.addEventListener("load", () => {
     });
 
     // --- 4. HYBRID ADD ---
-    // If it is the only location in the country, glue it securely to the base map.
-    // If there are multiple, send them to the cluster array!
     const c = location.country || "Other";
     if (countryCounts[c] === 1) {
       marker.addTo(map);
@@ -1107,28 +1155,13 @@ window.addEventListener("load", () => {
         // 1. Render the side gallery instantly
         renderPanel(locations[locIndex]);
 
-        // 2. Calculate the exact targeted zoom (identical to sidebar logic!)
-        let targetZoom = 6;
-        const visibleParent = markers.getVisibleParent(targetMarker);
-
-        if (visibleParent && visibleParent !== targetMarker) {
-          if (
-            targetMarker.__parent &&
-            typeof targetMarker.__parent._zoom === "number"
-          ) {
-            const breakZoom = targetMarker.__parent._zoom + 1;
-            targetZoom = Math.min(breakZoom, 15);
-          } else {
-            targetZoom = 15;
-          }
-        }
-        if (targetZoom < 6) targetZoom = 6;
+        // 2. Calculate the exact targeted zoom (shared helper, same math as before)
+        const targetZoom = computeTargetZoomForMarker(targetMarker);
 
         // 3. Instantly snap the map to the perfect calculated zoom
         map.setView(targetMarker.getLatLng(), targetZoom, { animate: false });
 
         // 4. Fire the click to highlight the active pin
-        // (A tiny 50ms delay guarantees the map tiles have snapped first)
         setTimeout(() => {
           targetMarker.fire("click");
         }, 50);

@@ -14,7 +14,8 @@ export const santabarbara = {
     },
     {
       src: `../assets/images/US/CA/santabarbara3.jpg`,
-      detailedDescription: "",
+      detailedDescription: "The plaque reads: 'In memory of our \
+      loved ones whose lives have been claimed by the sea'.",
     },
   ]
 };

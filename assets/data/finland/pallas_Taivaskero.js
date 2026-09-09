@@ -70,13 +70,13 @@ export const pallas_Taivaskero = {
       detailedDescription: "",
     },
     {
-      src: `../assets/images/finland/pallas_taivaskero/reduced-5961.jpg`,
+      src: `../assets/images/finland/pallas_taivaskero/reduced-6001.jpg`,
       location: "Downtown Reykjavik, Iceland",
       date: "October 2023",
       detailedDescription: "",
     },
     {
-      src: `../assets/images/finland/pallas_taivaskero/reduced-6001.jpg`,
+      src: `../assets/images/finland/pallas_taivaskero/reduced-5961.jpg`,
       location: "Downtown Reykjavik, Iceland",
       date: "October 2023",
       detailedDescription: "",
