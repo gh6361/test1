@@ -703,6 +703,15 @@ window.addEventListener("load", () => {
           squeezeSidebarSingleImage();
         }
       }
+      // --- ADD THIS BLOCK HERE ---
+      // Wait 800ms to let the visible thumbnails download first,
+      // then quietly fetch all the high-res lightbox images in the background.
+      setTimeout(() => {
+        loadedImages.forEach((img) => {
+          const preloader = new Image();
+          preloader.src = img.src;
+        });
+      }, 800);
     }
   }
 
