@@ -237,6 +237,9 @@ window.addEventListener("load", () => {
         if (newThumb) newThumb.classList.add("active");
 
         setTimeout(alignCaptionToImageTop, 50);
+        // --- ADD THIS LINE HERE ---
+        // Preload the next/prev images only AFTER the current one is safely on screen
+        preloadAdjacentImages();
       });
     };
 
@@ -300,6 +303,21 @@ window.addEventListener("load", () => {
   }
   function prevGalImage() {
     if (galImages.length > 1) renderGalImage(galCurrentIndex - 1);
+  }
+
+  function preloadAdjacentImages() {
+    if (galImages.length <= 1) return;
+
+    // Calculate the next and previous index wrapping around the array
+    const nextIdx = (galCurrentIndex + 1) % galImages.length;
+    const prevIdx = (galCurrentIndex - 1 + galImages.length) % galImages.length;
+
+    // Create detached Image objects to force the browser to download them into cache
+    const preNext = new Image();
+    preNext.src = galImages[nextIdx].src;
+
+    const prePrev = new Image();
+    prePrev.src = galImages[prevIdx].src;
   }
 
   function renderDefaultPanel() {
