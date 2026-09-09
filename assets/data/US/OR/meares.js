@@ -5,7 +5,6 @@ export const meares = {
   country: "United States",
   state: "Oregon",
   coords: [45.486333911793146, -123.97729851333669],
-  description: "A cold, bright stop with open skies and coastal views.",
   mode: "stacked",
   images: [
     {

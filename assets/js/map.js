@@ -43,18 +43,33 @@ window.addEventListener("load", () => {
   let galCurrentIndex = 0;
   let galActive = galImageA;
   let galInactive = galImageB;
-  let galleryTopGapLock = null; 
+  let galleryTopGapLock = null;
 
   if (!mapEl || !panel || typeof L === "undefined") return;
 
   const regionBounds = {
-    world: [[-55, -170], [75, 180]],
-    europe: [[38, -10], [69, 35]],
-    na: [[22, -175], [70, -45]],
-    oceania: [[-47, 110], [-10, 180]],
+    world: [
+      [-55, -170],
+      [75, 180],
+    ],
+    europe: [
+      [38, -10],
+      [69, 35],
+    ],
+    na: [
+      [22, -175],
+      [70, -45],
+    ],
+    oceania: [
+      [-47, 110],
+      [-10, 180],
+    ],
   };
 
-  const verticalBounds = [[-90, -10000], [90, 10000]];
+  const verticalBounds = [
+    [-90, -10000],
+    [90, 10000],
+  ];
 
   const urlParams = new URLSearchParams(window.location.search);
   let startCenter = null;
@@ -96,7 +111,8 @@ window.addEventListener("load", () => {
 
   L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
     maxZoom: 19,
-    attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+    attribution:
+      '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
   }).addTo(map);
 
   const regionControl = L.control({ position: "topright" });
@@ -118,12 +134,19 @@ window.addEventListener("load", () => {
 
       const currentZoom = mapInstance.getZoom();
       const isZoomedIn = currentZoom > 4;
-      const isWorldTransition = lastRegion === "world" || targetRegion === "world";
+      const isWorldTransition =
+        lastRegion === "world" || targetRegion === "world";
 
       if (isZoomedIn || !isWorldTransition) {
-        mapInstance.fitBounds(regionBounds[targetRegion], { animate: false, padding: [20, 20] });
+        mapInstance.fitBounds(regionBounds[targetRegion], {
+          animate: false,
+          padding: [20, 20],
+        });
       } else {
-        mapInstance.flyToBounds(regionBounds[targetRegion], { duration: 0.7, padding: [20, 20] });
+        mapInstance.flyToBounds(regionBounds[targetRegion], {
+          duration: 0.7,
+          padding: [20, 20],
+        });
       }
       lastRegion = targetRegion;
     });
@@ -139,7 +162,10 @@ window.addEventListener("load", () => {
     let targetZoom = 6;
     const visibleParent = markers.getVisibleParent(targetMarker);
     if (visibleParent && visibleParent !== targetMarker) {
-      if (targetMarker.__parent && typeof targetMarker.__parent._zoom === "number") {
+      if (
+        targetMarker.__parent &&
+        typeof targetMarker.__parent._zoom === "number"
+      ) {
         targetZoom = Math.min(targetMarker.__parent._zoom + 1, 15);
       } else {
         targetZoom = 15;
@@ -183,7 +209,9 @@ window.addEventListener("load", () => {
           lightboxCenterGroup?.classList.remove("no-caption");
           let collectionsHTML = "";
           if (hasCol) {
-            const links = image.collections.map((c) => `<a href="${c.url}">${c.name}</a>`).join(", ");
+            const links = image.collections
+              .map((c) => `<a href="${c.url}">${c.name}</a>`)
+              .join(", ");
             collectionsHTML = `In collections: ${links}`;
           }
           if (galCaption) {
@@ -203,7 +231,9 @@ window.addEventListener("load", () => {
 
         const activeThumb = document.querySelector(".lb-thumb.active");
         if (activeThumb) activeThumb.classList.remove("active");
-        const newThumb = document.querySelector(`.lb-thumb[data-index="${galCurrentIndex}"]`);
+        const newThumb = document.querySelector(
+          `.lb-thumb[data-index="${galCurrentIndex}"]`,
+        );
         if (newThumb) newThumb.classList.add("active");
 
         setTimeout(alignCaptionToImageTop, 50);
@@ -239,9 +269,12 @@ window.addEventListener("load", () => {
       galOverlay.classList.remove("single-mode");
       galOverlay.classList.add("has-thumbnails");
       if (thumbContainer) {
-        thumbContainer.innerHTML = images.map(
-          (img, idx) => `<img src="${img.src}" class="lb-thumb ${idx === (startIndex || 0) ? "active" : ""}" data-index="${idx}" alt="thumbnail">`
-        ).join("");
+        thumbContainer.innerHTML = images
+          .map(
+            (img, idx) =>
+              `<img src="${img.thumbSrc || img.src}" class="lb-thumb ${idx === (startIndex || 0) ? "active" : ""}" data-index="${idx}" alt="thumbnail">`,
+          )
+          .join("");
       }
     }
     galOverlay.classList.remove("hidden");
@@ -257,7 +290,7 @@ window.addEventListener("load", () => {
     if (galImageB) galImageB.src = "";
     if (galCaption) galCaption.textContent = "";
     galImages = [];
-    galleryTopGapLock = null; 
+    galleryTopGapLock = null;
 
     if (siteNavEl) siteNavEl.style.display = "";
   }
@@ -274,18 +307,30 @@ window.addEventListener("load", () => {
     locations.forEach((loc, index) => {
       const country = loc.country || "Other";
       const state = loc.state || "NONE";
-      const displayName = loc.name.includes(":") ? loc.name.split(":")[0].trim() : loc.name;
+      const displayName = loc.name.includes(":")
+        ? loc.name.split(":")[0].trim()
+        : loc.name;
 
       if (!groupedLocations[country]) groupedLocations[country] = {};
-      if (!groupedLocations[country][state]) groupedLocations[country][state] = [];
-      groupedLocations[country][state].push({ displayName, originalIndex: index });
+      if (!groupedLocations[country][state])
+        groupedLocations[country][state] = [];
+      groupedLocations[country][state].push({
+        displayName,
+        originalIndex: index,
+      });
     });
 
-    const sortedCountries = Object.keys(groupedLocations).sort((a, b) => a.localeCompare(b));
+    const sortedCountries = Object.keys(groupedLocations).sort((a, b) =>
+      a.localeCompare(b),
+    );
     const htmlParts = [];
 
     sortedCountries.forEach((country) => {
-      const displayCountry = (country.toUpperCase() === "UNITED STATES" || country.toUpperCase() === "U.S.") ? "UNITED STATES" : country;
+      const displayCountry =
+        country.toUpperCase() === "UNITED STATES" ||
+        country.toUpperCase() === "U.S."
+          ? "UNITED STATES"
+          : country;
       htmlParts.push(`
         <li>
           <div style="font-family: var(--font-sans); font-size: 0.75rem; color: var(--text-body); text-transform: uppercase; letter-spacing: 0.15em; margin: 0.9rem 0 1.1rem 0; line-height: 1.2;">
@@ -293,14 +338,18 @@ window.addEventListener("load", () => {
           </div>
       `);
 
-      const sortedStates = Object.keys(groupedLocations[country]).sort((a, b) => {
-        if (a === "NONE") return -1;
-        if (b === "NONE") return 1;
-        return a.localeCompare(b);
-      });
+      const sortedStates = Object.keys(groupedLocations[country]).sort(
+        (a, b) => {
+          if (a === "NONE") return -1;
+          if (b === "NONE") return 1;
+          return a.localeCompare(b);
+        },
+      );
 
       sortedStates.forEach((state) => {
-        groupedLocations[country][state].sort((a, b) => a.displayName.localeCompare(b.displayName));
+        groupedLocations[country][state].sort((a, b) =>
+          a.displayName.localeCompare(b.displayName),
+        );
         if (state !== "NONE") {
           htmlParts.push(`
             <div style="font-family: var(--font-sans); font-size: 0.65rem; color: rgba(28,28,28,0.5); text-transform: uppercase; letter-spacing: 0.1em; margin: 0.5rem 0 0.5rem 1rem;">
@@ -309,11 +358,15 @@ window.addEventListener("load", () => {
             <ul style="list-style-type: none; padding-left: 1.5rem; margin: 0 0 1.2rem 0; display: flex; flex-direction: column; gap: 0.25rem;">
           `);
         } else {
-          htmlParts.push(`<ul style="list-style-type: none; padding-left: 1rem; margin: 0 0 1.5rem 0; display: flex; flex-direction: column; gap: 0.25rem;">`);
+          htmlParts.push(
+            `<ul style="list-style-type: none; padding-left: 1rem; margin: 0 0 1.5rem 0; display: flex; flex-direction: column; gap: 0.25rem;">`,
+          );
         }
 
         groupedLocations[country][state].forEach((item) => {
-          htmlParts.push(`<li class="sidebar-loc-link" data-index="${item.originalIndex}" style="font-size: 1rem; color: #1c1c1c; cursor: pointer;">${item.displayName}</li>`);
+          htmlParts.push(
+            `<li class="sidebar-loc-link" data-index="${item.originalIndex}" style="font-size: 1rem; color: #1c1c1c; cursor: pointer;">${item.displayName}</li>`,
+          );
         });
         htmlParts.push(`</ul>`);
       });
@@ -353,17 +406,34 @@ window.addEventListener("load", () => {
 
       if (Math.abs(targetZoom - currentZoom) >= 5) {
         map.setView(targetLatLng, targetZoom, { animate: false });
-        setTimeout(() => markers.zoomToShowLayer(targetMarker, () => targetMarker.fire("click")), 50);
+        setTimeout(
+          () =>
+            markers.zoomToShowLayer(targetMarker, () =>
+              targetMarker.fire("click"),
+            ),
+          50,
+        );
       } else {
-        map.flyTo(targetLatLng, targetZoom, { animate: true, duration: targetZoom > 5 ? 1 : 0.7, easeLinearity: 1 });
-        map.once("moveend", () => markers.zoomToShowLayer(targetMarker, () => targetMarker.fire("click")));
+        map.flyTo(targetLatLng, targetZoom, {
+          animate: true,
+          duration: targetZoom > 5 ? 1 : 0.7,
+          easeLinearity: 1,
+        });
+        map.once("moveend", () =>
+          markers.zoomToShowLayer(targetMarker, () =>
+            targetMarker.fire("click"),
+          ),
+        );
       }
     }
   });
 
   function alignCaptionToImageTop() {
     if (!lightboxDescWrapper) return;
-    if (lightboxDescWrapper.classList.contains("caption-collapsed") || galImages.length <= 1) {
+    if (
+      lightboxDescWrapper.classList.contains("caption-collapsed") ||
+      galImages.length <= 1
+    ) {
       lightboxDescWrapper.style.marginTop = "0px";
       return;
     }
@@ -379,7 +449,7 @@ window.addEventListener("load", () => {
     let shortestRenderedHeight = maxH;
 
     galImages.forEach((imgObj) => {
-      let ratio = imageRatioCache.get(imgObj.src);
+      let ratio = imgObj.ratio || imageRatioCache.get(imgObj.src);
       if (ratio === undefined) {
         const temp = new Image();
         temp.src = imgObj.src;
@@ -390,28 +460,31 @@ window.addEventListener("load", () => {
       }
       if (ratio) {
         const renderedHeight = Math.min(maxH, maxW / ratio);
-        if (renderedHeight < shortestRenderedHeight) shortestRenderedHeight = renderedHeight;
+        if (renderedHeight < shortestRenderedHeight)
+          shortestRenderedHeight = renderedHeight;
       }
     });
 
-    galleryTopGapLock = ((windowH - shortestRenderedHeight) / 2) + (windowH * 0.01);
+    galleryTopGapLock = (windowH - shortestRenderedHeight) / 2 + windowH * 0.01;
     lightboxDescWrapper.style.marginTop = `${Math.max(0, galleryTopGapLock)}px`;
   }
 
-  window.addEventListener("resize", rafDebounce(() => {
-    galleryTopGapLock = null;
-    alignCaptionToImageTop();
-  }));
+  window.addEventListener(
+    "resize",
+    rafDebounce(() => {
+      galleryTopGapLock = null;
+      alignCaptionToImageTop();
+    }),
+  );
 
   // OPT: Define ResizeObserver ONCE globally to prevent instantiating multiple observers per pin click
   const galleryResizeObserver = new ResizeObserver((entries) => {
     entries.forEach((entry) => {
       const area = entry.contentRect.width * entry.contentRect.height;
       const t = entry.target.classList;
-      t.remove("box-small", "box-medium-small", "box-medium", "box-large");
-      
+      t.remove("box-small", "box-medium", "box-large");
+
       if (area < 40000) t.add("box-small");
-      else if (area <= 60000) t.add("box-medium-small");
       else if (area <= 80000) t.add("box-medium");
       else t.add("box-large");
     });
@@ -437,8 +510,8 @@ window.addEventListener("load", () => {
         .sb-dynamic-item:hover img { opacity: 0.8; }
         .sb-hover-tooltip { position: absolute; bottom: 0px; left: 0px; right: 0px; background: rgba(28, 28, 28, 0.75); color: #ffffff; padding: 8px 12px; font-family: var(--font-sans); font-size: 0.73rem; line-height: 1.4; opacity: 0; pointer-events: none; transform: translateY(4px); transition: opacity 0.2s ease, transform 0.2s ease; z-index: 10; }
         .sb-dynamic-item:hover .sb-hover-tooltip { opacity: 1; transform: translateY(0); }
-        .tt-small, .tt-medium-small, .tt-medium, .tt-large { display: none; } 
-        .box-small .tt-small, .box-medium-small .tt-medium-small, .box-medium .tt-medium, .box-large .tt-large { display: inline; }
+        .tt-small, .tt-medium, .tt-large { display: none; } 
+        .box-small .tt-small, .box-medium .tt-medium, .box-large .tt-large { display: inline; }
         @media (max-width: 1050px) {
           .sb-dynamic-row { flex-direction: column !important; }
           .sb-dynamic-item { flex: none !important; width: 100% !important; aspect-ratio: auto !important; }
@@ -457,131 +530,168 @@ window.addEventListener("load", () => {
     const galleryContainer = panel.querySelector("#sidebar-dynamic-gallery");
 
     if (isStacked && imgCount > 0) {
-      const imagesData = location.images.map((img, index) => ({
+      // Map data synchronously
+      const loadedImages = location.images.map((img, index) => ({
         src: img.src,
+        thumbSrc: img.thumbSrc || img.src,
+        ratio: img.ratio || 1.5,
+        detailedDescription: img.detailedDescription, // <-- Add this line back!
         caption: img.detailedDescription || img.caption || "",
         origIdx: index,
       }));
 
-      Promise.all(imagesData.map((img) => {
-        return new Promise((resolve) => {
-          if (imageRatioCache.has(img.src)) {
-            img.ratio = imageRatioCache.get(img.src);
-            return resolve(img);
-          }
-          const image = new Image();
-          image.src = img.src;
-          image.onload = () => {
-            img.ratio = image.naturalWidth / image.naturalHeight;
-            imageRatioCache.set(img.src, img.ratio);
-            resolve(img);
-          };
-          image.onerror = () => { img.ratio = 1.5; resolve(img); };
-        });
-      })).then((loadedImages) => {
-        const n = loadedImages.length;
-        const layoutGroups = [];
-        let i = 0;
+      const n = loadedImages.length;
+      const layoutGroups = [];
+      let i = 0;
 
-        if (n === 1) layoutGroups.push([loadedImages[0]]);
-        else if (n === 2) {
-          if (loadedImages[0].ratio < 1 && loadedImages[1].ratio < 1) layoutGroups.push([loadedImages[0], loadedImages[1]]);
-          else layoutGroups.push([loadedImages[0]], [loadedImages[1]]);
-        } else if (n === 3) {
-          if (loadedImages[0].ratio > loadedImages[2].ratio) layoutGroups.push([loadedImages[0]], [loadedImages[1], loadedImages[2]]);
-          else layoutGroups.push([loadedImages[0], loadedImages[1]], [loadedImages[2]]);
-        } else if (n === 4) {
-          layoutGroups.push([loadedImages[0]], [loadedImages[1], loadedImages[2]], [loadedImages[3]]);
-        } else if (n === 5) {
-          layoutGroups.push([loadedImages[0], loadedImages[1]], [loadedImages[2], loadedImages[3]], [loadedImages[4]]);
-        } else {
-          while (i < n) {
-            const remaining = n - i;
-            let groupSize = 2;
-            if (remaining >= 3) {
-              let hasPortrait = false;
-              for (let j = 0; j < 3; j++) { if (loadedImages[i + j].ratio < 1) hasPortrait = true; }
-              groupSize = hasPortrait ? 3 : 2;
-            } else { groupSize = remaining; }
-            layoutGroups.push(loadedImages.slice(i, i + groupSize));
-            i += groupSize;
-          }
-        }
-
-        galleryResizeObserver.disconnect();
-        const fragment = document.createDocumentFragment();
-
-        layoutGroups.forEach((group) => {
-          const rowDiv = document.createElement("div");
-          rowDiv.className = "sb-dynamic-row";
-
-          group.forEach((img) => {
-            const imgWrapper = document.createElement("div");
-            imgWrapper.className = "sb-dynamic-item";
-            galleryResizeObserver.observe(imgWrapper);
-
-            if (group.length === 1) imgWrapper.style.flex = "1 1 100%";
-            else { imgWrapper.style.flex = `${img.ratio} 1 0%`; imgWrapper.style.aspectRatio = `${img.ratio}`; }
-
-            imgWrapper.onclick = () => openGalleryLightbox(location.images, img.origIdx);
-
-            const imgEl = document.createElement("img");
-            imgEl.src = img.src;
-            if (n === 1) imgEl.style.maxHeight = "60vh";
-            else if (group.length === 1) imgEl.style.maxHeight = "72vh";
-            imgWrapper.appendChild(imgEl);
-
-            if (img.caption && n > 1) {
-              const tempDiv = document.createElement("div");
-              tempDiv.innerHTML = img.caption;
-              const plainText = (tempDiv.textContent || tempDiv.innerText || "").replace(/\s+/g, " ").trim();
-              const words = plainText.split(" ");
-              
-              if (plainText) {
-                const customTooltip = document.createElement("div");
-                customTooltip.className = "sb-hover-tooltip";
-                customTooltip.innerHTML = `
-                  <span class="tt-small">${words.length > 8 ? words.slice(0, 8).join(" ") + "..." : plainText}</span>
-                  <span class="tt-medium-small">${words.length > 40 ? words.slice(0, 40).join(" ") + "..." : plainText}</span>
-                  <span class="tt-medium">${words.length > 40 ? words.slice(0, 40).join(" ") + "..." : plainText}</span>
-                  <span class="tt-large">${words.length > 70 ? words.slice(0, 70).join(" ") + "..." : plainText}</span>
-                `;
-                imgWrapper.appendChild(customTooltip);
-
-                const iconOverlay = document.createElement("div");
-                iconOverlay.innerHTML = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>`;
-                Object.assign(iconOverlay.style, { position: "absolute", top: "6px", right: "6px", backgroundColor: "rgba(0, 0, 0, 0.4)", color: "#ffffff", padding: "5px", borderRadius: "2px", display: "flex", alignItems: "center", justifyContent: "center", pointerEvents: "none" });
-                imgWrapper.appendChild(iconOverlay);
-              }
+      if (n === 1) layoutGroups.push([loadedImages[0]]);
+      else if (n === 2) {
+        if (loadedImages[0].ratio < 1 && loadedImages[1].ratio < 1)
+          layoutGroups.push([loadedImages[0], loadedImages[1]]);
+        else layoutGroups.push([loadedImages[0]], [loadedImages[1]]);
+      } else if (n === 3) {
+        if (loadedImages[0].ratio > loadedImages[2].ratio)
+          layoutGroups.push(
+            [loadedImages[0]],
+            [loadedImages[1], loadedImages[2]],
+          );
+        else
+          layoutGroups.push(
+            [loadedImages[0], loadedImages[1]],
+            [loadedImages[2]],
+          );
+      } else if (n === 4) {
+        layoutGroups.push(
+          [loadedImages[0]],
+          [loadedImages[1], loadedImages[2]],
+          [loadedImages[3]],
+        );
+      } else if (n === 5) {
+        layoutGroups.push(
+          [loadedImages[0], loadedImages[1]],
+          [loadedImages[2], loadedImages[3]],
+          [loadedImages[4]],
+        );
+      } else {
+        while (i < n) {
+          const remaining = n - i;
+          let groupSize = 2;
+          if (remaining >= 3) {
+            let hasPortrait = false;
+            for (let j = 0; j < 3; j++) {
+              if (loadedImages[i + j].ratio < 1) hasPortrait = true;
             }
-            rowDiv.appendChild(imgWrapper);
-          });
-          fragment.appendChild(rowDiv);
-        });
-
-        galleryContainer.appendChild(fragment);
-
-        if (n === 1 && loadedImages[0].caption) {
-          const captionDiv = document.createElement("div");
-          Object.assign(captionDiv.style, { marginTop: "1.2rem", fontFamily: "var(--font-sans)", fontSize: "0.85rem", color: "#000000", lineHeight: "1.6" });
-          captionDiv.innerHTML = loadedImages[0].caption;
-          galleryContainer.appendChild(captionDiv);
-        }
-
-        if (n === 1) {
-          const wrapper = panel.querySelector("#sidebar-content-wrapper");
-          if (wrapper) {
-            wrapper.classList.add("single-image-mode");
-            wrapper.dataset.ratio = loadedImages[0].ratio; 
-            squeezeSidebarSingleImage(); 
+            groupSize = hasPortrait ? 3 : 2;
+          } else {
+            groupSize = remaining;
           }
+          layoutGroups.push(loadedImages.slice(i, i + groupSize));
+          i += groupSize;
         }
+      }
+
+      galleryResizeObserver.disconnect();
+      const fragment = document.createDocumentFragment();
+
+      layoutGroups.forEach((group) => {
+        const rowDiv = document.createElement("div");
+        rowDiv.className = "sb-dynamic-row";
+
+        group.forEach((img) => {
+          const imgWrapper = document.createElement("div");
+          imgWrapper.className = "sb-dynamic-item";
+          galleryResizeObserver.observe(imgWrapper);
+
+          if (group.length === 1) imgWrapper.style.flex = "1 1 100%";
+          else {
+            imgWrapper.style.flex = `${img.ratio} 1 0%`;
+            imgWrapper.style.aspectRatio = `${img.ratio}`;
+          }
+
+          imgWrapper.onclick = () =>
+            openGalleryLightbox(loadedImages, img.origIdx);
+
+          const imgEl = document.createElement("img");
+          // Use thumbSrc for the sidebar, load asynchronously
+          imgEl.src = img.thumbSrc;
+          imgEl.loading = "lazy";
+          imgEl.decoding = "async";
+
+          if (n === 1) imgEl.style.maxHeight = "60vh";
+          else if (group.length === 1) imgEl.style.maxHeight = "72vh";
+          imgWrapper.appendChild(imgEl);
+
+          if (img.caption && n > 1) {
+            const tempDiv = document.createElement("div");
+            tempDiv.innerHTML = img.caption;
+            const plainText = (tempDiv.textContent || tempDiv.innerText || "")
+              .replace(/\s+/g, " ")
+              .trim();
+            const words = plainText.split(" ");
+
+            if (plainText) {
+              const customTooltip = document.createElement("div");
+              customTooltip.className = "sb-hover-tooltip";
+              customTooltip.innerHTML = `
+                <span class="tt-small">${words.length > 8 ? words.slice(0, 8).join(" ") + "..." : plainText}</span>
+                <span class="tt-medium">${words.length > 40 ? words.slice(0, 40).join(" ") + "..." : plainText}</span>
+                <span class="tt-large">${words.length > 70 ? words.slice(0, 70).join(" ") + "..." : plainText}</span>
+              `;
+              imgWrapper.appendChild(customTooltip);
+
+              const iconOverlay = document.createElement("div");
+              iconOverlay.innerHTML = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>`;
+              Object.assign(iconOverlay.style, {
+                position: "absolute",
+                top: "6px",
+                right: "6px",
+                backgroundColor: "rgba(0, 0, 0, 0.4)",
+                color: "#ffffff",
+                padding: "5px",
+                borderRadius: "2px",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                pointerEvents: "none",
+              });
+              imgWrapper.appendChild(iconOverlay);
+            }
+          }
+          rowDiv.appendChild(imgWrapper);
+        });
+        fragment.appendChild(rowDiv);
       });
+
+      galleryContainer.appendChild(fragment);
+
+      if (n === 1 && loadedImages[0].caption) {
+        const captionDiv = document.createElement("div");
+        Object.assign(captionDiv.style, {
+          marginTop: "1.2rem",
+          fontFamily: "var(--font-sans)",
+          fontSize: "0.85rem",
+          color: "#000000",
+          lineHeight: "1.6",
+        });
+        captionDiv.innerHTML = loadedImages[0].caption;
+        galleryContainer.appendChild(captionDiv);
+      }
+
+      if (n === 1) {
+        const wrapper = panel.querySelector("#sidebar-content-wrapper");
+        if (wrapper) {
+          wrapper.classList.add("single-image-mode");
+          wrapper.dataset.ratio = loadedImages[0].ratio;
+          squeezeSidebarSingleImage();
+        }
+      }
     }
   }
 
   function squeezeSidebarSingleImage() {
-    const wrapper = document.querySelector("#sidebar-content-wrapper.single-image-mode");
+    const wrapper = document.querySelector(
+      "#sidebar-content-wrapper.single-image-mode",
+    );
     if (!wrapper) return;
     wrapper.style.maxWidth = "100%";
     const maxH = window.innerHeight * 0.6;
@@ -589,7 +699,7 @@ window.addEventListener("load", () => {
 
     if (ratio) {
       const defaultWidth = wrapper.getBoundingClientRect().width;
-      if ((defaultWidth / ratio) > maxH) {
+      if (defaultWidth / ratio > maxH) {
         wrapper.style.maxWidth = `${maxH * ratio}px`;
       }
     }
@@ -599,17 +709,31 @@ window.addEventListener("load", () => {
 
   const smallIcon = L.icon({
     iconUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png",
-    iconRetinaUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png",
+    iconRetinaUrl:
+      "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png",
     shadowUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
-    iconSize: [20, 32], iconAnchor: [10, 32], shadowSize: [32, 32], shadowAnchor: [10, 32],
+    iconSize: [20, 32],
+    iconAnchor: [10, 32],
+    shadowSize: [32, 32],
+    shadowAnchor: [10, 32],
     className: "interactive-marker",
   });
 
   let activeMarker = null;
 
   const markers = L.markerClusterGroup({
-    showCoverageOnHover: false, maxClusterRadius: 30, zoomToBoundsOnClick: false, removeOutsideVisibleBounds: false, disableClusteringAtZoom: 15, spiderfyOnMaxZoom: false,
-    iconCreateFunction: (cluster) => L.divIcon({ html: `<div class="custom-cluster-icon">${cluster.getChildCount()}</div>`, className: "", iconSize: L.point(36, 36) }),
+    showCoverageOnHover: false,
+    maxClusterRadius: 30,
+    zoomToBoundsOnClick: false,
+    removeOutsideVisibleBounds: false,
+    disableClusteringAtZoom: 15,
+    spiderfyOnMaxZoom: false,
+    iconCreateFunction: (cluster) =>
+      L.divIcon({
+        html: `<div class="custom-cluster-icon">${cluster.getChildCount()}</div>`,
+        className: "",
+        iconSize: L.point(36, 36),
+      }),
   });
 
   markers.on("clusterclick", (event) => {
@@ -621,7 +745,12 @@ window.addEventListener("load", () => {
 
     const desiredPixelSpread = cluster.getChildCount() > 2 ? 250 : 50;
     for (let z = currentZoom; z <= 15; z++) {
-      if (map.project(bounds.getSouthWest(), z).distanceTo(map.project(bounds.getNorthEast(), z)) >= desiredPixelSpread) {
+      if (
+        map
+          .project(bounds.getSouthWest(), z)
+          .distanceTo(map.project(bounds.getNorthEast(), z)) >=
+        desiredPixelSpread
+      ) {
         targetZoom = z;
         break;
       }
@@ -629,11 +758,15 @@ window.addEventListener("load", () => {
     }
 
     if (targetZoom <= currentZoom) targetZoom = Math.min(currentZoom + 3, 15);
-    
+
     if (Math.abs(targetZoom - currentZoom) >= 5) {
       map.setView(targetCenter, targetZoom, { animate: false });
     } else {
-      map.flyTo(targetCenter, targetZoom, { animate: true, duration: 0.7, easeLinearity: 0.25 });
+      map.flyTo(targetCenter, targetZoom, {
+        animate: true,
+        duration: 0.7,
+        easeLinearity: 0.25,
+      });
     }
   });
 
@@ -648,15 +781,24 @@ window.addEventListener("load", () => {
     const marker = L.marker(location.coords, { icon: smallIcon });
     location.markerInstance = marker;
 
-    marker.bindTooltip(`
+    marker.bindTooltip(
+      `
       <div style="width: max-content; white-space: nowrap; padding: 5px 12px; background-color: var(--bg-dark-accent, #3f464d); color: var(--text-light, #f4f3ee); font-family: var(--font-sans); font-size: 0.9em; letter-spacing: 1px;">
         ${location.name.includes(":") ? location.name.split(":")[0].trim() : location.name}
       </div>
-    `, { direction: "bottom", offset: [0, 5], className: "custom-map-tooltip", opacity: 1 });
+    `,
+      {
+        direction: "bottom",
+        offset: [0, 5],
+        className: "custom-map-tooltip",
+        opacity: 1,
+      },
+    );
 
     marker.on("click", () => {
       marker.closeTooltip();
-      if (activeMarker && activeMarker !== marker) activeMarker.getElement()?.classList.remove("marker-active");
+      if (activeMarker && activeMarker !== marker)
+        activeMarker.getElement()?.classList.remove("marker-active");
       activeMarker = marker;
       marker.getElement()?.classList.add("marker-active");
       renderPanel(location);
@@ -671,8 +813,14 @@ window.addEventListener("load", () => {
   renderDefaultPanel();
 
   if (galOverlay) {
-    galPrev?.addEventListener("click", (e) => { e.stopPropagation(); prevGalImage(); });
-    galNext?.addEventListener("click", (e) => { e.stopPropagation(); nextGalImage(); });
+    galPrev?.addEventListener("click", (e) => {
+      e.stopPropagation();
+      prevGalImage();
+    });
+    galNext?.addEventListener("click", (e) => {
+      e.stopPropagation();
+      nextGalImage();
+    });
     galClose?.addEventListener("click", closeGalleryLightbox);
   }
 
@@ -690,7 +838,11 @@ window.addEventListener("load", () => {
       const targetMarker = locations[locIndex].markerInstance;
       if (targetMarker) {
         renderPanel(locations[locIndex]);
-        map.setView(targetMarker.getLatLng(), computeTargetZoomForMarker(targetMarker), { animate: false });
+        map.setView(
+          targetMarker.getLatLng(),
+          computeTargetZoomForMarker(targetMarker),
+          { animate: false },
+        );
         setTimeout(() => targetMarker.fire("click"), 50);
       }
     }
