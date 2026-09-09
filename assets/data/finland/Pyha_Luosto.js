@@ -4,12 +4,12 @@ export const Pyha_Luosto = {
   name: "Tunturiaapa Nature Trail: Pyhä-Luosto National Park, Finland",
   country: "Finland",
   coords: [67.01277652557667, 27.243051968242906],
-  description: "A cold, bright stop with open skies and coastal views.",
   mode: "stacked",
   images: [
     {
       src: `../assets/images/finland/Pyha_Luosto/reduced-6163.jpg`,
-      date: "October 2023",
+      thumbSrc: '../assets/images/finland/Phya_Luosto/thumbnail-6163.jpg',
+      ratio: 1.33, // (e.g., 1200w / 800h = 1.5)
       detailedDescription: "The Tunturiaapa Nature Trail goes through both \
       old-growth forest and the open Tunturiaapa aapa mire. The trees in the \
       old-growth forest are generally over 250 years, although some are up to 400 \
@@ -18,7 +18,8 @@ export const Pyha_Luosto = {
     },
     {
       src: `../assets/images/finland/Pyha_Luosto/reduced-6088-2.jpg`,
-      date: "October 2023",
+      thumbSrc: '../assets/images/finland/Phya_Luosto/thumbnail-2.jpg',
+      ratio: 1.5, // (e.g., 1200w / 800h = 1.5),
       detailedDescription: "The name of the national park 'Pyhä-Luosto' \
       is a cominbination of the two main fell areas: <em>Pyhätunturi</em> \
       and <em>Luostotunturi</em> (<em>tunturi</em> translates as <em>fell</em>). \
