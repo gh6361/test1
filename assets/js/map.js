@@ -1,7 +1,10 @@
 // Import the combined locations array from your hub file
 import { locations } from "../data/index.js";
 
-window.addEventListener("load", () => {
+const DEFAULT_RATIO = 1.5; 
+const SIDEBAR_SIZES = "(max-width: 1050px) 100vw, 30vw";
+
+function init() {
   const mapEl = document.getElementById("map");
   const panel = document.getElementById("location-panel");
 
@@ -44,32 +47,53 @@ window.addEventListener("load", () => {
   let galActive = galImageA;
   let galInactive = galImageB;
   let galleryTopGapLock = null;
+  let galRenderToken = 0;
 
   if (!mapEl || !panel || typeof L === "undefined") return;
 
+  function ensureSidebarStyles() {
+    if (document.getElementById("sb-dynamic-styles")) return;
+    const styleEl = document.createElement("style");
+    styleEl.id = "sb-dynamic-styles";
+    styleEl.textContent = `
+      .sb-dynamic-row { display: flex; flex-direction: row; gap: 6px; width: 100%; }
+      .sb-dynamic-item { position: relative; overflow: hidden; cursor: zoom-in; container-type: inline-size; }
+      .sb-dynamic-item img { width: 100%; height: 100%; object-fit: cover; display: block; transition: opacity 0.2s ease; }
+      .sb-dynamic-item:hover img { opacity: 0.8; }
+      .sb-hover-tooltip { position: absolute; bottom: 0px; left: 0px; right: 0px; background: rgba(28, 28, 28, 0.75); color: #ffffff; padding: 8px 12px; font-family: var(--font-sans); font-size: 0.73rem; line-height: 1.4; opacity: 0; pointer-events: none; transform: translateY(4px); transition: opacity 0.2s ease, transform 0.2s ease; z-index: 10; }
+      .sb-dynamic-item:hover .sb-hover-tooltip { opacity: 1; transform: translateY(0); }
+      .tt-small, .tt-medium, .tt-large { display: none; } 
+      .box-small .tt-small, .box-medium .tt-medium, .box-large .tt-large { display: inline; }
+      @media (max-width: 1050px) {
+        .sb-dynamic-row { flex-direction: column !important; }
+        .sb-dynamic-item { flex: none !important; width: 100% !important; aspect-ratio: auto !important; }
+        .sb-dynamic-item img { height: auto !important; max-height: 70vh; }
+      }
+    `;
+    document.head.appendChild(styleEl);
+  }
+  ensureSidebarStyles();
+
+  function applyThumbSources(imgEl, img) {
+    imgEl.src = img.thumbSrc || img.src;
+    const candidates = [];
+    if (img.thumb400) candidates.push(`${img.thumb400} 400w`);
+    if (img.thumb800) candidates.push(`${img.thumb800} 800w`);
+    if (candidates.length) {
+      candidates.push(`${imgEl.src} 1280w`);
+      imgEl.srcset = candidates.join(", ");
+      imgEl.sizes = SIDEBAR_SIZES;
+    }
+  }
+
   const regionBounds = {
-    world: [
-      [-55, -170],
-      [75, 180],
-    ],
-    europe: [
-      [38, -10],
-      [69, 35],
-    ],
-    na: [
-      [22, -175],
-      [70, -45],
-    ],
-    oceania: [
-      [-47, 110],
-      [-10, 180],
-    ],
+    world: [[-55, -170], [75, 180]],
+    europe: [[38, -10], [69, 35]],
+    na: [[22, -175], [70, -45]],
+    oceania: [[-47, 110], [-10, 180]],
   };
 
-  const verticalBounds = [
-    [-90, -10000],
-    [90, 10000],
-  ];
+  const verticalBounds = [[-90, -10000], [90, 10000]];
 
   const urlParams = new URLSearchParams(window.location.search);
   let startCenter = null;
@@ -111,8 +135,7 @@ window.addEventListener("load", () => {
 
   L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
     maxZoom: 19,
-    attribution:
-      '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+    attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
   }).addTo(map);
 
   const regionControl = L.control({ position: "topright" });
@@ -134,8 +157,7 @@ window.addEventListener("load", () => {
 
       const currentZoom = mapInstance.getZoom();
       const isZoomedIn = currentZoom > 4;
-      const isWorldTransition =
-        lastRegion === "world" || targetRegion === "world";
+      const isWorldTransition = lastRegion === "world" || targetRegion === "world";
 
       if (isZoomedIn || !isWorldTransition) {
         mapInstance.fitBounds(regionBounds[targetRegion], {
@@ -178,8 +200,9 @@ window.addEventListener("load", () => {
     if (!galImages.length || !galInactive || !galActive) return;
     galCurrentIndex = (index + galImages.length) % galImages.length;
     const image = galImages[galCurrentIndex];
+    const myToken = ++galRenderToken;
 
-    galInactive.onload = () => {
+    function revealCurrent() {
       if (!lightboxCounterEl && galOverlay) {
         lightboxCounterEl = document.createElement("div");
         lightboxCounterEl.id = "lightbox-global-counter";
@@ -231,21 +254,27 @@ window.addEventListener("load", () => {
 
         const activeThumb = document.querySelector(".lb-thumb.active");
         if (activeThumb) activeThumb.classList.remove("active");
-        const newThumb = document.querySelector(
-          `.lb-thumb[data-index="${galCurrentIndex}"]`,
-        );
+        const newThumb = document.querySelector(`.lb-thumb[data-index="${galCurrentIndex}"]`);
         if (newThumb) newThumb.classList.add("active");
 
         setTimeout(alignCaptionToImageTop, 50);
-        // --- ADD THIS LINE HERE ---
-        // Preload the next/prev images only AFTER the current one is safely on screen
         preloadAdjacentImages();
       });
+    }
+
+    galInactive.onload = () => { if (myToken === galRenderToken) revealCurrent(); };
+    galInactive.onerror = () => {
+      if (myToken === galRenderToken) {
+        galInactive.alt = "Image unavailable";
+        revealCurrent();
+      }
     };
 
-    galInactive.src = "";
-    galInactive.src = image.src;
+    galInactive.removeAttribute("src");
+    galInactive.decoding = "async";
+    galInactive.fetchPriority = "high";
     galInactive.alt = image.caption || `Image ${galCurrentIndex + 1}`;
+    galInactive.src = image.src;
   }
 
   // OPT: Add thumbnail event listener globally ONCE to prevent memory leaks
@@ -275,7 +304,7 @@ window.addEventListener("load", () => {
         thumbContainer.innerHTML = images
           .map(
             (img, idx) =>
-              `<img src="${img.thumbSrc || img.src}" class="lb-thumb ${idx === (startIndex || 0) ? "active" : ""}" data-index="${idx}" alt="thumbnail">`,
+              `<img src="${img.thumbSrc || img.src}" class="lb-thumb ${idx === (startIndex || 0) ? "active" : ""}" data-index="${idx}" alt="thumbnail" loading="lazy" decoding="async">`
           )
           .join("");
       }
@@ -286,11 +315,12 @@ window.addEventListener("load", () => {
 
   function closeGalleryLightbox() {
     if (!galOverlay) return;
+    galRenderToken++;
     galOverlay.classList.add("hidden");
     galOverlay.classList.remove("single-mode");
 
-    if (galImageA) galImageA.src = "";
-    if (galImageB) galImageB.src = "";
+    if (galImageA) galImageA.removeAttribute("src");
+    if (galImageB) galImageB.removeAttribute("src");
     if (galCaption) galCaption.textContent = "";
     galImages = [];
     galleryTopGapLock = null;
@@ -307,15 +337,10 @@ window.addEventListener("load", () => {
 
   function preloadAdjacentImages() {
     if (galImages.length <= 1) return;
-
-    // Calculate the next and previous index wrapping around the array
     const nextIdx = (galCurrentIndex + 1) % galImages.length;
     const prevIdx = (galCurrentIndex - 1 + galImages.length) % galImages.length;
-
-    // Create detached Image objects to force the browser to download them into cache
     const preNext = new Image();
     preNext.src = galImages[nextIdx].src;
-
     const prePrev = new Image();
     prePrev.src = galImages[prevIdx].src;
   }
@@ -330,8 +355,7 @@ window.addEventListener("load", () => {
         : loc.name;
 
       if (!groupedLocations[country]) groupedLocations[country] = {};
-      if (!groupedLocations[country][state])
-        groupedLocations[country][state] = [];
+      if (!groupedLocations[country][state]) groupedLocations[country][state] = [];
       groupedLocations[country][state].push({
         displayName,
         originalIndex: index,
@@ -382,6 +406,7 @@ window.addEventListener("load", () => {
         }
 
         groupedLocations[country][state].forEach((item) => {
+          // Exactly matching your original <li> typography
           htmlParts.push(
             `<li class="sidebar-loc-link" data-index="${item.originalIndex}" style="font-size: 1rem; color: #1c1c1c; cursor: pointer;">${item.displayName}</li>`,
           );
@@ -469,11 +494,12 @@ window.addEventListener("load", () => {
     galImages.forEach((imgObj) => {
       let ratio = imgObj.ratio || imageRatioCache.get(imgObj.src);
       if (ratio === undefined) {
-        const temp = new Image();
-        temp.src = imgObj.src;
-        if (temp.complete && temp.naturalHeight > 0) {
-          ratio = temp.naturalWidth / temp.naturalHeight;
+        const liveEl = document.querySelector(`#lightbox img[src="${imgObj.src}"]`);
+        if (liveEl && liveEl.complete && liveEl.naturalHeight > 0) {
+          ratio = liveEl.naturalWidth / liveEl.naturalHeight;
           imageRatioCache.set(imgObj.src, ratio);
+        } else {
+          ratio = DEFAULT_RATIO;
         }
       }
       if (ratio) {
@@ -495,7 +521,6 @@ window.addEventListener("load", () => {
     }),
   );
 
-  // OPT: Define ResizeObserver ONCE globally to prevent instantiating multiple observers per pin click
   const galleryResizeObserver = new ResizeObserver((entries) => {
     entries.forEach((entry) => {
       const area = entry.contentRect.width * entry.contentRect.height;
@@ -520,22 +545,8 @@ window.addEventListener("load", () => {
       subTitle = parts[1].trim();
     }
 
+    // Exactly matching your original title styling typography
     panel.innerHTML = `
-      <style>
-        .sb-dynamic-row { display: flex; flex-direction: row; gap: 6px; width: 100%; }
-        .sb-dynamic-item { position: relative; overflow: hidden; cursor: zoom-in; container-type: inline-size; }
-        .sb-dynamic-item img { width: 100%; height: 100%; object-fit: cover; display: block; transition: opacity 0.2s ease; }
-        .sb-dynamic-item:hover img { opacity: 0.8; }
-        .sb-hover-tooltip { position: absolute; bottom: 0px; left: 0px; right: 0px; background: rgba(28, 28, 28, 0.75); color: #ffffff; padding: 8px 12px; font-family: var(--font-sans); font-size: 0.73rem; line-height: 1.4; opacity: 0; pointer-events: none; transform: translateY(4px); transition: opacity 0.2s ease, transform 0.2s ease; z-index: 10; }
-        .sb-dynamic-item:hover .sb-hover-tooltip { opacity: 1; transform: translateY(0); }
-        .tt-small, .tt-medium, .tt-large { display: none; } 
-        .box-small .tt-small, .box-medium .tt-medium, .box-large .tt-large { display: inline; }
-        @media (max-width: 1050px) {
-          .sb-dynamic-row { flex-direction: column !important; }
-          .sb-dynamic-item { flex: none !important; width: 100% !important; aspect-ratio: auto !important; }
-          .sb-dynamic-item img { height: auto !important; max-height: 70vh; }
-        }
-      </style>
       <div id="sidebar-content-wrapper" style="padding: 0; margin: 0 auto; width: 100%; transition: max-width 0.3s ease; box-sizing: border-box;"> 
         <div style="text-align: left; margin-top: 1rem; margin-bottom: 0.5rem;">
           <h2 style="margin: 0; color: #1c1c1c; font-weight: 600 !important; white-space: normal; font-size: 1.9rem; line-height: 1.1;">${mainTitle}</h2>
@@ -548,13 +559,15 @@ window.addEventListener("load", () => {
     const galleryContainer = panel.querySelector("#sidebar-dynamic-gallery");
 
     if (isStacked && imgCount > 0) {
-      // Map data synchronously
       const loadedImages = location.images.map((img, index) => ({
         src: img.src,
         thumbSrc: img.thumbSrc || img.src,
-        ratio: img.ratio || 1.5,
-        detailedDescription: img.detailedDescription, // <-- Add this line back!
+        thumb400: img.thumb400 || null,
+        thumb800: img.thumb800 || null,
+        ratio: img.ratio || DEFAULT_RATIO,
+        detailedDescription: img.detailedDescription,
         caption: img.detailedDescription || img.caption || "",
+        collections: img.collections || [],
         origIdx: index,
       }));
 
@@ -629,9 +642,14 @@ window.addEventListener("load", () => {
           imgWrapper.onclick = () =>
             openGalleryLightbox(loadedImages, img.origIdx);
 
+          // Fast intent preloading
+          imgWrapper.addEventListener("pointerenter", () => {
+             const warm = new Image();
+             warm.src = img.src;
+          }, { once: true });
+
           const imgEl = document.createElement("img");
-          // Use thumbSrc for the sidebar, load asynchronously
-          imgEl.src = img.thumbSrc;
+          applyThumbSources(imgEl, img);
           imgEl.loading = "lazy";
           imgEl.decoding = "async";
 
@@ -703,9 +721,7 @@ window.addEventListener("load", () => {
           squeezeSidebarSingleImage();
         }
       }
-      // --- ADD THIS BLOCK HERE ---
-      // Wait 800ms to let the visible thumbnails download first,
-      // then quietly fetch all the high-res lightbox images in the background.
+
       setTimeout(() => {
         loadedImages.forEach((img) => {
           const preloader = new Image();
@@ -876,4 +892,11 @@ window.addEventListener("load", () => {
   }
 
   setTimeout(() => map.invalidateSize(), 300);
-});
+}
+
+// Replaced global `load` wrapper with efficient DOMContentLoaded check
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", init, { once: true });
+} else {
+  init();
+}
