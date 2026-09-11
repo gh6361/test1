@@ -58,3 +58,10 @@ collections:
 #   - vendor/cache/
 #   - vendor/gems/
 #   - vendor/ruby/
+
+exclude:
+  - .venv
+  - node_modules # (if you have other things excluded, just add it to the list)
+
+port: 4005
+livereload_port: 35735
