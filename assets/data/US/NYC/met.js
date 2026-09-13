@@ -9,7 +9,11 @@ export const met = {
   mode: "stacked",
   images: [
     {
-      src: `../assets/images/US/NYC/met1.jpg`,
+      src: `../assets/images/US/NYC/avif/avif--avif65-5.avif`,
+      thumb400: "../assets/images/US/NYC/thumbnail400/thumbnail400--6.jpg",
+      thumb800: "../assets/images/US/NYC/thumbnail800/thumbnail800--6.jpg",
+      thumbSrc: "../assets/images/US/NYC/thumbnail1280/thumbnail1280--6.jpg",
+      ratio: 0.75,
       detailedDescription: "The Metropolitan Museum of Art, known simply \
       as 'The Met', contains more than 1.5 million objects from over 5,000 \
       years of global history. It was founded in 1870 and receives more \
@@ -17,7 +21,12 @@ export const met = {
       the Egyptian galleries.",
     },
     {
-      src: `../assets/images/US/NYC/met2.jpg`,
+      src: `../assets/images/US/NYC/avif/avif-145734.avif`,
+      thumb400: "../assets/images/US/NYC/thumbnail400/thumbnail400-145734.jpg",
+      thumb800: "../assets/images/US/NYC/thumbnail800/thumbnail800-145734.jpg",
+      thumbSrc:
+        "../assets/images/US/NYC/thumbnail1280/thumbnail1280-145734.jpg",
+      ratio: 1.3333,
       detailedDescription: "'The Cat' by Swiss artist Alberto Giacometti \
       (1901-1966). This object was \
       on display in the Temple of Dendur, an actual Egyptian \
@@ -25,5 +34,5 @@ export const met = {
       all the way to New York. Giacometti showed a lifelong fascination for \
       ancient Egyptian art.",
     },
-  ]
+  ],
 };

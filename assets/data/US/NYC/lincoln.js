@@ -9,12 +9,20 @@ export const lincoln = {
   mode: "stacked",
   images: [
     {
-      src: `../assets/images/US/NYC/lincoln1.jpg`,
+      src: `../assets/images/US/NYC/avif/avif-6587.avif`,
+      thumb400: "../assets/images/US/NYC/thumbnail400/thumbnail400-6587.jpg",
+      thumb800: "../assets/images/US/NYC/thumbnail800/thumbnail800-6587.jpg",
+      thumbSrc: "../assets/images/US/NYC/thumbnail1280/thumbnail1280-6587.jpg",
+      ratio: 1.5006,
       detailedDescription: "",
     },
     {
-      src: `../assets/images/US/NYC/lincoln2.jpg`,
+      src: `../assets/images/US/NYC/avif/avif-6591.avif`,
+      thumb400: "../assets/images/US/NYC/thumbnail400/thumbnail400-6591.jpg",
+      thumb800: "../assets/images/US/NYC/thumbnail800/thumbnail800-6591.jpg",
+      thumbSrc: "../assets/images/US/NYC/thumbnail1280/thumbnail1280-6591.jpg",
+      ratio: 1.5006,
       detailedDescription: "",
     },
-  ]
+  ],
 };

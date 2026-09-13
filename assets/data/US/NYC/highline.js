@@ -9,23 +9,35 @@ export const highline = {
   mode: "stacked",
   images: [
     {
-      src: `../assets/images/US/NYC/highline1.jpg`,
+      src: `../assets/images/US/NYC/avif/avif-6511.avif`,
+      thumb400: "../assets/images/US/NYC/thumbnail400/thumbnail400-6511.jpg",
+      thumb800: "../assets/images/US/NYC/thumbnail800/thumbnail800-6511.jpg",
+      thumbSrc: "../assets/images/US/NYC/thumbnail1280/thumbnail1280-6511.jpg",
+      ratio: 1.5006,
       detailedDescription: "The High Line is a popular park built on a former \
       elevated freight railway &mdash; indeed, old tracks can be seen to \
       the left of this image. The park lies 30 ft above street level.",
     },
     {
-      src: `../assets/images/US/NYC/highline2.jpg`,
+      src: `../assets/images/US/NYC/avif/avif-6521.avif`,
+      thumb400: "../assets/images/US/NYC/thumbnail400/thumbnail400-6521.jpg",
+      thumb800: "../assets/images/US/NYC/thumbnail800/thumbnail800-6521.jpg",
+      thumbSrc: "../assets/images/US/NYC/thumbnail1280/thumbnail1280-6521.jpg",
+      ratio: 1.5006,
       detailedDescription: "The line opened in 1934 and the last train ran in \
       1980. Grasses, wildflowers, shrubs and trees gradually filled the space \
       and ultimately led to the design of the park as it is today.",
     },
     {
-      src: `../assets/images/US/NYC/hudsonyards_building.jpg`,
+      src: `../assets/images/US/NYC/avif/avif-6500.avif`,
+      thumb400: "../assets/images/US/NYC/thumbnail400/thumbnail400-6500.jpg",
+      thumb800: "../assets/images/US/NYC/thumbnail800/thumbnail800-6500.jpg",
+      thumbSrc: "../assets/images/US/NYC/thumbnail1280/thumbnail1280-6500.jpg",
+      ratio: 1.3333,
       detailedDescription: "A view of buildings taken from near the High Line \
       in Hudson Yards, which is one of the newest parts of Manhattan and \
       sits right beside the northern section of the High Line. The tower on the \
       left of the image is The Spiral.",
     },
-  ]
+  ],
 };
