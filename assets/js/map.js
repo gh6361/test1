@@ -1,7 +1,7 @@
 // Import the combined locations array from your hub file
 import { locations } from "../data/index.js";
 
-const DEFAULT_RATIO = 1.5; 
+const DEFAULT_RATIO = 1.5;
 const SIDEBAR_SIZES = "(max-width: 1050px) 100vw, 30vw";
 
 function init() {
@@ -56,7 +56,7 @@ function init() {
     const styleEl = document.createElement("style");
     styleEl.id = "sb-dynamic-styles";
     styleEl.textContent = `
-      .sb-dynamic-row { display: flex; flex-direction: row; gap: 6px; width: 100%; }
+      .sb-dynamic-row { display: flex; flex-direction: row; gap: 9px; width: 100%; }
       .sb-dynamic-item { position: relative; overflow: hidden; cursor: zoom-in; container-type: inline-size; }
       .sb-dynamic-item img { width: 100%; height: 100%; object-fit: cover; display: block; transition: opacity 0.2s ease; }
       .sb-dynamic-item:hover img { opacity: 0.8; }
@@ -87,13 +87,28 @@ function init() {
   }
 
   const regionBounds = {
-    world: [[-55, -170], [75, 180]],
-    europe: [[38, -10], [69, 35]],
-    na: [[22, -175], [70, -45]],
-    oceania: [[-47, 110], [-10, 180]],
+    world: [
+      [-55, -170],
+      [75, 180],
+    ],
+    europe: [
+      [38, -10],
+      [69, 35],
+    ],
+    na: [
+      [22, -175],
+      [70, -45],
+    ],
+    oceania: [
+      [-47, 110],
+      [-10, 180],
+    ],
   };
 
-  const verticalBounds = [[-90, -10000], [90, 10000]];
+  const verticalBounds = [
+    [-90, -10000],
+    [90, 10000],
+  ];
 
   const urlParams = new URLSearchParams(window.location.search);
   let startCenter = null;
@@ -135,7 +150,8 @@ function init() {
 
   L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
     maxZoom: 19,
-    attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+    attribution:
+      '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
   }).addTo(map);
 
   const regionControl = L.control({ position: "topright" });
@@ -157,7 +173,8 @@ function init() {
 
       const currentZoom = mapInstance.getZoom();
       const isZoomedIn = currentZoom > 4;
-      const isWorldTransition = lastRegion === "world" || targetRegion === "world";
+      const isWorldTransition =
+        lastRegion === "world" || targetRegion === "world";
 
       if (isZoomedIn || !isWorldTransition) {
         mapInstance.fitBounds(regionBounds[targetRegion], {
@@ -254,7 +271,9 @@ function init() {
 
         const activeThumb = document.querySelector(".lb-thumb.active");
         if (activeThumb) activeThumb.classList.remove("active");
-        const newThumb = document.querySelector(`.lb-thumb[data-index="${galCurrentIndex}"]`);
+        const newThumb = document.querySelector(
+          `.lb-thumb[data-index="${galCurrentIndex}"]`,
+        );
         if (newThumb) newThumb.classList.add("active");
 
         setTimeout(alignCaptionToImageTop, 50);
@@ -262,7 +281,9 @@ function init() {
       });
     }
 
-    galInactive.onload = () => { if (myToken === galRenderToken) revealCurrent(); };
+    galInactive.onload = () => {
+      if (myToken === galRenderToken) revealCurrent();
+    };
     galInactive.onerror = () => {
       if (myToken === galRenderToken) {
         galInactive.alt = "Image unavailable";
@@ -304,7 +325,7 @@ function init() {
         thumbContainer.innerHTML = images
           .map(
             (img, idx) =>
-              `<img src="${img.thumbSrc || img.src}" class="lb-thumb ${idx === (startIndex || 0) ? "active" : ""}" data-index="${idx}" alt="thumbnail" loading="lazy" decoding="async">`
+              `<img src="${img.thumbSrc || img.src}" class="lb-thumb ${idx === (startIndex || 0) ? "active" : ""}" data-index="${idx}" alt="thumbnail" loading="lazy" decoding="async">`,
           )
           .join("");
       }
@@ -355,7 +376,8 @@ function init() {
         : loc.name;
 
       if (!groupedLocations[country]) groupedLocations[country] = {};
-      if (!groupedLocations[country][state]) groupedLocations[country][state] = [];
+      if (!groupedLocations[country][state])
+        groupedLocations[country][state] = [];
       groupedLocations[country][state].push({
         displayName,
         originalIndex: index,
@@ -494,7 +516,9 @@ function init() {
     galImages.forEach((imgObj) => {
       let ratio = imgObj.ratio || imageRatioCache.get(imgObj.src);
       if (ratio === undefined) {
-        const liveEl = document.querySelector(`#lightbox img[src="${imgObj.src}"]`);
+        const liveEl = document.querySelector(
+          `#lightbox img[src="${imgObj.src}"]`,
+        );
         if (liveEl && liveEl.complete && liveEl.naturalHeight > 0) {
           ratio = liveEl.naturalWidth / liveEl.naturalHeight;
           imageRatioCache.set(imgObj.src, ratio);
@@ -552,7 +576,7 @@ function init() {
           <h2 style="margin: 0; color: #1c1c1c; font-weight: 600 !important; white-space: normal; font-size: 1.9rem; line-height: 1.1;">${mainTitle}</h2>
           ${subTitle ? `<div style="font-family: var(--font-sans); font-size: 0.75rem; color: var(--text-body); text-transform: uppercase; letter-spacing: 0.15em; margin: 0.9rem 0 1.9rem 0; line-height: 1.2;">${subTitle}</div>` : ""}
         </div>
-        <div id="sidebar-dynamic-gallery" style="display: flex; flex-direction: column; gap: 6px; margin-top: 1rem; margin-bottom: 2rem;"></div>
+        <div id="sidebar-dynamic-gallery" style="display: flex; flex-direction: column; gap: 9px; margin-top: 1rem; margin-bottom: 2rem;"></div>
       </div>
     `;
 
@@ -575,8 +599,9 @@ function init() {
       const layoutGroups = [];
       let i = 0;
 
-      if (n === 1) layoutGroups.push([loadedImages[0]]);
-      else if (n === 2) {
+      if (n === 1) {
+        layoutGroups.push([loadedImages[0]]);
+      } else if (n === 2) {
         if (loadedImages[0].ratio < 1 && loadedImages[1].ratio < 1)
           layoutGroups.push([loadedImages[0], loadedImages[1]]);
         else layoutGroups.push([loadedImages[0]], [loadedImages[1]]);
@@ -603,7 +628,60 @@ function init() {
           [loadedImages[2], loadedImages[3]],
           [loadedImages[4]],
         );
+      } else if (n === 6) {
+        const isPortrait = (img) => img.ratio < 1;
+
+        // Check for 3 consecutive portraits to group them together
+        if (
+          isPortrait(loadedImages[0]) &&
+          isPortrait(loadedImages[1]) &&
+          isPortrait(loadedImages[2])
+        ) {
+          layoutGroups.push(
+            [loadedImages[0], loadedImages[1], loadedImages[2]],
+            [loadedImages[3], loadedImages[4]],
+            [loadedImages[5]],
+          );
+        } else if (
+          isPortrait(loadedImages[1]) &&
+          isPortrait(loadedImages[2]) &&
+          isPortrait(loadedImages[3])
+        ) {
+          layoutGroups.push(
+            [loadedImages[0]],
+            [loadedImages[1], loadedImages[2], loadedImages[3]],
+            [loadedImages[4], loadedImages[5]],
+          );
+        } else if (
+          isPortrait(loadedImages[2]) &&
+          isPortrait(loadedImages[3]) &&
+          isPortrait(loadedImages[4])
+        ) {
+          layoutGroups.push(
+            [loadedImages[0], loadedImages[1]],
+            [loadedImages[2], loadedImages[3], loadedImages[4]],
+            [loadedImages[5]],
+          );
+        } else if (
+          isPortrait(loadedImages[3]) &&
+          isPortrait(loadedImages[4]) &&
+          isPortrait(loadedImages[5])
+        ) {
+          layoutGroups.push(
+            [loadedImages[0]],
+            [loadedImages[1], loadedImages[2]],
+            [loadedImages[3], loadedImages[4], loadedImages[5]],
+          );
+        } else {
+          // Default 6-image layout: 2 images per row
+          layoutGroups.push(
+            [loadedImages[0], loadedImages[1]],
+            [loadedImages[2], loadedImages[3]],
+            [loadedImages[4], loadedImages[5]],
+          );
+        }
       } else {
+        // Handles 7+ images
         while (i < n) {
           const remaining = n - i;
           let groupSize = 2;
@@ -643,10 +721,14 @@ function init() {
             openGalleryLightbox(loadedImages, img.origIdx);
 
           // Fast intent preloading
-          imgWrapper.addEventListener("pointerenter", () => {
-             const warm = new Image();
-             warm.src = img.src;
-          }, { once: true });
+          imgWrapper.addEventListener(
+            "pointerenter",
+            () => {
+              const warm = new Image();
+              warm.src = img.src;
+            },
+            { once: true },
+          );
 
           const imgEl = document.createElement("img");
           applyThumbSources(imgEl, img);
