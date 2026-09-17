@@ -1,6 +1,15 @@
 // data/index.js
 
 // 1. Import all your individual cities
+import { elkisland } from './canada/elkisland.js';
+import { blackbill } from './canada/jasper/blackbill.js';
+import { yellowhead } from './canada/jasper/yellowhead.js';
+import { moose } from './canada/jasper/moose.js';
+import { pyramid } from './canada/jasper/pyramid.js';
+import { medicine } from './canada/jasper/medicine.js';
+import { baldhill } from './canada/jasper/baldhill.js';
+import { maligne } from './canada/jasper/maligne.js';
+import { annette } from './canada/jasper/annette.js';
 import { santabarbara } from './US/CA/santabarbara.js';
 import { sandstone } from './US/CA/sandstone.js';
 import { mandalay } from './US/CA/mandalay.js';
@@ -25,6 +34,15 @@ import { swing } from './finland/swing.js'
 
 // 2. Export them as one combined array for your map to use
 export const locations = [
+  elkisland,
+  blackbill,
+  yellowhead,
+  moose,
+  pyramid,
+  medicine,
+  baldhill,
+  maligne,
+  annette,
   santabarbara,
   sandstone,
   mandalay,

@@ -62,8 +62,14 @@ function init() {
       .sb-dynamic-item:hover img { opacity: 0.8; }
       .sb-hover-tooltip { position: absolute; bottom: 0px; left: 0px; right: 0px; background: rgba(28, 28, 28, 0.75); color: #ffffff; padding: 8px 12px; font-family: var(--font-sans); font-size: 0.73rem; line-height: 1.4; opacity: 0; pointer-events: none; transform: translateY(4px); transition: opacity 0.2s ease, transform 0.2s ease; z-index: 10; }
       .sb-dynamic-item:hover .sb-hover-tooltip { opacity: 1; transform: translateY(0); }
-      .tt-small, .tt-medium, .tt-large { display: none; } 
-      .box-small .tt-small, .box-medium .tt-medium, .box-large .tt-large { display: inline; }
+      .tt-content { 
+        display: -webkit-box; 
+        -webkit-box-orient: vertical; 
+        overflow: hidden; 
+      }
+      .box-small .tt-content { -webkit-line-clamp: 2; }
+      .box-medium .tt-content { -webkit-line-clamp: 4; }
+      .box-large .tt-content { -webkit-line-clamp: 7; }
       @media (max-width: 1050px) {
         .sb-dynamic-row { flex-direction: column !important; }
         .sb-dynamic-item { flex: none !important; width: 100% !important; aspect-ratio: auto !important; }
@@ -740,41 +746,31 @@ function init() {
           imgWrapper.appendChild(imgEl);
 
           if (img.caption && n > 1) {
-            const tempDiv = document.createElement("div");
-            tempDiv.innerHTML = img.caption;
-            const plainText = (tempDiv.textContent || tempDiv.innerText || "")
-              .replace(/\s+/g, " ")
-              .trim();
-            const words = plainText.split(" ");
+            const customTooltip = document.createElement("div");
+            customTooltip.className = "sb-hover-tooltip";
 
-            if (plainText) {
-              const customTooltip = document.createElement("div");
-              customTooltip.className = "sb-hover-tooltip";
-              customTooltip.innerHTML = `
-                <span class="tt-small">${words.length > 8 ? words.slice(0, 8).join(" ") + "..." : plainText}</span>
-                <span class="tt-medium">${words.length > 40 ? words.slice(0, 40).join(" ") + "..." : plainText}</span>
-                <span class="tt-large">${words.length > 70 ? words.slice(0, 70).join(" ") + "..." : plainText}</span>
-              `;
-              imgWrapper.appendChild(customTooltip);
+            // Pass the HTML directly so <em> tags are preserved
+            customTooltip.innerHTML = `<div class="tt-content">${img.caption}</div>`;
+            imgWrapper.appendChild(customTooltip);
 
-              const iconOverlay = document.createElement("div");
-              iconOverlay.innerHTML = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>`;
-              Object.assign(iconOverlay.style, {
-                position: "absolute",
-                top: "6px",
-                right: "6px",
-                backgroundColor: "rgba(0, 0, 0, 0.4)",
-                color: "#ffffff",
-                padding: "5px",
-                borderRadius: "2px",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                pointerEvents: "none",
-              });
-              imgWrapper.appendChild(iconOverlay);
-            }
+            const iconOverlay = document.createElement("div");
+            iconOverlay.innerHTML = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>`;
+            Object.assign(iconOverlay.style, {
+              position: "absolute",
+              top: "6px",
+              right: "6px",
+              backgroundColor: "rgba(0, 0, 0, 0.4)",
+              color: "#ffffff",
+              padding: "5px",
+              borderRadius: "2px",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              pointerEvents: "none",
+            });
+            imgWrapper.appendChild(iconOverlay);
           }
+
           rowDiv.appendChild(imgWrapper);
         });
         fragment.appendChild(rowDiv);
