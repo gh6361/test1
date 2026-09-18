@@ -14,7 +14,8 @@ export const baldhill = {
       thumbSrc:
         "../assets/images/canada/jasper/maligne/thumbnail1280/thumbnail1280-4693.jpg",
       ratio: 1.5006,
-      detailedDescription: "",
+      detailedDescription: "Bald Hills Trail is a 10.4 km return trail in the \
+      Maligne Lake area that gives a high viewpoint over the lake.",
     },
     {
       src: `../assets/images/canada/jasper/maligne/avif/avif-4626.avif`,
@@ -25,7 +26,9 @@ export const baldhill = {
       thumbSrc:
         "../assets/images/canada/jasper/maligne/thumbnail1280/thumbnail1280-4626.jpg",
       ratio: 1.3333,
-      detailedDescription: "",
+      detailedDescription: "Let's just say that 500 m of elevation gain feels like \
+      <em>a lot</em> more if you're sinking ankle-to-knee-deep into snow every \
+      few steps...",
     },
     {
       src: `../assets/images/canada/jasper/maligne/avif/avif-4679.avif`,
@@ -36,7 +39,7 @@ export const baldhill = {
       thumbSrc:
         "../assets/images/canada/jasper/maligne/thumbnail1280/thumbnail1280-4679.jpg",
       ratio: 1.3333,
-      detailedDescription: "",
+      detailedDescription: "A fluffy Canada Jay",
     },
     {
       src: `../assets/images/canada/jasper/maligne/avif/avif-4677.avif`,

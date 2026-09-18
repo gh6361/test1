@@ -26,7 +26,11 @@ export const maligne = {
       thumbSrc:
         "../assets/images/canada/jasper/maligne/thumbnail1280/thumbnail1280-4613.jpg",
       ratio: 0.75,
-      detailedDescription: "",
+      detailedDescription: "At 22 km long, Maligne Lake is the largest \
+      natural lake in the Canadian Rockies. The Maligne Valley is \
+      a classic example of a glaciated U-shaped valley, the result of \
+      enormous glaciers scouring and deepening the valley floor as it \
+      flowed down the valley during the last ice age.",
     },
     {
       src: `../assets/images/canada/jasper/maligne/avif/avif-4499.avif`,
@@ -37,7 +41,7 @@ export const maligne = {
       thumbSrc:
         "../assets/images/canada/jasper/maligne/thumbnail1280/thumbnail1280-4499.jpg",
       ratio: 0.5625,
-      detailedDescription: "",
+      detailedDescription: "A Canada Jay",
     },
     
   ],

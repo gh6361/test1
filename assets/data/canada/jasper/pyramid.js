@@ -14,7 +14,10 @@ export const pyramid = {
       thumbSrc:
         "../assets/images/canada/jasper/pyramid/thumbnail1280/thumbnail1280-4550.jpg",
       ratio: 1.5006,
-      detailedDescription: "",
+      detailedDescription: "Named after the mountain it sits beneath, Pyramid \
+      Mountain (due to its distinctive pyramid-like profile), Pyramid Lake is a \
+      'finger-lake', created when the moving ice carved elongated depressions \
+      into the landscape.",
     },
     {
       src: `../assets/images/canada/jasper/pyramid/avif/avif-4554.avif`,
@@ -25,7 +28,7 @@ export const pyramid = {
       thumbSrc:
         "../assets/images/canada/jasper/pyramid/thumbnail1280/thumbnail1280-4554.jpg",
       ratio: 1.5006,
-      detailedDescription: "",
+      detailedDescription: "A short wooden footbridge leading to Pyramid Island",
     },
   ],
 };

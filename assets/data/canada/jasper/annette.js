@@ -14,7 +14,11 @@ export const annette = {
       thumbSrc:
         "../assets/images/canada/jasper/annette/thumbnail1280/thumbnail1280-4410.jpg",
       ratio: 1.5006,
-      detailedDescription: "",
+      detailedDescription: "Lake Edith and Lake Annette are pothole lakes, \
+      formed when chunks of glacier ice broke off and became buried \
+      beneath gravel and sediment, later melting and leaving depressions \
+      in the ground. Enormous glaciers occupied the Athabasca Valley during \
+      the last ice age.",
     },
     {
       src: `../assets/images/canada/jasper/annette/avif/avif-4705.avif`,

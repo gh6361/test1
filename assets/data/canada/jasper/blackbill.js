@@ -14,7 +14,7 @@ export const blackbill = {
       thumbSrc:
         "../assets/images/canada/jasper/other/thumbnail1280/thumbnail1280-.jpg",
       ratio: 0.75,
-      detailedDescription: "",
+      detailedDescription: "'ka-ka-ka!'",
     },
   ],
 };
