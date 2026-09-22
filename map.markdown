@@ -83,4 +83,4 @@ header: solid
 <script>
   window.siteBaseUrl = "{{ site.baseurl }}";
 </script>
-<script type="module" src="{{ '/assets/js/map.js' | relative_url }}?v=20"></script>
+<script type="module" src="{{ '/assets/js/map.js' | relative_url }}?v=21"></script>

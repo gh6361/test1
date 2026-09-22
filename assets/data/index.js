@@ -1,6 +1,11 @@
 // data/index.js
 
 // 1. Import all your individual cities
+import { teanau } from './NZ/teanau.js';
+import { mccracken } from './NZ/mccracken.js';
+import { milford } from './NZ/milford.js';
+import { keysummit } from './NZ/keysummit.js';
+import { bluecliffs } from './NZ/bluecliffs.js';
 import { elkisland } from './canada/elkisland.js';
 import { blackbill } from './canada/jasper/blackbill.js';
 import { yellowhead } from './canada/jasper/yellowhead.js';
@@ -34,6 +39,11 @@ import { swing } from './finland/swing.js'
 
 // 2. Export them as one combined array for your map to use
 export const locations = [
+  teanau,
+  mccracken,
+  milford,
+  keysummit,
+  bluecliffs,
   elkisland,
   blackbill,
   yellowhead,

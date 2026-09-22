@@ -22,7 +22,7 @@ def generate_js_data(target_dir):
             continue
 
         base_name = os.path.splitext(filename)[0]
-        # FIX: Safely remove the prefix instead of splitting by hyphens
+        # Safely remove the prefix instead of splitting by hyphens
         file_id = base_name.replace("thumbnail1280-", "")
 
         file_path = os.path.join(thumb1280_dir, filename)
