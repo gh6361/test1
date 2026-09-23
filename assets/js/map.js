@@ -1,5 +1,5 @@
 // Import the combined locations array from your hub file
-import { locations } from "../data/index.js?v=fix1";
+import { locations } from "../data/index.js";
 
 const DEFAULT_RATIO = 1.5;
 const SIDEBAR_SIZES = "(max-width: 1050px) 100vw, 30vw";

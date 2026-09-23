@@ -6,6 +6,17 @@ export const milford = {
   mode: "stacked",
   images: [
     {
+      src: `../assets/images/NZ/aroundQT/avif/avif-143839.avif`,
+      thumb400:
+        "../assets/images/NZ/aroundQT/thumbnail400/thumbnail400-143839.jpg",
+      thumb800:
+        "../assets/images/NZ/aroundQT/thumbnail800/thumbnail800-143839.jpg",
+      thumbSrc:
+        "../assets/images/NZ/aroundQT/thumbnail1280/thumbnail1280-143839.jpg",
+      ratio: 1.3333,
+      detailedDescription: "",
+    },
+    {
       src: `../assets/images/NZ/aroundQT/avif/avif-3594.avif`,
       thumb400:
         "../assets/images/NZ/aroundQT/thumbnail400/thumbnail400-3594.jpg",
@@ -28,27 +39,6 @@ export const milford = {
       detailedDescription: "",
     },
     {
-      src: `../assets/images/NZ/aroundQT/avif/avif-143839.avif`,
-      thumb400:
-        "../assets/images/NZ/aroundQT/thumbnail400/thumbnail400-143839.jpg",
-      thumb800:
-        "../assets/images/NZ/aroundQT/thumbnail800/thumbnail800-143839.jpg",
-      thumbSrc:
-        "../assets/images/NZ/aroundQT/thumbnail1280/thumbnail1280-143839.jpg",
-      ratio: 1.3333,
-      detailedDescription: "",
-    },
-    {
-      src: `../assets/images/NZ/aroundQT/avif/avif-3.avif`,
-      thumb400: "../assets/images/NZ/aroundQT/thumbnail400/thumbnail400-3.jpg",
-      thumb800: "../assets/images/NZ/aroundQT/thumbnail800/thumbnail800-3.jpg",
-      thumbSrc:
-        "../assets/images/NZ/aroundQT/thumbnail1280/thumbnail1280-3.jpg",
-      ratio: 1.7778,
-      detailedDescription: "",
-    },
-
-    {
       src: `../assets/images/NZ/aroundQT/avif/avif-211129.avif`,
       thumb400:
         "../assets/images/NZ/aroundQT/thumbnail400/thumbnail400-211129.jpg",
@@ -57,6 +47,16 @@ export const milford = {
       thumbSrc:
         "../assets/images/NZ/aroundQT/thumbnail1280/thumbnail1280-211129.jpg",
       ratio: 1.5006,
+      detailedDescription: "",
+    },
+
+    {
+      src: `../assets/images/NZ/aroundQT/avif/avif-3.avif`,
+      thumb400: "../assets/images/NZ/aroundQT/thumbnail400/thumbnail400-3.jpg",
+      thumb800: "../assets/images/NZ/aroundQT/thumbnail800/thumbnail800-3.jpg",
+      thumbSrc:
+        "../assets/images/NZ/aroundQT/thumbnail1280/thumbnail1280-3.jpg",
+      ratio: 1.7778,
       detailedDescription: "",
     },
   ],

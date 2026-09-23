@@ -47,16 +47,5 @@ export const keysummit = {
       ratio: 1.7778,
       detailedDescription: "",
     },
-    {
-      src: `../assets/images/NZ/aroundQT/avif/avif-190238.avif`,
-      thumb400:
-        "../assets/images/NZ/aroundQT/thumbnail400/thumbnail400-190238.jpg",
-      thumb800:
-        "../assets/images/NZ/aroundQT/thumbnail800/thumbnail800-190238.jpg",
-      thumbSrc:
-        "../assets/images/NZ/aroundQT/thumbnail1280/thumbnail1280-190238.jpg",
-      ratio: 1.4988,
-      detailedDescription: "",
-    },
   ],
 };

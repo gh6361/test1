@@ -6,6 +6,17 @@ export const mccracken = {
   mode: "stacked",
   images: [
     {
+      src: `../assets/images/NZ/aroundQT/avif/avif-203759.avif`,
+      thumb400:
+        "../assets/images/NZ/aroundQT/thumbnail400/thumbnail400-203759.jpg",
+      thumb800:
+        "../assets/images/NZ/aroundQT/thumbnail800/thumbnail800-203759.jpg",
+      thumbSrc:
+        "../assets/images/NZ/aroundQT/thumbnail1280/thumbnail1280-203759.jpg",
+      ratio: 1.5006,
+      detailedDescription: "",
+    },
+    {
       src: `../assets/images/NZ/aroundQT/avif/avif-143303.avif`,
       thumb400:
         "../assets/images/NZ/aroundQT/thumbnail400/thumbnail400-143303.jpg",

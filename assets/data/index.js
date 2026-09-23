@@ -1,6 +1,9 @@
 // data/index.js
 
 // 1. Import all your individual cities
+import { mirrorlakes } from './NZ/mirrorlakes.js';
+import { manapouri } from './NZ/manapouri.js';
+import { queenstown } from './NZ/queenstown.js';
 import { wakatipu } from './NZ/wakatipu.js';
 import { teanau } from './NZ/teanau.js';
 import { mccracken } from './NZ/mccracken.js';
@@ -40,6 +43,9 @@ import { swing } from './finland/swing.js'
 
 // 2. Export them as one combined array for your map to use
 export const locations = [
+  mirrorlakes,
+  manapouri,
+  queenstown,
   wakatipu,
   teanau,
   mccracken,
