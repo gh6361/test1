@@ -80,6 +80,7 @@ header: solid
 
 </div>
 
+
 <script>
   window.siteBaseUrl = "{{ site.baseurl }}";
 </script>
