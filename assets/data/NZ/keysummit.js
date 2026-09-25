@@ -1,5 +1,5 @@
 export const keysummit = {
-  name: "Key Summit Trail: Southland, N.Z.",
+  name: "Key Summit Track: Fiordland National Park, N.Z.",
   country: "New Zealand",
   state: "",
   coords: [-44.81419924546447, 168.12829221020982],
@@ -14,7 +14,9 @@ export const keysummit = {
       thumbSrc:
         "../assets/images/NZ/aroundQT/thumbnail1280/thumbnail1280-3751.jpg",
       ratio: 1.5006,
-      detailedDescription: "",
+      detailedDescription: "The Key Summit is part of the Routeburn Track, \
+      a 33 km Great Walk normally done over several days. The walk offers \
+      spectacular views of Fiordland National Park &mdash; on a clear day!",
     },
     {
       src: `../assets/images/NZ/aroundQT/avif/avif-3764.avif`,

@@ -1,5 +1,5 @@
 export const mirrorlakes = {
-  name: "Mirror Lakes: Southland, N.Z.",
+  name: "Mirror Lakes: Fiordland National Park, N.Z.",
   country: "New Zealand",
   state: "",
   coords: [-45.02854683991737, 168.01114668408536],

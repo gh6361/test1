@@ -14,7 +14,11 @@ export const milford = {
       thumbSrc:
         "../assets/images/NZ/aroundQT/thumbnail1280/thumbnail1280-143839.jpg",
       ratio: 1.3333,
-      detailedDescription: "",
+      detailedDescription: "Milford Sound is one of the 14 fjords in Fiordland \
+      National Park. Although not the longest (at 16 km) nor the deepest (up to 265 m) \
+      of the fjords, its fame comes more from its accessibility and stunning \
+      combination of steep mountains (including the famous Mitre Peak), waterfalls, \
+      rainforest and unusual marine ecology.",
     },
     {
       src: `../assets/images/NZ/aroundQT/avif/avif-3594.avif`,

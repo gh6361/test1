@@ -14,7 +14,7 @@ export const bluecliffs = {
       thumbSrc:
         "../assets/images/NZ/aroundQT/thumbnail1280/thumbnail1280-3540.jpg",
       ratio: 1.5006,
-      detailedDescription: "",
+      detailedDescription: "Very remote, loads of space, lovely views.",
     },
   ],
 };

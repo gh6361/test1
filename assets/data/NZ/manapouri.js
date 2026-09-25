@@ -14,7 +14,9 @@ export const manapouri = {
       thumbSrc:
         "../assets/images/NZ/aroundQT/thumbnail1280/thumbnail1280-184224.jpg",
       ratio: 1.3333,
-      detailedDescription: "",
+      detailedDescription: "Looking out towards Lake Manapouri from above \
+      Frasers Beach. Manapouri is small town sat right \
+      beside Fiordland National Park.",
     },
     {
       src: `../assets/images/NZ/aroundQT/avif/avif-221915.avif`,
@@ -25,7 +27,7 @@ export const manapouri = {
       thumbSrc:
         "../assets/images/NZ/aroundQT/thumbnail1280/thumbnail1280-221915.jpg",
       ratio: 1.5006,
-      detailedDescription: "",
+      detailedDescription: "Pearl Harbour, a river port.",
     },
   ],
 };

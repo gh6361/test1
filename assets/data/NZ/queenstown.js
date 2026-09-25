@@ -14,7 +14,8 @@ export const queenstown = {
       thumbSrc:
         "../assets/images/NZ/aroundQT/thumbnail1280/thumbnail1280-3831.jpg",
       ratio: 1.5006,
-      detailedDescription: "",
+      detailedDescription: "The view from Queenstown Hill, overlooking the city \
+      and Lake Wakatipu below.",
     },
     {
       src: `../assets/images/NZ/aroundQT/avif/avif-195434.avif`,
@@ -25,7 +26,7 @@ export const queenstown = {
       thumbSrc:
         "../assets/images/NZ/aroundQT/thumbnail1280/thumbnail1280-195434.jpg",
       ratio: 0.75,
-      detailedDescription: "",
+      detailedDescription: "From the sky...",
     },
     {
       src: `../assets/images/NZ/aroundQT/avif/avif-3821.avif`,
@@ -36,7 +37,13 @@ export const queenstown = {
       thumbSrc:
         "../assets/images/NZ/aroundQT/thumbnail1280/thumbnail1280-3821.jpg",
       ratio: 1.5006,
-      detailedDescription: "",
+      detailedDescription: "The conifers in this photo are actually an \
+      invasive (unwanted!) species. Conifers were introduced to New Zealand \
+      in the 1800s but have since spread from forests, shelterbelts and \
+      erosion plantings. Their seeds can travel kilometres downwind and \
+      grow easily. Left unchecked, these 'wilding conifers' will form dense \
+      forests that have environmental consequences on the native ecosystems, \
+      use up scarce water, and alter iconic landscapes.",
     },
     
   ],

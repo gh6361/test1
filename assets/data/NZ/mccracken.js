@@ -14,7 +14,9 @@ export const mccracken = {
       thumbSrc:
         "../assets/images/NZ/aroundQT/thumbnail1280/thumbnail1280-203759.jpg",
       ratio: 1.5006,
-      detailedDescription: "",
+      detailedDescription: "McCracken's Rest is a lookout and rest area along \
+      New Zealand's Southern Scenic Route. It is named after the landowners, \
+      Robert and David McCracken.",
     },
     {
       src: `../assets/images/NZ/aroundQT/avif/avif-143303.avif`,
