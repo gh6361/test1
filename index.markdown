@@ -70,7 +70,7 @@ full_width: true
   <div id="featured-editorial" style="max-width: 1000px; margin: 0 auto; padding: 0 2rem 6rem 2rem;">
   
   <!-- Centered, sans-serif "FEATURED" heading without the bottom line -->
-  <h2 style="font-family: var(--font-sans) !important; font-weight: 600; font-size: 2rem; letter-spacing: 0.05em; text-align: center; margin-top: 1rem; margin-bottom: 2rem; color: #1c1c1c;">FEATURED</h2>
+  <h2 style="font-family: var(--font-sans) !important; font-weight: 700 !important; font-size: 2rem; letter-spacing: 0.05em; text-align: center; margin-top: 1rem; margin-bottom: 2rem; color: #1c1c1c;">FEATURED</h2>
 
   <!-- Increased height to 700px, added white background and a subtle border -->
   <div style="position: relative; width: 100%; height: 700px; background: #ffffff; border: 1px solid #e5e5e5; overflow: hidden;">

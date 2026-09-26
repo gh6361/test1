@@ -393,7 +393,56 @@ function init() {
     const sortedCountries = Object.keys(groupedLocations).sort((a, b) =>
       a.localeCompare(b),
     );
+
+    // 1. Determine which starting letters are active
+    const activeLetters = new Set();
+    sortedCountries.forEach((country) => {
+      const displayCountry =
+        country.toUpperCase() === "UNITED STATES" ||
+        country.toUpperCase() === "U.S."
+          ? "UNITED STATES"
+          : country;
+      activeLetters.add(displayCountry.charAt(0).toUpperCase());
+    });
+
+    // 2. Generate the A-Z Alphabet Navigation HTML using the display font
+    const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
+    let alphabetHtml = `
+      <style>
+        .alphabet-link {
+          color: #1c1c1c;
+          text-decoration: underline !important;
+          text-underline-offset: 4px;
+          border: none !important; 
+          box-shadow: none !important; 
+          transition: color 0.2s ease;
+          cursor: pointer;
+          font-family: var(--font-display), serif !important; /* Using DM Serif Display */
+          font-weight: normal !important; /* Critical: DM Serif only supports 400 weight */
+        }
+        .alphabet-link:hover {
+          color: #888888 !important;
+        }
+        .alphabet-inactive {
+          color: #d3d3d3;
+          font-family: var(--font-display), serif !important; /* Using DM Serif Display */
+          font-weight: normal !important;
+        }
+      </style>
+      <div style="display: flex; flex-wrap: wrap; gap: 12px; font-size: 1.35rem; margin-bottom: 0.5rem; font-family: var(--font-display), serif; font-weight: normal;">
+    `;
+
+    alphabet.forEach((letter) => {
+      if (activeLetters.has(letter)) {
+        alphabetHtml += `<a href="#" class="alphabet-link" onclick="event.preventDefault(); document.getElementById('letter-${letter}').scrollIntoView({ behavior: 'smooth', block: 'start' });">${letter}</a>`;
+      } else {
+        alphabetHtml += `<span class="alphabet-inactive">${letter}</span>`;
+      }
+    });
+    alphabetHtml += "</div>";
+
     const htmlParts = [];
+    let currentLetter = "";
 
     sortedCountries.forEach((country) => {
       const displayCountry =
@@ -401,8 +450,17 @@ function init() {
         country.toUpperCase() === "U.S."
           ? "UNITED STATES"
           : country;
+
+      // 3. Assign an ID to the first country of each letter for the scroll target
+      const startingLetter = displayCountry.charAt(0).toUpperCase();
+      let idAttr = "";
+      if (startingLetter !== currentLetter) {
+        idAttr = `id="letter-${startingLetter}"`;
+        currentLetter = startingLetter;
+      }
+
       htmlParts.push(`
-        <li>
+        <li ${idAttr} style="scroll-margin-top: 27px;">
           <div style="font-family: var(--font-sans); font-size: 0.75rem; color: var(--text-body); text-transform: uppercase; letter-spacing: 0.15em; margin: 0.9rem 0 1.1rem 0; line-height: 1.2;">
             ${displayCountry}
           </div>
@@ -434,7 +492,6 @@ function init() {
         }
 
         groupedLocations[country][state].forEach((item) => {
-          // Exactly matching your original <li> typography
           htmlParts.push(
             `<li class="sidebar-loc-link" data-index="${item.originalIndex}" style="font-size: 1rem; color: #1c1c1c; cursor: pointer;">${item.displayName}</li>`,
           );
@@ -444,10 +501,11 @@ function init() {
       htmlParts.push(`</li>`);
     });
 
+    // 4. Inject the HTML
     panel.innerHTML = `
       <div style="padding: 0;"> 
         <div style="text-align: left; margin-top: 1rem; margin-bottom: 0.5rem;">
-          <h2 style="margin: 0; color: #1c1c1c; font-weight: 600 !important; white-space: normal; font-size: 1.9rem; line-height: 1.1;">Index</h2>
+          ${alphabetHtml}
           <div style="border-bottom: 1px solid #e2e0d8; margin-top: 1.2rem; margin-bottom: 1.5rem;"></div>
         </div>
         <ul style="list-style-type: none; padding-left: 0; margin: 0;">
@@ -457,12 +515,25 @@ function init() {
     `;
   }
 
+  // Flag to track if the user has clicked the "ALL LOCATIONS" button
+  let hasClickedAllLocations = false;
+
   // OPT: Add panel click event globally ONCE
   panel.addEventListener("click", (e) => {
     const link = e.target.closest(".sidebar-loc-link");
     if (!link || !panel.contains(link)) return;
 
     const idx = parseInt(link.dataset.index, 10);
+
+    // If the index was loaded via the "ALL LOCATIONS" button, bypass animation and redirect
+    if (hasClickedAllLocations) {
+      const url = new URL(window.location.href);
+      url.searchParams.set("loc", idx);
+      window.location.href = url.toString();
+      return;
+    }
+
+    // OTHERWISE (default page load), use the original flyTo animation logic
     const targetMarker = locations[idx].markerInstance;
 
     if (targetMarker) {
@@ -575,16 +646,41 @@ function init() {
       subTitle = parts[1].trim();
     }
 
-    // Exactly matching your original title styling typography
+    // Exactly matching your original title styling typography, plus the borderless button
     panel.innerHTML = `
-      <div id="sidebar-content-wrapper" style="padding: 0; margin: 0 auto; width: 100%; transition: max-width 0.3s ease; box-sizing: border-box;"> 
-        <div style="text-align: left; margin-top: 1rem; margin-bottom: 0.5rem;">
+      <style>
+        #btn-all-locations {
+          transition: color 0.2s ease;
+        }
+        #btn-all-locations:hover {
+          color: #888888 !important; /* Makes the text a lighter grey on hover */
+        }
+      </style>
+      
+      <div id="sidebar-content-wrapper" style="padding: 0; margin: 0 auto; width: 100%; transition: max-width 0.3s ease; box-sizing: border-box; position: relative;"> 
+        
+        <!-- ALL LOCATIONS BUTTON (No border/bg, negative top position to pull it up higher) -->
+        <button id="btn-all-locations" style="position: absolute; top: -0.7rem; right: 0; font-family: var(--font-sans); font-size: 0.65rem; color: #1c1c1c; text-transform: uppercase; letter-spacing: 0.1em; background: transparent; border: none; padding: 0; cursor: pointer; z-index: 10;">ALL LOCATIONS</button>
+
+        <!-- Title wrapper (Padding protects the text from overlapping the button) -->
+        <div style="text-align: left; margin-top: 1rem; margin-bottom: 0.5rem; padding-right: 100px;">
           <h2 style="margin: 0; color: #1c1c1c; font-weight: 600 !important; white-space: normal; font-size: 1.9rem; line-height: 1.1;">${mainTitle}</h2>
           ${subTitle ? `<div style="font-family: var(--font-sans); font-size: 0.75rem; color: var(--text-body); text-transform: uppercase; letter-spacing: 0.15em; margin: 0.9rem 0 1.9rem 0; line-height: 1.2;">${subTitle}</div>` : ""}
         </div>
+        
         <div id="sidebar-dynamic-gallery" style="display: flex; flex-direction: column; gap: 9px; margin-top: 1rem; margin-bottom: 2rem;"></div>
       </div>
     `;
+
+    // Attach listener to reload the index and set the bypass flag
+    const btnAllLocations = panel.querySelector("#btn-all-locations");
+    if (btnAllLocations) {
+      btnAllLocations.addEventListener("click", (e) => {
+        e.preventDefault();
+        hasClickedAllLocations = true; // Tell the click listener to use the URL redirect from now on
+        renderDefaultPanel(); // Reloads the index view without moving the map
+      });
+    }
 
     const galleryContainer = panel.querySelector("#sidebar-dynamic-gallery");
 

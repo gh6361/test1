@@ -64,7 +64,7 @@ export const elkisland = {
       thumbSrc:
         "../assets/images/canada/jasper/elkisland/thumbnail1280/thumbnail1280-4765.jpg",
       ratio: 1.5006,
-      detailedDescription: "Hm looks like somewhere was here...",
+      detailedDescription: "Hm looks like someone was here...",
     },
   ],
 };
