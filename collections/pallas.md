@@ -1,0 +1,84 @@
+---
+layout: collection
+permalink: /collections/pallas-yllastunturi/
+title: Pallas-Yllästunturi National Park
+description: Exploring the capital and the Arctic Circle.
+meta_details:
+  - FINLAND x GLEDA HO
+  - HELSINKI TO LAPLAND
+  - AUGUST 2026
+images:
+  - src: './assets/images/finland/pallas_palkaskero/avif/avif-6268.avif'
+    thumb400: './assets/images/finland/pallas_palkaskero/thumbnail400/thumbnail400-6268.jpg'
+    thumb800: './assets/images/finland/pallas_palkaskero/thumbnail800/thumbnail800-6268.jpg'
+    thumbSrc: './assets/images/finland/pallas_palkaskero/thumbnail1280/thumbnail1280-6268.jpg'
+    ratio: 1.5
+    detailedDescription: "The Palkaskero Fell can be reached by the Palkaskeron \
+      kierros Trail, a 6.1 km circle trail. The rocky fell summit lies around 700 m \
+      above sea level."
+  - src: './assets/images/finland/pallas_palkaskero/avif/avif-6204.avif'
+    thumb400: './assets/images/finland/pallas_palkaskero/thumbnail400/thumbnail400-6204.jpg'
+    thumb800: './assets/images/finland/pallas_palkaskero/thumbnail800/thumbnail800-6204.jpg'
+    thumbSrc: './assets/images/finland/pallas_palkaskero/thumbnail1280/thumbnail1280-6204.jpg'
+    ratio: 1.33
+    detailedDescription: "Well, hello there!"
+  - src: './assets/images/finland/pallas_palkaskero/avif/avif-6198.avif'
+    thumb400: './assets/images/finland/pallas_palkaskero/thumbnail400/thumbnail400-6198.jpg'
+    thumb800: './assets/images/finland/pallas_palkaskero/thumbnail800/thumbnail800-6198.jpg'
+    thumbSrc: './assets/images/finland/pallas_palkaskero/thumbnail1280/thumbnail1280-6198.jpg'
+    ratio: 1.5
+    detailedDescription: "Pallas-Yllästunturi National Park contains reindeer husbandry \
+      areas. The reindeer are semi-domesticated and belong to their owners who \
+      work in these areas seasonally."
+  - src: './assets/images/finland/pallas_palkaskero/avif/avif-6189.avif'
+    thumb400: './assets/images/finland/pallas_palkaskero/thumbnail400/thumbnail400-6189.jpg'
+    thumb800: './assets/images/finland/pallas_palkaskero/thumbnail800/thumbnail800-6189.jpg'
+    thumbSrc: './assets/images/finland/pallas_palkaskero/thumbnail1280/thumbnail1280-6189.jpg'
+    ratio: 1.5
+    detailedDescription: ""
+  - src: './assets/images/finland/pallas_palkaskero/avif/avif-6229.avif'
+    thumb400: './assets/images/finland/pallas_palkaskero/thumbnail400/thumbnail400-6229.jpg'
+    thumb800: './assets/images/finland/pallas_palkaskero/thumbnail800/thumbnail800-6229.jpg'
+    thumbSrc: './assets/images/finland/pallas_palkaskero/thumbnail1280/thumbnail1280-6229.jpg'
+    ratio: 1.5
+    detailedDescription: ""
+  - src: './assets/images/finland/pallas_palkaskero/avif/avif-6239.avif'
+    thumb400: './assets/images/finland/pallas_palkaskero/thumbnail400/thumbnail400-6239.jpg'
+    thumb800: './assets/images/finland/pallas_palkaskero/thumbnail800/thumbnail800-6239.jpg'
+    thumbSrc: './assets/images/finland/pallas_palkaskero/thumbnail1280/thumbnail1280-6239.jpg'
+    ratio: 1.5
+    detailedDescription: ""
+  - src: './assets/images/finland/pallas_palkaskero/avif/avif-6244.avif'
+    thumb400: './assets/images/finland/pallas_palkaskero/thumbnail400/thumbnail400-6244.jpg'
+    thumb800: './assets/images/finland/pallas_palkaskero/thumbnail800/thumbnail800-6244.jpg'
+    thumbSrc: './assets/images/finland/pallas_palkaskero/thumbnail1280/thumbnail1280-6244.jpg'
+    ratio: 0.667
+    detailedDescription: ""
+  - src: './assets/images/finland/pallas_palkaskero/avif/avif-6248.avif'
+    thumb400: './assets/images/finland/pallas_palkaskero/thumbnail400/thumbnail400-6248.jpg'
+    thumb800: './assets/images/finland/pallas_palkaskero/thumbnail800/thumbnail800-6248.jpg'
+    thumbSrc: './assets/images/finland/pallas_palkaskero/thumbnail1280/thumbnail1280-6248.jpg'
+    ratio: 1.5
+    detailedDescription: ""
+
+  - src: './assets/images/finland/pallas_palkaskero/avif/avif-6235.avif'
+    thumb400: './assets/images/finland/pallas_palkaskero/thumbnail400/thumbnail400-6235.jpg'
+    thumb800: './assets/images/finland/pallas_palkaskero/thumbnail800/thumbnail800-6235.jpg'
+    thumbSrc: './assets/images/finland/pallas_palkaskero/thumbnail1280/thumbnail1280-6235.jpg'
+    ratio: 1.78
+    detailedDescription: "The entire hike is above the tree line, as above a certain \
+      elevation the conditions are too harsh for a normal forest to grow."
+  - src: './assets/images/finland/pallas_palkaskero/avif/avif-6280.avif'
+    thumb400: './assets/images/finland/pallas_palkaskero/thumbnail400/thumbnail400-6280.jpg'
+    thumb800: './assets/images/finland/pallas_palkaskero/thumbnail800/thumbnail800-6280.jpg'
+    thumbSrc: './assets/images/finland/pallas_palkaskero/thumbnail1280/thumbnail1280-6280.jpg'
+    ratio: 1.5
+    detailedDescription: "The descent from Palkaskero, overlooking Pallasjärvi Lake."
+  - src: './assets/images/finland/pallas_palkaskero/avif/avif-6292.avif'
+    thumb400: './assets/images/finland/pallas_palkaskero/thumbnail400/thumbnail400-6292.jpg'
+    thumb800: './assets/images/finland/pallas_palkaskero/thumbnail800/thumbnail800-6292.jpg'
+    thumbSrc: './assets/images/finland/pallas_palkaskero/thumbnail1280/thumbnail1280-6292.jpg'
+    ratio: 1.5
+    detailedDescription: ""
+
+---

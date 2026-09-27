@@ -23,6 +23,16 @@ layout: default
     {% endif %}
   </header>
 
+  <!-- CSS FOR HOVER TOOLTIPS -->
+  <style>
+    .col-dynamic-item { position: relative; overflow: hidden; cursor: zoom-in; }
+    .col-hover-tooltip { position: absolute; bottom: 0px; left: 0px; right: 0px; background: rgba(28, 28, 28, 0.75); color: #ffffff; padding: 8px 12px; font-family: var(--font-sans); font-size: 0.73rem; line-height: 1.4; opacity: 0; pointer-events: none; transform: translateY(4px); transition: opacity 0.2s ease, transform 0.2s ease; z-index: 10; text-align: left; }
+    .col-dynamic-item:hover .col-hover-tooltip { opacity: 1; transform: translateY(0); }
+    .tt-content { display: -webkit-box; -webkit-box-orient: vertical; overflow: hidden; -webkit-line-clamp: 6; }
+    /* Icon is now always visible */
+    .col-icon-overlay { position: absolute; top: 6px; right: 6px; background-color: rgba(0, 0, 0, 0.4); color: #ffffff; padding: 5px; border-radius: 2px; display: flex; align-items: center; justify-content: center; pointer-events: none; z-index: 10; }
+  </style>
+
   <!-- 2. DYNAMIC ALGORITHM GALLERY -->
   <div id="dynamic-gallery" style="display: flex; flex-direction: column; gap: 0.5rem;"></div>
 
@@ -66,12 +76,28 @@ layout: default
   document.addEventListener("DOMContentLoaded", () => {
     const container = document.getElementById('dynamic-gallery');
     const gap = 8; 
+    const DEFAULT_RATIO = 1.5;
+
+    function rafDebounce(fn) {
+      let scheduled = false;
+      return function (...args) {
+        if (scheduled) return;
+        scheduled = true;
+        requestAnimationFrame(() => {
+          scheduled = false;
+          fn.apply(this, args);
+        });
+      };
+    }
 
     // --- GATHER IMAGES & DATA ---
     const imagesData = [
       {% for image in page.images %}
         { 
-          src: "{{ image.src | relative_url }}", 
+          src: "{{ image.src | relative_url }}",
+          thumbSrc: {% if image.thumbSrc %}"{{ image.thumbSrc | relative_url }}"{% else %}"{{ image.src | relative_url }}"{% endif %},
+          thumb400: {% if image.thumb400 %}"{{ image.thumb400 | relative_url }}"{% else %}null{% endif %},
+          ratio: {% if image.ratio %}{{ image.ratio }}{% else %}null{% endif %},
           origIdx: {{ forloop.index0 }},
           detailedDescription: {{ image.detailedDescription | default: "" | jsonify }}
         }{% unless forloop.last %},{% endunless %}
@@ -79,173 +105,257 @@ layout: default
     ];
 
     // --- LIGHTBOX LOGIC ---
-    const colOverlay = document.getElementById("lightbox");
-    const colImgA = document.getElementById("lightbox-image-a");
-    const colImgB = document.getElementById("lightbox-image-b");
-    const colCaption = document.getElementById("lightbox-caption");
-    const descWrapper = document.querySelector(".lightbox-desc-wrapper");
-    const centerGroup = document.querySelector(".lightbox-center-group");
+    const galOverlay = document.getElementById("lightbox");
+    const galImageA = document.getElementById("lightbox-image-a");
+    const galImageB = document.getElementById("lightbox-image-b");
+    const galClose = document.getElementById("lightbox-close");
+    const galPrev = document.getElementById("lightbox-prev");
+    const galNext = document.getElementById("lightbox-next");
+    const galCaption = document.getElementById("lightbox-caption");
+
+    const lightboxDescWrapper = document.querySelector(".lightbox-desc-wrapper");
+    const lightboxCenterGroup = document.querySelector(".lightbox-center-group");
+    const siteNavEl = document.querySelector("header");
+    let lightboxCounterEl = document.getElementById("lightbox-global-counter");
     const thumbContainer = document.getElementById("lightbox-thumbnails");
-    
-    let colCurrentIdx = 0;
-    let colActiveImg = colImgA;
-    let colInactiveImg = colImgB;
+
+    const imageRatioCache = new Map();
+
+    let galCurrentIndex = 0;
+    let galActive = galImageA;
+    let galInactive = galImageB;
+    let galleryTopGapLock = null;
+    let galRenderToken = 0;
+
+    function swapGalImages() {
+      [galActive, galInactive] = [galInactive, galActive];
+    }
 
     function alignCaptionToImageTop() {
-      if (imagesData.length <= 1) {
-        if (descWrapper) descWrapper.style.marginTop = "0px";
+      if (!lightboxDescWrapper) return;
+      if (
+        lightboxDescWrapper.classList.contains("caption-collapsed") ||
+        imagesData.length <= 1
+      ) {
+        lightboxDescWrapper.style.marginTop = "0px";
+        return;
+      }
+      if (galleryTopGapLock !== null) {
+        lightboxDescWrapper.style.marginTop = `${galleryTopGapLock}px`;
         return;
       }
 
-      if (!descWrapper || !centerGroup || !colInactiveImg || colInactiveImg.naturalHeight === 0) return;
-      
-      const groupHeight = centerGroup.getBoundingClientRect().height;
-      const computed = window.getComputedStyle(colInactiveImg);
-      const maxHeight = parseFloat(computed.maxHeight) || window.innerHeight;
-      const maxWidth = parseFloat(computed.maxWidth) || window.innerWidth;
+      const windowW = window.innerWidth;
+      const windowH = window.innerHeight;
+      const maxW = windowW * 0.764 - 140;
+      const maxH = windowH - 270;
+      let shortestRenderedHeight = maxH;
 
-      let minRenderedHeight = maxHeight;
-
-      imagesData.forEach((imgData) => {
-        const tempImg = new Image();
-        tempImg.src = imgData.src;
-
-        if (tempImg.naturalHeight > 0) {
-          const ratio = tempImg.naturalWidth / tempImg.naturalHeight;
-          const containerRatio = maxWidth / maxHeight;
-          let renderedHeight = maxHeight;
-          if (ratio > containerRatio) {
-            renderedHeight = maxWidth / ratio; 
+      imagesData.forEach((imgObj) => {
+        let ratio = imgObj.ratio || imageRatioCache.get(imgObj.src);
+        if (ratio === undefined || ratio === null) {
+          const liveEl = document.querySelector(`#lightbox img[src="${imgObj.src}"]`);
+          if (liveEl && liveEl.complete && liveEl.naturalHeight > 0) {
+            ratio = liveEl.naturalWidth / liveEl.naturalHeight;
+            imageRatioCache.set(imgObj.src, ratio);
+          } else {
+            ratio = DEFAULT_RATIO;
           }
-          if (renderedHeight < minRenderedHeight) {
-            minRenderedHeight = renderedHeight;
-          }
+        }
+        if (ratio) {
+          const renderedHeight = Math.min(maxH, maxW / ratio);
+          if (renderedHeight < shortestRenderedHeight)
+            shortestRenderedHeight = renderedHeight;
         }
       });
 
-      let marginNeeded = (groupHeight - minRenderedHeight) / 2;
-      if (marginNeeded < 0) marginNeeded = 0;
-      descWrapper.style.marginTop = `${marginNeeded}px`;
+      galleryTopGapLock = (windowH - shortestRenderedHeight) / 2 + windowH * 0.01;
+      lightboxDescWrapper.style.marginTop = `${Math.max(0, galleryTopGapLock)}px`;
     }
 
-    window.addEventListener("resize", alignCaptionToImageTop);
+    window.addEventListener(
+      "resize",
+      rafDebounce(() => {
+        galleryTopGapLock = null;
+        alignCaptionToImageTop();
+      })
+    );
+
+    function preloadAdjacentImages() {
+      if (imagesData.length <= 1) return;
+      const nextIdx = (galCurrentIndex + 1) % imagesData.length;
+      const prevIdx = (galCurrentIndex - 1 + imagesData.length) % imagesData.length;
+      
+      const preNext = new Image();
+      preNext.src = imagesData[nextIdx].src;
+      
+      const prePrev = new Image();
+      prePrev.src = imagesData[prevIdx].src; 
+    }
 
     function renderCollectionImage(index) {
-      if (imagesData.length === 0) return;
-      colCurrentIdx = (index + imagesData.length) % imagesData.length;
-      const imgData = imagesData[colCurrentIdx];
+      if (imagesData.length === 0 || !galInactive || !galActive) return;
+      galCurrentIndex = (index + imagesData.length) % imagesData.length;
+      const image = imagesData[galCurrentIndex];
+      const myToken = ++galRenderToken;
 
-      [colActiveImg, colInactiveImg] = [colInactiveImg, colActiveImg];
-      colInactiveImg.src = imgData.src;
-      
-      if (colCaption) {
-        let indexHtml = `<div class="caption-index" style="font-size: 0.75rem; letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 0.5rem; color: #999;">${colCurrentIdx + 1} / ${imagesData.length}</div>`;
-        
-        colCaption.innerHTML = `
-          ${indexHtml}
-          ${imgData.detailedDescription ? `<div class="caption-details">${imgData.detailedDescription}</div>` : ""}
-        `;
+      function revealCurrent() {
+        if (!lightboxCounterEl && galOverlay) {
+          lightboxCounterEl = document.createElement("div");
+          lightboxCounterEl.id = "lightbox-global-counter";
+          galOverlay.appendChild(lightboxCounterEl);
+        }
+
+        if (imagesData.length <= 1) {
+          if (lightboxDescWrapper) lightboxDescWrapper.style.display = "none";
+          if (lightboxCounterEl) lightboxCounterEl.style.display = "none";
+          if (galCaption) galCaption.innerHTML = "";
+        } else {
+          if (lightboxDescWrapper) lightboxDescWrapper.style.display = "";
+          if (lightboxCounterEl) {
+            lightboxCounterEl.style.display = "block";
+            lightboxCounterEl.innerHTML = `${galCurrentIndex + 1} / ${imagesData.length}`;
+          }
+
+          const hasDesc = !!image.detailedDescription;
+
+          if (!hasDesc) {
+            lightboxDescWrapper?.classList.add("caption-collapsed");
+            lightboxCenterGroup?.classList.add("no-caption");
+            if (galCaption) galCaption.innerHTML = "";
+          } else {
+            lightboxDescWrapper?.classList.remove("caption-collapsed");
+            lightboxCenterGroup?.classList.remove("no-caption");
+            if (galCaption) {
+              galCaption.innerHTML = `
+                ${hasDesc ? `<div class="caption-details">${image.detailedDescription}</div>` : ""}
+              `;
+            }
+          }
+        }
+
+        galOverlay.classList.remove("hidden");
+        requestAnimationFrame(() => {
+          galActive.classList.remove("active");
+          galInactive.classList.add("active");
+          swapGalImages();
+
+          const activeThumb = document.querySelector(".lb-thumb.active");
+          if (activeThumb) activeThumb.classList.remove("active");
+          const newThumb = document.querySelector(`.lb-thumb[data-index="${galCurrentIndex}"]`);
+          if (newThumb) newThumb.classList.add("active");
+
+          setTimeout(alignCaptionToImageTop, 50);
+          preloadAdjacentImages();
+        });
       }
 
-      requestAnimationFrame(() => {
-        colActiveImg.classList.remove("active");
-        colInactiveImg.classList.add("active");
-
-        if (thumbContainer) {
-          const thumbs = thumbContainer.querySelectorAll(".lb-thumb");
-          thumbs.forEach((t) => t.classList.remove("active"));
-          const activeThumb = thumbContainer.querySelector(`.lb-thumb[data-index="${colCurrentIdx}"]`);
-          if (activeThumb) activeThumb.classList.add("active");
+      galInactive.onload = () => {
+        if (myToken === galRenderToken) revealCurrent();
+      };
+      galInactive.onerror = () => {
+        if (myToken === galRenderToken) {
+          galInactive.alt = "Image unavailable";
+          revealCurrent();
         }
+      };
 
-        const triggerAlignment = () => {
-          setTimeout(alignCaptionToImageTop, 50);
-        };
+      galInactive.removeAttribute("src");
+      galInactive.decoding = "async";
+      galInactive.fetchPriority = "high";
+      galInactive.alt = image.detailedDescription || `Image ${galCurrentIndex + 1}`;
+      
+      galInactive.src = image.src;
+    }
 
-        if (colInactiveImg.complete && colInactiveImg.naturalHeight > 0) {
-          triggerAlignment();
-        } else {
-          colInactiveImg.onload = triggerAlignment;
-        }
+    if (thumbContainer) {
+      thumbContainer.addEventListener("click", (e) => {
+        const thumbEl = e.target.closest(".lb-thumb");
+        if (!thumbEl) return;
+        const clickedIdx = parseInt(thumbEl.dataset.index, 10);
+        renderCollectionImage(clickedIdx);
       });
     }
 
     window.openCollectionLightbox = function(index) {
-      if (!colOverlay) return;
+      if (!galOverlay) return;
       
-      const siteNav = document.querySelector(".editorial-header");
-      if (siteNav) siteNav.style.display = "none";
+      if (siteNavEl) siteNavEl.style.display = "none";
 
       if (imagesData.length <= 1) {
-        colOverlay.classList.add("single-mode");
-        colOverlay.classList.remove("has-thumbnails");
+        galOverlay.classList.add("single-mode");
+        galOverlay.classList.remove("has-thumbnails");
         if (thumbContainer) thumbContainer.innerHTML = "";
       } else {
-        colOverlay.classList.remove("single-mode");
-        colOverlay.classList.add("has-thumbnails");
+        galOverlay.classList.remove("single-mode");
+        galOverlay.classList.add("has-thumbnails");
         if (thumbContainer) {
           thumbContainer.innerHTML = imagesData.map((img, idx) => `
-            <img src="${img.src}" class="lb-thumb ${idx === index ? "active" : ""}" data-index="${idx}" alt="thumbnail">
+            <img src="${img.thumb400 || img.thumbSrc || img.src}" class="lb-thumb ${idx === index ? "active" : ""}" data-index="${idx}" alt="thumbnail" loading="lazy" decoding="async">
           `).join("");
-
-          thumbContainer.querySelectorAll(".lb-thumb").forEach((thumb) => {
-            thumb.addEventListener("click", (e) => {
-              const clickedIdx = parseInt(e.target.dataset.index, 10);
-              renderCollectionImage(clickedIdx);
-            });
-          });
         }
       }
 
-      colOverlay.classList.remove("hidden");
+      galOverlay.classList.remove("hidden");
       renderCollectionImage(index);
     };
 
     window.closeCollectionLightbox = function() {
-      if (!colOverlay) return;
-      colOverlay.classList.add("hidden");
-      const siteNav = document.querySelector(".editorial-header");
-      if (siteNav) siteNav.style.display = "";
+      if (!galOverlay) return;
+      galRenderToken++;
+      galOverlay.classList.add("hidden");
+      galOverlay.classList.remove("single-mode");
+
+      if (galImageA) galImageA.removeAttribute("src");
+      if (galImageB) galImageB.removeAttribute("src");
+      if (galCaption) galCaption.textContent = "";
+      galleryTopGapLock = null;
+
+      if (siteNavEl) siteNavEl.style.display = "";
     };
 
-    window.nextCollectionImage = function() { renderCollectionImage(colCurrentIdx + 1); };
-    window.prevCollectionImage = function() { renderCollectionImage(colCurrentIdx - 1); };
+    window.nextCollectionImage = function() { if (imagesData.length > 1) renderCollectionImage(galCurrentIndex + 1); };
+    window.prevCollectionImage = function() { if (imagesData.length > 1) renderCollectionImage(galCurrentIndex - 1); };
 
     document.addEventListener("keydown", (event) => {
-      if (colOverlay && !colOverlay.classList.contains("hidden")) {
+      if (galOverlay && !galOverlay.classList.contains("hidden")) {
         if (event.key === "ArrowLeft") window.prevCollectionImage();
         if (event.key === "ArrowRight") window.nextCollectionImage();
         if (event.key === "Escape") window.closeCollectionLightbox();
       }
     });
 
-    const btnClose = document.getElementById("lightbox-close");
-    const btnPrev = document.getElementById("lightbox-prev");
-    const btnNext = document.getElementById("lightbox-next");
-    if (btnClose) btnClose.addEventListener("click", window.closeCollectionLightbox);
-    if (btnPrev) btnPrev.addEventListener("click", window.prevCollectionImage);
-    if (btnNext) btnNext.addEventListener("click", window.nextCollectionImage);
+    if (galClose) galClose.addEventListener("click", window.closeCollectionLightbox);
+    if (galPrev) galPrev.addEventListener("click", window.prevCollectionImage);
+    if (galNext) galNext.addEventListener("click", window.nextCollectionImage);
 
 
     // --- DYNAMIC GALLERY ALGORITHM ---
     Promise.all(imagesData.map(img => {
       return new Promise((resolve) => {
-        const image = new Image();
-        image.src = img.src;
-        image.onload = () => {
-          img.ratio = image.naturalWidth / image.naturalHeight;
-          img.isPortrait = img.ratio < 1; 
+        if (img.ratio) {
+          img.isPortrait = img.ratio < 1;
+          imageRatioCache.set(img.src, img.ratio);
           resolve(img);
-        };
-        image.onerror = () => {
-          img.ratio = 1.5; 
-          img.isPortrait = false;
-          resolve(img);
-        };
+        } else {
+          const image = new Image();
+          image.src = img.thumbSrc || img.src; 
+          image.onload = () => {
+            img.ratio = image.naturalWidth / image.naturalHeight;
+            img.isPortrait = img.ratio < 1; 
+            imageRatioCache.set(img.src, img.ratio);
+            resolve(img);
+          };
+          image.onerror = () => {
+            img.ratio = DEFAULT_RATIO; 
+            img.isPortrait = false;
+            resolve(img);
+          };
+        }
       });
     })).then((loadedImages) => {
       renderDynamicGallery(loadedImages);
-      window.addEventListener('resize', () => renderDynamicGallery(loadedImages));
+      window.addEventListener('resize', rafDebounce(() => renderDynamicGallery(loadedImages)));
     });
 
     function renderDynamicGallery(images) {
@@ -310,29 +420,53 @@ layout: default
         group.forEach(img => {
           const imgWrapper = document.createElement('div');
           
-          if (isFinalEditorialRow && groupSize === 1) {
+          if (isFinalEditorialRow && groupSize <= 2) {
             imgWrapper.style.flex = '1 1 100%';
           } else {
             imgWrapper.style.flex = `${img.ratio} 1 0%`;
           }
           
-          imgWrapper.style.cursor = 'pointer';
-          imgWrapper.style.overflow = 'hidden';
-          imgWrapper.style.position = 'relative';
+          imgWrapper.className = 'col-dynamic-item';
           
           imgWrapper.onclick = () => window.openCollectionLightbox(img.origIdx);
 
+          imgWrapper.addEventListener("pointerenter", () => {
+            const warm = new Image();
+            warm.src = img.src;
+          }, { once: true });
+
           const imgEl = document.createElement('img');
-          imgEl.src = img.src;
+          const isLeftover = isFinalEditorialRow && groupSize <= 2;
+          imgEl.src = isLeftover ? img.src : img.thumbSrc;
+          
+          imgEl.loading = "lazy";
+          imgEl.decoding = "async";
           imgEl.style.width = '100%';
           imgEl.style.height = '100%';
           imgEl.style.objectFit = 'cover';
           imgEl.style.display = 'block';
-          imgEl.style.transition = 'transform 0.4s ease, filter 0.4s ease';
-          imgEl.onmouseover = () => { imgEl.style.transform = 'scale(1.03)'; imgEl.style.filter = 'brightness(0.85)'; };
-          imgEl.onmouseout = () => { imgEl.style.transform = 'scale(1)'; imgEl.style.filter = 'brightness(1)'; };
-
+          // Removed transform from transition
+          imgEl.style.transition = 'filter 0.4s ease, opacity 0.2s ease';
+          
           imgWrapper.appendChild(imgEl);
+
+          // Append Hover Tooltip and Icon if a description exists
+          if (img.detailedDescription) {
+            const customTooltip = document.createElement("div");
+            customTooltip.className = "col-hover-tooltip";
+            customTooltip.innerHTML = `<div class="tt-content">${img.detailedDescription}</div>`;
+            imgWrapper.appendChild(customTooltip);
+
+            const iconOverlay = document.createElement("div");
+            iconOverlay.className = "col-icon-overlay";
+            iconOverlay.innerHTML = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>`;
+            imgWrapper.appendChild(iconOverlay);
+          }
+
+          // Handle the image dimming on hover (removed zoom)
+          imgWrapper.onmouseover = () => { imgEl.style.opacity = '0.85'; };
+          imgWrapper.onmouseout = () => { imgEl.style.opacity = '1'; };
+
           rowDiv.appendChild(imgWrapper);
         });
 
