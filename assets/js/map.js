@@ -119,13 +119,22 @@ function init() {
   const urlParams = new URLSearchParams(window.location.search);
   let startCenter = null;
   let startZoom = null;
+  let startLocIndex = -1; // Tracks the final index we find
 
+  // Check for exact index OR search by name
   if (urlParams.has("loc")) {
-    const locIdx = parseInt(urlParams.get("loc"), 10);
-    if (!isNaN(locIdx) && locations[locIdx]) {
-      startCenter = locations[locIdx].coords;
-      startZoom = 6;
-    }
+    startLocIndex = parseInt(urlParams.get("loc"), 10);
+  } else if (urlParams.has("name")) {
+    const searchName = urlParams.get("name").toLowerCase();
+    // Finds the first location whose name includes your search word
+    startLocIndex = locations.findIndex((loc) =>
+      loc.name.toLowerCase().includes(searchName),
+    );
+  }
+
+  if (startLocIndex >= 0 && locations[startLocIndex]) {
+    startCenter = locations[startLocIndex].coords;
+    startZoom = 6;
   } else if (urlParams.has("lat") && urlParams.has("lng")) {
     startCenter = [
       parseFloat(urlParams.get("lat")),
@@ -1049,19 +1058,17 @@ function init() {
     }
   });
 
-  if (urlParams.has("loc")) {
-    const locIndex = parseInt(urlParams.get("loc"), 10);
-    if (!isNaN(locIndex) && locations[locIndex]) {
-      const targetMarker = locations[locIndex].markerInstance;
-      if (targetMarker) {
-        renderPanel(locations[locIndex]);
-        map.setView(
-          targetMarker.getLatLng(),
-          computeTargetZoomForMarker(targetMarker),
-          { animate: false },
-        );
-        setTimeout(() => targetMarker.fire("click"), 50);
-      }
+  // Trigger the sidebar and marker click using our discovered index
+  if (startLocIndex >= 0 && locations[startLocIndex]) {
+    const targetMarker = locations[startLocIndex].markerInstance;
+    if (targetMarker) {
+      renderPanel(locations[startLocIndex]);
+      map.setView(
+        targetMarker.getLatLng(),
+        computeTargetZoomForMarker(targetMarker),
+        { animate: false },
+      );
+      setTimeout(() => targetMarker.fire("click"), 50);
     }
   }
 

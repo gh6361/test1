@@ -2,22 +2,59 @@
 layout: default
 ---
 
-<article style="width: 100%; max-width: calc(1270px); margin: 0 auto; padding: 6rem 2rem; text-align: center; box-sizing: border-box;">
-  
+<article
+  style="
+    width: 100%;
+    max-width: calc(1270px);
+    margin: 0 auto;
+    padding: 3.2rem 2rem;
+    text-align: center;
+    box-sizing: border-box;
+  "
+>
   <!-- 1. EDITORIAL HEADER -->
-  <header style="margin-bottom: 4rem;">
-    <h1 style="font-family: var(--font-sans); font-weight: 700; font-size: clamp(2.5rem, 5vw, 4rem); letter-spacing: 0.02em; color: #1c1c1c; text-transform: uppercase; margin: 0 0 1rem 0;">
+  <header style="margin-bottom: 4rem">
+    <h1
+      style="
+        font-family: var(--font-sans);
+        font-weight: 700;
+        font-size: clamp(2.5rem, 4vw, 3.3rem);
+        max-width: 800px;
+        margin: 0 auto 1rem auto;
+        line-height: 1.2;
+        letter-spacing: 0.02em;
+        color: #1c1c1c;
+        text-transform: uppercase;
+      "
+    >
       {{ page.title }}
     </h1>
     {% if page.description %}
-    <p style="font-family: var(--font-sans); font-size: 1.1rem; color: #666666; max-width: 650px; margin: 0 auto 3rem auto; line-height: 1.6;">
+    <p
+      style="
+        font-family: var(--font-sans);
+        font-size: 1.1rem;
+        color: #666666;
+        max-width: 650px;
+        margin: 0 auto 3rem auto;
+        line-height: 1.6;
+      "
+    >
       {{ page.description }}
     </p>
-    {% endif %}
-    {% if page.meta_details %}
-    <div style="font-family: var(--font-sans); font-size: 0.75rem; color: #999999; text-transform: uppercase; letter-spacing: 0.15em; line-height: 2;">
+    {% endif %} {% if page.meta_details %}
+    <div
+      style="
+        font-family: var(--font-sans);
+        font-size: 0.75rem;
+        color: #999999;
+        text-transform: uppercase;
+        letter-spacing: 0.15em;
+        line-height: 2;
+      "
+    >
       {% for detail in page.meta_details %}
-        <div>{{ detail }}</div>
+      <div>{{ detail }}</div>
       {% endfor %}
     </div>
     {% endif %}
@@ -25,23 +62,92 @@ layout: default
 
   <!-- CSS FOR HOVER TOOLTIPS -->
   <style>
-    .col-dynamic-item { position: relative; overflow: hidden; cursor: zoom-in; }
-    .col-hover-tooltip { position: absolute; bottom: 0px; left: 0px; right: 0px; background: rgba(28, 28, 28, 0.75); color: #ffffff; padding: 8px 12px; font-family: var(--font-sans); font-size: 0.73rem; line-height: 1.4; opacity: 0; pointer-events: none; transform: translateY(4px); transition: opacity 0.2s ease, transform 0.2s ease; z-index: 10; text-align: left; }
-    .col-dynamic-item:hover .col-hover-tooltip { opacity: 1; transform: translateY(0); }
-    .tt-content { display: -webkit-box; -webkit-box-orient: vertical; overflow: hidden; -webkit-line-clamp: 6; }
-    /* Icon is now always visible */
-    .col-icon-overlay { position: absolute; top: 6px; right: 6px; background-color: rgba(0, 0, 0, 0.4); color: #ffffff; padding: 5px; border-radius: 2px; display: flex; align-items: center; justify-content: center; pointer-events: none; z-index: 10; }
+    .col-dynamic-item {
+      position: relative;
+      overflow: hidden;
+      cursor: zoom-in;
+    }
+    .col-hover-tooltip {
+      position: absolute;
+      bottom: 0px;
+      left: 0px;
+      right: 0px;
+      background: rgba(28, 28, 28, 0.75);
+      color: #ffffff;
+      padding: 8px 12px;
+      font-family: var(--font-sans);
+      font-size: 0.73rem;
+      line-height: 1.4;
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(4px);
+      transition:
+        opacity 0.2s ease,
+        transform 0.2s ease;
+      z-index: 10;
+      text-align: left;
+    }
+    .col-dynamic-item:hover .col-hover-tooltip {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .tt-content {
+      display: -webkit-box;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      -webkit-line-clamp: 6;
+    }
+    .col-icon-overlay {
+      position: absolute;
+      top: 6px;
+      right: 6px;
+      background-color: rgba(0, 0, 0, 0.4);
+      color: #ffffff;
+      padding: 5px;
+      border-radius: 2px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      pointer-events: none;
+      z-index: 10;
+    }
   </style>
 
   <!-- 2. DYNAMIC ALGORITHM GALLERY -->
-  <div id="dynamic-gallery" style="display: flex; flex-direction: column; gap: 0.5rem;"></div>
-
+  <div
+    id="dynamic-gallery"
+    style="display: flex; flex-direction: column; gap: 0.5rem"
+  ></div>
 </article>
 
 <!-- 3. FOOTER SECTION -->
-<footer style="background-color: #ffffff; width: 100%; padding: 4rem 0 3rem 0; border-top: 1px solid #e5e5e5; margin-top: 4rem;">
-  <div style="max-width: 1000px; margin: 0 auto; padding: 0 2rem; text-align: center;">
-    <p style="font-family: var(--font-sans); font-size: 0.75rem; color: #666666; text-transform: uppercase; letter-spacing: 0.15em; margin: 0;">
+<footer
+  style="
+    background-color: #ffffff;
+    width: 100%;
+    padding: 4rem 0 3rem 0;
+    border-top: 1px solid #e5e5e5;
+    margin-top: 4rem;
+  "
+>
+  <div
+    style="
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 0 2rem;
+      text-align: center;
+    "
+  >
+    <p
+      style="
+        font-family: var(--font-sans);
+        font-size: 0.75rem;
+        color: #666666;
+        text-transform: uppercase;
+        letter-spacing: 0.15em;
+        margin: 0;
+      "
+    >
       &copy; 2026 Gleda Ho.
     </p>
   </div>
@@ -50,24 +156,36 @@ layout: default
 <!-- 4. STANDARD GALLERY LIGHTBOX -->
 <div id="lightbox" class="lightbox hidden">
   <div class="lightbox-main">
-    
     <button id="lightbox-close" class="lightbox-control">&times;</button>
     <button id="lightbox-prev" class="lightbox-arrow">‹</button>
     <button id="lightbox-next" class="lightbox-arrow">›</button>
 
     <div class="lightbox-center-group">
       <div class="lightbox-img-wrapper">
-        <img id="lightbox-image-a" class="lightbox-image active" src="" alt="">
-        <img id="lightbox-image-b" class="lightbox-image" src="" alt="">
+        <img
+          id="lightbox-image-a"
+          class="lightbox-image active"
+          src=""
+          alt=""
+        />
+        <img id="lightbox-image-b" class="lightbox-image" src="" alt="" />
       </div>
-      
+
       <div class="lightbox-desc-wrapper">
-        <div id="lightbox-caption" style="font-family: var(--font-sans); font-size: 0.95rem; line-height: 1.6; color: #ffffff; text-align: left;"></div>
+        <div
+          id="lightbox-caption"
+          style="
+            font-family: var(--font-sans);
+            font-size: 0.95rem;
+            line-height: 1.6;
+            color: #ffffff;
+            text-align: left;
+          "
+        ></div>
       </div>
     </div>
-    
-    <div id="lightbox-thumbnails" class="lightbox-thumbnails"></div>
 
+    <div id="lightbox-thumbnails" class="lightbox-thumbnails"></div>
   </div>
 </div>
 
@@ -75,7 +193,7 @@ layout: default
 <script>
   document.addEventListener("DOMContentLoaded", () => {
     const container = document.getElementById('dynamic-gallery');
-    const gap = 8; 
+    const gap = 8;
     const DEFAULT_RATIO = 1.5;
 
     function rafDebounce(fn) {
@@ -93,13 +211,15 @@ layout: default
     // --- GATHER IMAGES & DATA ---
     const imagesData = [
       {% for image in page.images %}
-        { 
+        {
           src: "{{ image.src | relative_url }}",
           thumbSrc: {% if image.thumbSrc %}"{{ image.thumbSrc | relative_url }}"{% else %}"{{ image.src | relative_url }}"{% endif %},
           thumb400: {% if image.thumb400 %}"{{ image.thumb400 | relative_url }}"{% else %}null{% endif %},
           ratio: {% if image.ratio %}{{ image.ratio }}{% else %}null{% endif %},
           origIdx: {{ forloop.index0 }},
-          detailedDescription: {{ image.detailedDescription | default: "" | jsonify }}
+          detailedDescription: {{ image.detailedDescription | default: "" | jsonify }},
+          layout: {{ image.layout | default: 3 | jsonify }},
+          addGap: {{ image.add_gap | default: false | jsonify }} // NEW: supports true or custom strings
         }{% unless forloop.last %},{% endunless %}
       {% endfor %}
     ];
@@ -173,24 +293,14 @@ layout: default
       lightboxDescWrapper.style.marginTop = `${Math.max(0, galleryTopGapLock)}px`;
     }
 
-    window.addEventListener(
-      "resize",
-      rafDebounce(() => {
-        galleryTopGapLock = null;
-        alignCaptionToImageTop();
-      })
-    );
+    window.addEventListener("resize", rafDebounce(() => { galleryTopGapLock = null; alignCaptionToImageTop(); }));
 
     function preloadAdjacentImages() {
       if (imagesData.length <= 1) return;
       const nextIdx = (galCurrentIndex + 1) % imagesData.length;
       const prevIdx = (galCurrentIndex - 1 + imagesData.length) % imagesData.length;
-      
-      const preNext = new Image();
-      preNext.src = imagesData[nextIdx].src;
-      
-      const prePrev = new Image();
-      prePrev.src = imagesData[prevIdx].src; 
+      const preNext = new Image(); preNext.src = imagesData[nextIdx].src;
+      const prePrev = new Image(); prePrev.src = imagesData[prevIdx].src;
     }
 
     function renderCollectionImage(index) {
@@ -218,7 +328,6 @@ layout: default
           }
 
           const hasDesc = !!image.detailedDescription;
-
           if (!hasDesc) {
             lightboxDescWrapper?.classList.add("caption-collapsed");
             lightboxCenterGroup?.classList.add("no-caption");
@@ -227,9 +336,7 @@ layout: default
             lightboxDescWrapper?.classList.remove("caption-collapsed");
             lightboxCenterGroup?.classList.remove("no-caption");
             if (galCaption) {
-              galCaption.innerHTML = `
-                ${hasDesc ? `<div class="caption-details">${image.detailedDescription}</div>` : ""}
-              `;
+              galCaption.innerHTML = `${hasDesc ? `<div class="caption-details">${image.detailedDescription}</div>` : ""}`;
             }
           }
         }
@@ -250,21 +357,13 @@ layout: default
         });
       }
 
-      galInactive.onload = () => {
-        if (myToken === galRenderToken) revealCurrent();
-      };
-      galInactive.onerror = () => {
-        if (myToken === galRenderToken) {
-          galInactive.alt = "Image unavailable";
-          revealCurrent();
-        }
-      };
+      galInactive.onload = () => { if (myToken === galRenderToken) revealCurrent(); };
+      galInactive.onerror = () => { if (myToken === galRenderToken) { galInactive.alt = "Image unavailable"; revealCurrent(); } };
 
       galInactive.removeAttribute("src");
       galInactive.decoding = "async";
       galInactive.fetchPriority = "high";
       galInactive.alt = image.detailedDescription || `Image ${galCurrentIndex + 1}`;
-      
       galInactive.src = image.src;
     }
 
@@ -272,14 +371,12 @@ layout: default
       thumbContainer.addEventListener("click", (e) => {
         const thumbEl = e.target.closest(".lb-thumb");
         if (!thumbEl) return;
-        const clickedIdx = parseInt(thumbEl.dataset.index, 10);
-        renderCollectionImage(clickedIdx);
+        renderCollectionImage(parseInt(thumbEl.dataset.index, 10));
       });
     }
 
     window.openCollectionLightbox = function(index) {
       if (!galOverlay) return;
-      
       if (siteNavEl) siteNavEl.style.display = "none";
 
       if (imagesData.length <= 1) {
@@ -330,25 +427,22 @@ layout: default
     if (galNext) galNext.addEventListener("click", window.nextCollectionImage);
 
 
-    // --- DYNAMIC GALLERY ALGORITHM ---
+    // --- MANUAL LAYOUT GALLERY ALGORITHM ---
     Promise.all(imagesData.map(img => {
       return new Promise((resolve) => {
         if (img.ratio) {
-          img.isPortrait = img.ratio < 1;
           imageRatioCache.set(img.src, img.ratio);
           resolve(img);
         } else {
           const image = new Image();
-          image.src = img.thumbSrc || img.src; 
+          image.src = img.thumbSrc || img.src;
           image.onload = () => {
             img.ratio = image.naturalWidth / image.naturalHeight;
-            img.isPortrait = img.ratio < 1; 
             imageRatioCache.set(img.src, img.ratio);
             resolve(img);
           };
           image.onerror = () => {
-            img.ratio = DEFAULT_RATIO; 
-            img.isPortrait = false;
+            img.ratio = DEFAULT_RATIO;
             resolve(img);
           };
         }
@@ -361,38 +455,28 @@ layout: default
     function renderDynamicGallery(images) {
       container.innerHTML = '';
       const containerWidth = container.getBoundingClientRect().width;
-      const isMobile = window.innerWidth <= 768; 
+      const isMobile = window.innerWidth <= 768;
 
       let i = 0;
-      let isFirstRow = true; 
-      
+      let isFirstRow = true;
+
       while (i < images.length) {
-        let groupSize = 3; 
+        let requestedSize = parseInt(images[i].layout, 10);
+        if (isNaN(requestedSize) || requestedSize < 1) requestedSize = 3;
+
+        // Read the manual gap variable
+        let applyManualGap = images[i].addGap;
+
+        let groupSize = requestedSize;
         const remaining = images.length - i;
-        let isFinalEditorialRow = false; 
+        if (groupSize > remaining) groupSize = remaining;
 
         if (isMobile) {
-          groupSize = window.innerWidth <= 480 ? 1 : 2;
-          if (groupSize > remaining) groupSize = remaining;
-        } else {
-          if (remaining >= 4) {
-            let portraitCount = 0;
-            for (let j = 0; j < 4; j++) {
-              if (images[i + j].isPortrait) portraitCount++;
-            }
-            if (portraitCount >= 2) {
-              groupSize = 4;
-            }
-          } else if (remaining === 3) {
-            groupSize = 3;
-          } else if (remaining === 2) {
-            groupSize = 2;
-            isFinalEditorialRow = true;
-          } else {
-            groupSize = 1;
-            isFinalEditorialRow = true;
-          }
+          let maxMobile = window.innerWidth <= 480 ? 1 : 2;
+          if (groupSize > maxMobile) groupSize = maxMobile;
         }
+
+        const isEditorialRow = !isMobile && (requestedSize <= 2);
 
         const group = images.slice(i, i + groupSize);
         i += groupSize;
@@ -403,54 +487,54 @@ layout: default
 
         let rowHeight = availableWidth / sumRatios;
 
-        if (isFinalEditorialRow && rowHeight > 850) {
-            rowHeight = 850; 
+        if (isEditorialRow && rowHeight > 850) {
+          rowHeight = 850;
         }
 
         const rowDiv = document.createElement('div');
         rowDiv.style.display = 'flex';
         rowDiv.style.gap = gap + 'px';
         rowDiv.style.width = '100%';
-        rowDiv.style.height = rowHeight + 'px'; 
+        rowDiv.style.height = rowHeight + 'px';
 
-        if (isFinalEditorialRow && !isFirstRow) {
-          rowDiv.style.marginTop = '2rem'; 
+        // Apply custom margin if requested
+        if (!isFirstRow && applyManualGap) {
+          if (applyManualGap === true) {
+            rowDiv.style.marginTop = '2rem'; // Default 2rem if they just put "true"
+          } else if (typeof applyManualGap === 'string') {
+            rowDiv.style.marginTop = applyManualGap; // Custom string like "1.5rem"
+          }
         }
 
         group.forEach(img => {
           const imgWrapper = document.createElement('div');
-          
-          if (isFinalEditorialRow && groupSize <= 2) {
+
+          if (isEditorialRow && groupSize === 1) {
             imgWrapper.style.flex = '1 1 100%';
           } else {
             imgWrapper.style.flex = `${img.ratio} 1 0%`;
           }
-          
+
           imgWrapper.className = 'col-dynamic-item';
-          
           imgWrapper.onclick = () => window.openCollectionLightbox(img.origIdx);
 
           imgWrapper.addEventListener("pointerenter", () => {
-            const warm = new Image();
-            warm.src = img.src;
+            const warm = new Image(); warm.src = img.src;
           }, { once: true });
 
           const imgEl = document.createElement('img');
-          const isLeftover = isFinalEditorialRow && groupSize <= 2;
-          imgEl.src = isLeftover ? img.src : img.thumbSrc;
-          
+
+          imgEl.src = isEditorialRow ? img.src : img.thumbSrc;
           imgEl.loading = "lazy";
           imgEl.decoding = "async";
           imgEl.style.width = '100%';
           imgEl.style.height = '100%';
           imgEl.style.objectFit = 'cover';
           imgEl.style.display = 'block';
-          // Removed transform from transition
           imgEl.style.transition = 'filter 0.4s ease, opacity 0.2s ease';
-          
+
           imgWrapper.appendChild(imgEl);
 
-          // Append Hover Tooltip and Icon if a description exists
           if (img.detailedDescription) {
             const customTooltip = document.createElement("div");
             customTooltip.className = "col-hover-tooltip";
@@ -463,7 +547,6 @@ layout: default
             imgWrapper.appendChild(iconOverlay);
           }
 
-          // Handle the image dimming on hover (removed zoom)
           imgWrapper.onmouseover = () => { imgEl.style.opacity = '0.85'; };
           imgWrapper.onmouseout = () => { imgEl.style.opacity = '1'; };
 
@@ -471,7 +554,8 @@ layout: default
         });
 
         container.appendChild(rowDiv);
-        isFirstRow = false; 
+
+        isFirstRow = false;
       }
     }
   });
