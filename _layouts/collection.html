@@ -13,12 +13,12 @@ layout: default
   "
 >
   <!-- 1. EDITORIAL HEADER -->
-  <header style="margin-bottom: 4rem">
+  <header style="margin-bottom: 2.75rem">
     <h1
       style="
-        font-family: var(--font-sans);
+        font-family: var(--font-sans) !important;
         font-weight: 700;
-        font-size: clamp(2.5rem, 4vw, 3.3rem);
+        font-size: clamp(2.5rem, 4vw, 3rem);
         max-width: 800px;
         margin: 0 auto 1rem auto;
         line-height: 1.2;
@@ -33,10 +33,10 @@ layout: default
     <p
       style="
         font-family: var(--font-sans);
-        font-size: 1.1rem;
-        color: #666666;
+        font-size: 1.2rem;
+        color: #999999;
         max-width: 650px;
-        margin: 0 auto 3rem auto;
+        margin: 0 auto 7rem auto;
         line-height: 1.6;
       "
     >
@@ -46,7 +46,7 @@ layout: default
     <div
       style="
         font-family: var(--font-sans);
-        font-size: 0.75rem;
+        font-size: 0.8rem;
         color: #999999;
         text-transform: uppercase;
         letter-spacing: 0.15em;
@@ -62,6 +62,24 @@ layout: default
 
   <!-- CSS FOR HOVER TOOLTIPS -->
   <style>
+    .meta-loc-link {
+      color: inherit !important;
+      text-decoration: none !important;
+      border-bottom: none !important;
+      box-shadow: none !important;
+      background-image: none !important;
+      /* NEW: Restores the vertical gap that inline-flex compresses */
+      margin-top: 0.1rem;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+      transition: opacity 0.2s ease;
+    }
+
+    .meta-loc-link:hover {
+      opacity: 0.6;
+    }
     .col-dynamic-item {
       position: relative;
       overflow: hidden;
@@ -91,6 +109,112 @@ layout: default
       opacity: 1;
       transform: translateY(0);
     }
+    /* LIGHTBOX THUMBNAIL SCROLLING & FADE */
+    #lightbox-thumbnails {
+      position: absolute;
+      bottom: 0px;
+      left: 0;
+      width: 100%;
+      display: flex;
+      flex-wrap: nowrap;
+      overflow-x: auto;
+      overflow-y: hidden;
+      justify-content: flex-start;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 0;
+      box-sizing: border-box;
+
+      /* Default mask: Both edges faded (Middle) */
+      -webkit-mask-image: linear-gradient(
+        to right,
+        transparent 0%,
+        rgba(0, 0, 0, 1) 15%,
+        rgba(0, 0, 0, 1) 85%,
+        transparent 100%
+      );
+      mask-image: linear-gradient(
+        to right,
+        transparent 0%,
+        rgba(0, 0, 0, 1) 15%,
+        rgba(0, 0, 0, 1) 85%,
+        transparent 100%
+      );
+
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+
+    #lightbox-thumbnails::-webkit-scrollbar {
+      display: none;
+    }
+
+    /* MASK STATES: Dynamically applied by Javascript */
+
+    /* Start: Solid left, faded right */
+    #lightbox-thumbnails[data-scroll="start"] {
+      -webkit-mask-image: linear-gradient(
+        to right,
+        rgba(0, 0, 0, 1) 0%,
+        rgba(0, 0, 0, 1) 85%,
+        transparent 100%
+      );
+      mask-image: linear-gradient(
+        to right,
+        rgba(0, 0, 0, 1) 0%,
+        rgba(0, 0, 0, 1) 85%,
+        transparent 100%
+      );
+    }
+
+    /* End: Faded left, solid right */
+    #lightbox-thumbnails[data-scroll="end"] {
+      -webkit-mask-image: linear-gradient(
+        to right,
+        transparent 0%,
+        rgba(0, 0, 0, 1) 15%,
+        rgba(0, 0, 0, 1) 100%
+      );
+      mask-image: linear-gradient(
+        to right,
+        transparent 0%,
+        rgba(0, 0, 0, 1) 15%,
+        rgba(0, 0, 0, 1) 100%
+      );
+    }
+
+    /* None: All images fit on screen, no fading needed */
+    #lightbox-thumbnails[data-scroll="none"] {
+      -webkit-mask-image: none;
+      mask-image: none;
+    }
+
+    /* BUFFERS */
+    .lb-thumb:first-child {
+      margin-left: 7vw;
+    }
+    .lb-thumb:last-child {
+      margin-right: 7vw;
+    }
+
+    .lb-thumb {
+      flex: 0 0 auto;
+      height: 50px;
+      width: auto;
+      opacity: 0.5;
+      transition: opacity 0.2s ease;
+      cursor: pointer;
+    }
+
+    .lb-thumb.active {
+      opacity: 1;
+      border: 2px solid white;
+    }
+    /* 
+   * LIGHTBOX UI SPACING
+   * Anchors the counter into the safe zone created by maxH = windowH - 270.
+   */
+
     .tt-content {
       display: -webkit-box;
       -webkit-box-orient: vertical;
@@ -184,7 +308,6 @@ layout: default
         ></div>
       </div>
     </div>
-
     <div id="lightbox-thumbnails" class="lightbox-thumbnails"></div>
   </div>
 </div>
@@ -238,6 +361,30 @@ layout: default
     const siteNavEl = document.querySelector("header");
     let lightboxCounterEl = document.getElementById("lightbox-global-counter");
     const thumbContainer = document.getElementById("lightbox-thumbnails");
+
+    // --- DYNAMIC EDGE FADING ---
+    function updateThumbnailMask() {
+      if (!thumbContainer) return;
+
+      // We use a 5px buffer to account for decimal pixel scaling on some screens
+      const isAtStart = thumbContainer.scrollLeft <= 5;
+      const isAtEnd = thumbContainer.scrollLeft + thumbContainer.clientWidth >= thumbContainer.scrollWidth - 5;
+
+      if (isAtStart && isAtEnd) {
+        thumbContainer.setAttribute("data-scroll", "none");
+      } else if (isAtStart) {
+        thumbContainer.setAttribute("data-scroll", "start");
+      } else if (isAtEnd) {
+        thumbContainer.setAttribute("data-scroll", "end");
+      } else {
+        thumbContainer.setAttribute("data-scroll", "middle");
+      }
+    }
+
+    if (thumbContainer) {
+      thumbContainer.addEventListener("scroll", updateThumbnailMask, { passive: true });
+      window.addEventListener("resize", updateThumbnailMask);
+    }
 
     const imageRatioCache = new Map();
 
@@ -310,6 +457,7 @@ layout: default
       const myToken = ++galRenderToken;
 
       function revealCurrent() {
+        // ADD THIS BLOCK BACK: Let JS append it to galOverlay so the original CSS catches it
         if (!lightboxCounterEl && galOverlay) {
           lightboxCounterEl = document.createElement("div");
           lightboxCounterEl.id = "lightbox-global-counter";
@@ -321,6 +469,7 @@ layout: default
           if (lightboxCounterEl) lightboxCounterEl.style.display = "none";
           if (galCaption) galCaption.innerHTML = "";
         } else {
+          // ... [keep the rest of your logic here]
           if (lightboxDescWrapper) lightboxDescWrapper.style.display = "";
           if (lightboxCounterEl) {
             lightboxCounterEl.style.display = "block";
@@ -349,8 +498,24 @@ layout: default
 
           const activeThumb = document.querySelector(".lb-thumb.active");
           if (activeThumb) activeThumb.classList.remove("active");
+
           const newThumb = document.querySelector(`.lb-thumb[data-index="${galCurrentIndex}"]`);
-          if (newThumb) newThumb.classList.add("active");
+          if (newThumb) {
+            newThumb.classList.add("active");
+
+            // Calculate the precise pixel position to center this specific thumbnail
+            setTimeout(() => {
+              const container = document.getElementById("lightbox-thumbnails");
+
+              // Math: The thumbnail's left position, minus half the container's width, plus half the thumbnail's width
+              const targetScroll = newThumb.offsetLeft - (container.clientWidth / 2) + (newThumb.clientWidth / 2);
+
+              container.scrollTo({
+                left: targetScroll,
+                behavior: 'smooth'
+              });
+            }, 50); // 50ms delay ensures the lightbox is visible and has dimensions before doing math
+          }
 
           setTimeout(alignCaptionToImageTop, 50);
           preloadAdjacentImages();
@@ -390,6 +555,9 @@ layout: default
           thumbContainer.innerHTML = imagesData.map((img, idx) => `
             <img src="${img.thumb400 || img.thumbSrc || img.src}" class="lb-thumb ${idx === index ? "active" : ""}" data-index="${idx}" alt="thumbnail" loading="lazy" decoding="async">
           `).join("");
+
+          // NEW: Initialize the mask state as soon as the thumbnails are loaded
+          setTimeout(updateThumbnailMask, 50);
         }
       }
 

@@ -1,4 +1,5 @@
 export const baldhill = {
+  id: "bald-hills",
   name: "Bald Hills Trail: Jasper National Park, Canada",
   country: "Canada",
   state: "Jasper",

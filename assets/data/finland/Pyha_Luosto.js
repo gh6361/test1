@@ -1,6 +1,7 @@
 // data/Pyha_Luosto.js
 
 export const Pyha_Luosto = {
+  id: "pyha-luosto",
   name: "Tunturiaapa Nature Trail: Pyhä-Luosto National Park, Finland",
   country: "Finland",
   coords: [67.01277652557667, 27.243051968242906],

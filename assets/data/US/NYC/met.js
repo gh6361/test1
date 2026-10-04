@@ -1,6 +1,7 @@
 // data/US/NYC/met.js
 
 export const met = {
+  id: "met",
   name: "Inside The Met: New York City, U.S.",
   country: "United States",
   state: "New York",

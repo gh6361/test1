@@ -1,4 +1,5 @@
 export const milford = {
+  id: "milford-sound",
   name: "Milford Sound: Fiordland National Park, N.Z.",
   country: "New Zealand",
   state: "",

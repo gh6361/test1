@@ -1,6 +1,7 @@
 // data/US/NYC/times.js
 
 export const times = {
+  id: "times-square-and-broadway",
   name: "Times Square and Broadway: New York City, U.S.",
   country: "United States",
   state: "New York",

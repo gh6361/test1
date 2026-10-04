@@ -1,6 +1,7 @@
 // data/oodi.js
 
 export const oodi = {
+  id: "oodi",
   name: "Oodi: Helsinki Central Library, Finland",
   country: "Finland",
   coords: [60.17370808477547, 24.9380890084605],

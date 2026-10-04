@@ -1,4 +1,5 @@
 export const moose = {
+  id: "moose-lake",
   name: "Moose Lake : Jasper National Park, Canada",
   country: "Canada",
   state: "Jasper",

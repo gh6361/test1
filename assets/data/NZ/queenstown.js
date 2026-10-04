@@ -1,4 +1,5 @@
 export const queenstown = {
+  id: "queenstown",
   name: "Overlooking Queenstown: Otago Region, N.Z.",
   country: "New Zealand",
   state: "",

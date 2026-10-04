@@ -1,4 +1,5 @@
 export const medicine = {
+  id: "lake-medicine",
   name: "Medicine Lake: Jasper National Park, Canada",
   country: "Canada",
   state: "Jasper",

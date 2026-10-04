@@ -1,4 +1,5 @@
 export const maligne = {
+  id: "lake-maligne",
   name: "Maligne Lake: Jasper National Park, Canada",
   country: "Canada",
   state: "Jasper",

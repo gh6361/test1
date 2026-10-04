@@ -1,6 +1,7 @@
 // data/US/CA/santabarbara.js
 
 export const santabarbara = {
+  id: "santa-barbara",
   name: "Santa Barbara Waterfront: CA, U.S.",
   country: "United States",
   state: "California",

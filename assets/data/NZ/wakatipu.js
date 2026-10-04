@@ -1,4 +1,5 @@
 export const wakatipu = {
+  id: "lake-wakatipu",
   name: "Lake Wakatipu: Otago Region, N.Z.",
   country: "New Zealand",
   state: "",

@@ -1,6 +1,7 @@
 // data/US/NYC/pier.js
 
 export const pier = {
+  id: "pier-97",
   name: "Pier 97 at Hudson River Park: New York City, U.S.",
   country: "United States",
   state: "New York",

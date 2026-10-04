@@ -1,4 +1,5 @@
 export const mccracken = {
+  id: "mccrackens-rest",
   name: "McCracken's Rest: Southland, N.Z.",
   country: "New Zealand",
   state: "",

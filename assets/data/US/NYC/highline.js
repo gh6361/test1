@@ -1,6 +1,7 @@
 // data/US/NYC/highline.js
 
 export const highline = {
+  id: "the-high-line",
   name: "The High Line: Hudson Yards, New York City, U.S.",
   country: "United States",
   state: "New York",

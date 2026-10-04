@@ -119,14 +119,20 @@ function init() {
   const urlParams = new URLSearchParams(window.location.search);
   let startCenter = null;
   let startZoom = null;
-  let startLocIndex = -1; // Tracks the final index we find
+  let startLocIndex = -1;
 
-  // Check for exact index OR search by name
-  if (urlParams.has("loc")) {
+  // NEW: Check for your custom 'id' parameter first
+  if (urlParams.has("id")) {
+    const targetId = urlParams.get("id").toLowerCase();
+    startLocIndex = locations.findIndex(
+      (loc) => loc.id && loc.id.toLowerCase() === targetId,
+    );
+  }
+  // Fallback to exact index OR search by name
+  else if (urlParams.has("loc")) {
     startLocIndex = parseInt(urlParams.get("loc"), 10);
   } else if (urlParams.has("name")) {
     const searchName = urlParams.get("name").toLowerCase();
-    // Finds the first location whose name includes your search word
     startLocIndex = locations.findIndex((loc) =>
       loc.name.toLowerCase().includes(searchName),
     );
@@ -527,20 +533,31 @@ function init() {
   // Flag to track if the user has clicked the "ALL LOCATIONS" button
   let hasClickedAllLocations = false;
 
-  // OPT: Add panel click event globally ONCE
   panel.addEventListener("click", (e) => {
     const link = e.target.closest(".sidebar-loc-link");
     if (!link || !panel.contains(link)) return;
 
     const idx = parseInt(link.dataset.index, 10);
+    const selectedLocation = locations[idx]; // Grab the location data
 
     // If the index was loaded via the "ALL LOCATIONS" button, bypass animation and redirect
     if (hasClickedAllLocations) {
       const url = new URL(window.location.href);
-      url.searchParams.set("loc", idx);
+
+      // If the location has a custom ID, use it. Otherwise fallback to numeric index.
+      if (selectedLocation.id) {
+        url.searchParams.set("id", selectedLocation.id);
+        url.searchParams.delete("loc"); // Clean up old param if present
+      } else {
+        url.searchParams.set("loc", idx);
+      }
+
       window.location.href = url.toString();
       return;
     }
+
+    // OTHERWISE (default page load), use the original flyTo animation logic
+    // ... [keep your existing flyTo code here] ...
 
     // OTHERWISE (default page load), use the original flyTo animation logic
     const targetMarker = locations[idx].markerInstance;

@@ -1,6 +1,7 @@
 // data/US/NYC/brooklyn.js
 
 export const brooklyn = {
+  id: "brooklyn-bridge",
   name: "Brooklyn Bridge: New York City, U.S.",
   country: "United States",
   state: "New York",

@@ -1,6 +1,7 @@
 // data/US/NYC/dog.js
 
 export const dog = {
+  id: "dog-in-nyc",
   name: "DOG in NYC: New York City, U.S.",
   country: "United States",
   state: "New York",

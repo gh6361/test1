@@ -1,4 +1,5 @@
 export const bluecliffs = {
+  id: "bluecliffs-beach",
   name: "Bluecliffs Beach: Southland, N.Z.",
   country: "New Zealand",
   state: "",

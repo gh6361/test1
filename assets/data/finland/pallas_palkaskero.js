@@ -1,6 +1,7 @@
 // data/pallas_palkaskero.js
 
 export const pallas_palkaskero = {
+  id: "palkaskero",
   name: "Palkaskero: Pallas-Yllästunturi National Park, Finland",
   country: "Finland",
   coords: [68.03411749858194, 24.116048165808575],

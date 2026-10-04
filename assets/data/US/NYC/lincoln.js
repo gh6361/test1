@@ -1,6 +1,7 @@
 // data/US/NYC/lincoln.js
 
 export const lincoln = {
+  id: "reflections-at-lincoln-center-plaza",
   name: "Reflections at Lincoln Center Plaza: New York City, U.S.",
   country: "United States",
   state: "New York",

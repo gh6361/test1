@@ -1,4 +1,5 @@
 export const annette = {
+  id: "lake-edith-and-lake-annette",
   name: "Lake Edith and Lake Annette: Jasper National Park, Canada",
   country: "Canada",
   state: "Jasper",

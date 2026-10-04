@@ -1,4 +1,5 @@
 export const teanau = {
+  id: "te-anau",
   name: "Te Anau Waterfront: Southland, N.Z.",
   country: "New Zealand",
   state: "",

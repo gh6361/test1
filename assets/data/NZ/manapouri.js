@@ -1,4 +1,5 @@
 export const manapouri = {
+  id: "manapouri",
   name: "Manapouri: Southland, N.Z.",
   country: "New Zealand",
   state: "",

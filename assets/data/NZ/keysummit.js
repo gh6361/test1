@@ -1,4 +1,5 @@
 export const keysummit = {
+  id: "key-summit",
   name: "Key Summit Track: Fiordland National Park, N.Z.",
   country: "New Zealand",
   state: "",

@@ -1,4 +1,5 @@
 export const elkisland = {
+  id: "elk-island",
   name: "Elk Island National Park: AB, Canada",
   country: "Canada",
   state: "",

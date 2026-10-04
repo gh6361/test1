@@ -1,6 +1,7 @@
 // data/US/NYC/honeycomb.js
 
 export const honeycomb = {
+  id: "vessel",
   name: "Vessel: Hudson Yards, New York City, U.S.",
   country: "United States",
   state: "New York",

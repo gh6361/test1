@@ -1,6 +1,7 @@
 // data/US/NYC/katz.js
 
 export const katz = {
+  id: "katzs-delicatessen",
   name: "Katz's Delicatessen: New York City, U.S.",
   country: "United States",
   state: "New York",

@@ -1,4 +1,5 @@
 export const pyramid = {
+  id: "pyramid-lake",
   name: "Pyramid Lake: Jasper National Park, Canada",
   country: "Canada",
   state: "Jasper",

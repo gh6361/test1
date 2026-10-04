@@ -1,6 +1,7 @@
 // data/reindeer.js
 
 export const reindeer = {
+  id: "reindeer-lapland",
   name: "Reindeer (on a Road) in Lapland: Finland",
   country: "Finland",
   coords: [67.10601217426539, 27.00596534757806],

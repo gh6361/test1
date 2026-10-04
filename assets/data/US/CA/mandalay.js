@@ -1,6 +1,7 @@
 // data/US/CA/mandalay.js
 
 export const mandalay = {
+  id: "mandalay-beach",
   name: "Mandalay Beach and Sunset: Oxnard, CA, U.S.",
   country: "United States",
   state: "California",

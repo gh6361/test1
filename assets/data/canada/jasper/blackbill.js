@@ -1,4 +1,5 @@
 export const blackbill = {
+  id: "black-billed-magpie",
   name: "Black-billed Magpie: Jasper, Canada",
   country: "Canada",
   state: "Jasper",

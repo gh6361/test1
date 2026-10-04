@@ -5,8 +5,8 @@ title: Pallas-Yllästunturi National Park
 description: Finnish Lapland in Summer
 meta_details:
   - ARCTIC FELLS X CHILLIN' REINDEER
-  - "<a href='/?loc=5' style='color: inherit; text-decoration: underline; text-underline-offset: 4px;'>TAIVASKERO</a>"
-  - "<a href='/?loc=6' style='color: inherit; text-decoration: underline; text-underline-offset: 4px;'>PALKASKERO</a>"
+  - "<a href='/test1/map/?id=taivaskero' class='meta-loc-link'><svg width='11' height='11' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z'></path><circle cx='12' cy='10' r='3'></circle></svg>TAIVASKERO</a>"
+  - "<a href='/test1/map/?id=palkaskero' class='meta-loc-link'><svg width='11' height='11' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z'></path><circle cx='12' cy='10' r='3'></circle></svg>PALKASKERO</a>"
 
 images:
   - src: "./assets/images/finland/pallas_palkaskero/avif/avif-6268.avif"

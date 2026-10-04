@@ -1,6 +1,7 @@
 // data/swing.js
 
 export const swing = {
+  id: "lake-akaslompolo",
   name: "Lake Äkäslompolo: Finland",
   country: "Finland",
   coords: [67.60654643860333, 24.15775658460504],

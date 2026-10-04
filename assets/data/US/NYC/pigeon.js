@@ -1,6 +1,7 @@
 // data/US/NYC/pigeon.js
 
 export const pigeon = {
+  id: "a-commuter-pigeon",
   name: "A Commuter Pigeon: New York City, U.S.",
   country: "United States",
   state: "New York",

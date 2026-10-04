@@ -1,6 +1,7 @@
 // data/pallas_Taivaskero.js
 
 export const pallas_Taivaskero = {
+  id: "taivaskero",
   name: "Taivaskero: Pallas-Yllästunturi National Park, Finland",
   country: "Finland",
   coords: [68.06796435859441, 24.049790004747106],

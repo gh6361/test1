@@ -1,6 +1,7 @@
 // data/US/OR/meares.js
 
 export const meares = {
+  id: "cape-meares",
   name: "Cape Meares: Oregon Coast, U.S.",
   country: "United States",
   state: "Oregon",
