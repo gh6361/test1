@@ -23,7 +23,7 @@ layout: default
     /* 2. The Smooth Math: 
        Absorbs empty space until the margin drops to exactly 5px. 
        Once it hits 5px, it locks, and the images beautifully shrink instead. */
-    padding: 3.2rem max(10px, calc((var(--true-vw, 100vw) - 1200px) / 2));
+    padding: 3.2rem max(8px, calc((var(--true-vw, 100vw) - 1200px) / 2));
 
     text-align: center;
     box-sizing: border-box;
@@ -33,7 +33,7 @@ layout: default
   <header style="margin-bottom: 2.75rem">
     <h1
       style="
-        font-family: Merriweather, serif;
+        font-family: var(--font-sans) !important;
         font-weight: 700;
         font-size: clamp(2.5rem, 4vw, 3rem);
         max-width: 800px;
@@ -44,8 +44,6 @@ layout: default
         text-transform: uppercase;
         /* NEW: Forces the text to break evenly, preventing orphaned words on new lines */
         text-wrap: balance;
-        padding: 0 1rem;
-        box-sizing: border-box;
       "
     >
       {{ page.title }}
@@ -54,34 +52,15 @@ layout: default
     <p
       style="
         font-family: var(--font-sans);
-        font-size: 0.9rem;
-        color: #1c1c1c;
-        text-transform: uppercase;
-        max-width: 750px;
-        margin: 0 auto 2rem auto;
+        font-size: 1.2rem;
+        color: #999999;
+        max-width: 650px;
+        margin: 0 auto 7rem auto;
         line-height: 1.6;
-        padding: 0 0.5rem;
-        box-sizing: border-box;
       "
     >
       {{ page.description }}
     </p>
-    {% endif %} {% if page.extra_text and page.description %}
-    <hr
-      style="
-        width: 730px;
-        border: none;
-        border-top: 5px solid #000000 !important;
-        margin: 0 auto 2rem auto;
-        opacity: 1 !important; /* Forces the line to be 100% solid */
-        padding: 0 1rem;
-        box-sizing: border-box;
-      "
-    />
-    {% endif %}
-    <!-- NEW: Extra left-aligned text block -->
-    {% if page.extra_text %}
-    <div class="editorial-text">{{ page.extra_text }}</div>
     {% endif %} {% if page.meta_details %}
     <div
       style="
@@ -100,36 +79,55 @@ layout: default
     {% endif %}
   </header>
 
-  <!-- CSS FOR HOVER TOOLTIPS & GALLERY -->
+  <!-- CSS FOR HOVER TOOLTIPS -->
   <style>
+    .meta-loc-link {
+      color: inherit !important;
+      text-decoration: none !important;
+      border-bottom: none !important;
+      box-shadow: none !important;
+      background-image: none !important;
+      /* NEW: Restores the vertical gap that inline-flex compresses */
+      margin-top: 0.1rem;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+      transition: opacity 0.2s ease;
+    }
+
+    .meta-loc-link:hover {
+      opacity: 0.6;
+    }
     .col-dynamic-item {
       position: relative;
       overflow: hidden;
       cursor: zoom-in;
     }
-
-    .tt-content {
-      display: -webkit-box;
-      -webkit-box-orient: vertical;
-      overflow: hidden;
-      -webkit-line-clamp: 6; /* Keeps long descriptions from getting too tall */
-    }
-
-    .col-icon-overlay {
+    .col-hover-tooltip {
       position: absolute;
-      top: 6px;
-      right: 6px;
-      background-color: rgba(0, 0, 0, 0.4);
+      bottom: 0px;
+      left: 0px;
+      right: 0px;
+      background: rgba(28, 28, 28, 0.75);
       color: #ffffff;
-      padding: 5px;
-      border-radius: 2px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      padding: 8px 12px;
+      font-family: var(--font-sans);
+      font-size: 0.73rem;
+      line-height: 1.4;
+      opacity: 0;
       pointer-events: none;
+      transform: translateY(4px);
+      transition:
+        opacity 0.2s ease,
+        transform 0.2s ease;
       z-index: 10;
+      text-align: left;
     }
-
+    .col-dynamic-item:hover .col-hover-tooltip {
+      opacity: 1;
+      transform: translateY(0);
+    }
     /* LIGHTBOX THUMBNAIL SCROLLING & FADE */
     #lightbox-thumbnails {
       position: absolute;
@@ -145,6 +143,8 @@ layout: default
       gap: 8px;
       padding: 10px 0;
       box-sizing: border-box;
+
+      /* Default mask: Both edges faded (Middle) */
       -webkit-mask-image: linear-gradient(
         to right,
         transparent 0%,
@@ -159,6 +159,7 @@ layout: default
         rgba(0, 0, 0, 1) 85%,
         transparent 100%
       );
+
       -ms-overflow-style: none;
       scrollbar-width: none;
     }
@@ -167,6 +168,9 @@ layout: default
       display: none;
     }
 
+    /* MASK STATES: Dynamically applied by Javascript */
+
+    /* Start: Solid left, faded right */
     #lightbox-thumbnails[data-scroll="start"] {
       -webkit-mask-image: linear-gradient(
         to right,
@@ -182,6 +186,7 @@ layout: default
       );
     }
 
+    /* End: Faded left, solid right */
     #lightbox-thumbnails[data-scroll="end"] {
       -webkit-mask-image: linear-gradient(
         to right,
@@ -197,11 +202,13 @@ layout: default
       );
     }
 
+    /* None: All images fit on screen, no fading needed */
     #lightbox-thumbnails[data-scroll="none"] {
       -webkit-mask-image: none;
       mask-image: none;
     }
 
+    /* BUFFERS */
     .lb-thumb:first-child {
       margin-left: 7vw;
     }
@@ -222,58 +229,31 @@ layout: default
       opacity: 1;
       border: 2px solid white;
     }
-    /* NEW: IMAGE OVERLAY BASE */
-    .img-overlay-text {
+    /* 
+   * LIGHTBOX UI SPACING
+   * Anchors the counter into the safe zone created by maxH = windowH - 270.
+   */
+
+    .tt-content {
+      display: -webkit-box;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      -webkit-line-clamp: 6;
+    }
+    .col-icon-overlay {
       position: absolute;
-      font-family: var(--font-sans);
-      font-size: 0.8rem;
-      font-weight: 500;
-      line-height: 1.4;
-      pointer-events: none; /* Clicks pass through to the lightbox trigger */
-      z-index: 5;
-      box-sizing: border-box;
+      top: 6px;
+      right: 6px;
+      background-color: rgba(0, 0, 0, 0.4);
+      color: #ffffff;
+      padding: 5px;
+      border-radius: 2px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      pointer-events: none;
+      z-index: 10;
     }
-    /* FULL-WIDTH ROW TEXT */
-    .row-description-text {
-      width: 100%;
-      max-width: 850px; /* <-- Change this to control how wide the text gets */
-      margin: 0 auto; /* Centers the text block perfectly beneath the gallery */
-      text-align: left;
-      font-family: var(--font-sans);
-      font-size: 0.9rem; /* <-- Change this to control the text size */
-      color: #1c1c1c;
-      line-height: 1.6;
-      padding: 0.5rem 0 1.5rem 0;
-    }
-    /* BASE TEXT STYLING */
-    .editorial-text {
-      font-family: "Merriweather", serif;
-      font-size: 0.9rem;
-      color: #1c1c1c;
-      max-width: 750px;
-      margin: 0 auto 3rem auto;
-      text-align: justify;
-      line-height: 1.8;
-      letter-spacing: 0.02em;
-
-      /* CONTROLS REGULAR TEXT: Try 300 for a delicate, lighter look, or 400 for standard */
-      font-weight: 300;
-      /* NEW: Safety margins for smaller screens */
-      padding: 0 0.5rem;
-      box-sizing: border-box;
-    }
-
-    /* BOLD TEXT STYLING */
-    .editorial-text b,
-    .editorial-text strong {
-      /* CONTROLS BOLD TEXT: Try 700 for standard bold, or 900 for extra thick */
-      text-transform: uppercase;
-      font-weight: 900;
-
-      /* Optional: Make the bold text slightly darker than the paragraph so it pops */
-      color: #1c1c1c;
-    }
-    
   </style>
 
   <!-- 2. DYNAMIC ALGORITHM GALLERY -->
@@ -380,19 +360,8 @@ layout: default
           ratio: {% if image.ratio %}{{ image.ratio }}{% else %}null{% endif %},
           origIdx: {{ forloop.index0 }},
           detailedDescription: {{ image.detailedDescription | default: "" | jsonify }},
-
-          // NEW: Advanced Overlay Controls
-          overlayText: {{ image.overlay_text | default: "" | jsonify }},
-          overlayTop: {{ image.overlay_top | jsonify }},
-          overlayBottom: {{ image.overlay_bottom | jsonify }},
-          overlayLeft: {{ image.overlay_left | jsonify }},
-          overlayRight: {{ image.overlay_right | jsonify }},
-          overlayWidth: {{ image.overlay_width | default: "auto" | jsonify }},
-          overlayAlign: {{ image.overlay_align | default: "left" | jsonify }},
-          overlayColor: {{ image.overlay_color | default: "white" | jsonify }},
-
           layout: {{ image.layout | default: 3 | jsonify }},
-          addGap: {{ image.add_gap | default: false | jsonify }}
+          addGap: {{ image.add_gap | default: false | jsonify }} // NEW: supports true or custom strings
         }{% unless forloop.last %},{% endunless %}
       {% endfor %}
     ];
@@ -691,6 +660,7 @@ layout: default
         const group = images.slice(i, i + groupSize);
         i += groupSize;
 
+        // FIXED: Restored the static gap logic
         const totalGap = (groupSize - 1) * gap;
         const availableWidth = containerWidth - totalGap;
         const sumRatios = group.reduce((sum, img) => sum + img.ratio, 0);
@@ -703,7 +673,7 @@ layout: default
 
         const rowDiv = document.createElement('div');
         rowDiv.style.display = 'flex';
-        rowDiv.style.gap = gap + 'px';
+        rowDiv.style.gap = gap + 'px'; // FIXED: Static gap
         rowDiv.style.width = '100%';
         rowDiv.style.height = rowHeight + 'px';
 
@@ -717,7 +687,6 @@ layout: default
 
         group.forEach(img => {
           const imgWrapper = document.createElement('div');
-          imgWrapper.className = 'col-dynamic-item';
 
           if (groupSize === 1) {
             imgWrapper.style.flex = '1 1 100%';
@@ -725,7 +694,7 @@ layout: default
             imgWrapper.style.flex = `${img.ratio} 1 0%`;
           }
 
-          imgWrapper.style.height = '100%';
+          imgWrapper.className = 'col-dynamic-item';
           imgWrapper.onclick = () => window.openCollectionLightbox(img.origIdx);
 
           imgWrapper.addEventListener("pointerenter", () => {
@@ -733,6 +702,8 @@ layout: default
           }, { once: true });
 
           const imgEl = document.createElement('img');
+
+          // NEW: Only load the high-res src if it's a layout=1 single image
           imgEl.src = (groupSize === 1) ? img.src : img.thumbSrc;
           imgEl.loading = "lazy";
           imgEl.decoding = "async";
@@ -744,37 +715,16 @@ layout: default
 
           imgWrapper.appendChild(imgEl);
 
-          // NEW: Add Overlay Text directly over the image
-          if (img.overlayText) {
-            const overlayDiv = document.createElement("div");
-            overlayDiv.className = `img-overlay-text overlay-${img.overlayPos || 'bottom-left'}`;
-            overlayDiv.innerHTML = img.overlayText;
-            imgWrapper.appendChild(overlayDiv);
-          }
+          if (img.detailedDescription) {
+            const customTooltip = document.createElement("div");
+            customTooltip.className = "col-hover-tooltip";
+            customTooltip.innerHTML = `<div class="tt-content">${img.detailedDescription}</div>`;
+            imgWrapper.appendChild(customTooltip);
 
-          // NEW: Add Dynamic Overlay Text
-          if (img.overlayText) {
-            const overlayDiv = document.createElement("div");
-            overlayDiv.className = "img-overlay-text";
-            overlayDiv.innerHTML = img.overlayText;
-
-            // Apply coordinates only if they exist in the YAML
-            if (img.overlayTop) overlayDiv.style.top = img.overlayTop;
-            if (img.overlayBottom) overlayDiv.style.bottom = img.overlayBottom;
-            if (img.overlayLeft) overlayDiv.style.left = img.overlayLeft;
-            if (img.overlayRight) overlayDiv.style.right = img.overlayRight;
-
-            // Apply formatting
-            overlayDiv.style.width = img.overlayWidth;
-            overlayDiv.style.textAlign = img.overlayAlign;
-            overlayDiv.style.color = img.overlayColor;
-
-            // Add a subtle shadow ONLY if the text is white, to guarantee readability
-            if (img.overlayColor.toLowerCase() === "white" || img.overlayColor === "#ffffff") {
-              overlayDiv.style.textShadow = "0 2px 5px rgba(0, 0, 0, 0.6)";
-            }
-
-            imgWrapper.appendChild(overlayDiv);
+            const iconOverlay = document.createElement("div");
+            iconOverlay.className = "col-icon-overlay";
+            iconOverlay.innerHTML = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>`;
+            imgWrapper.appendChild(iconOverlay);
           }
 
           imgWrapper.onmouseover = () => { imgEl.style.opacity = '0.85'; };
@@ -783,20 +733,7 @@ layout: default
           rowDiv.appendChild(imgWrapper);
         });
 
-        // Append the row of images
         container.appendChild(rowDiv);
-
-        // Check only the LAST image in the group for full-width row text
-        const lastImageInGroup = group[group.length - 1];
-
-        if (lastImageInGroup && lastImageInGroup.detailedDescription) {
-          const captionDiv = document.createElement("div");
-          captionDiv.className = "row-description-text";
-          captionDiv.innerHTML = lastImageInGroup.detailedDescription;
-
-          container.appendChild(captionDiv);
-        }
-
         isFirstRow = false;
       }
     }
