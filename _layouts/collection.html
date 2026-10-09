@@ -55,7 +55,7 @@ layout: default
       style="
         font-family: var(--font-sans);
         font-size: 0.9rem;
-        color: #1c1c1c;
+        color: #555555;
         text-transform: uppercase;
         max-width: 750px;
         margin: 0 auto 2rem auto;
@@ -226,8 +226,8 @@ layout: default
     .img-overlay-text {
       position: absolute;
       font-family: var(--font-sans);
-      font-size: 0.8rem;
-      font-weight: 500;
+      font-size: 0.77rem;
+      font-weight: 600;
       line-height: 1.4;
       pointer-events: none; /* Clicks pass through to the lightbox trigger */
       z-index: 5;
@@ -236,14 +236,14 @@ layout: default
     /* FULL-WIDTH ROW TEXT */
     .row-description-text {
       width: 100%;
-      max-width: 850px; /* <-- Change this to control how wide the text gets */
+      max-width: 750px; /* <-- Change this to control how wide the text gets */
       margin: 0 auto; /* Centers the text block perfectly beneath the gallery */
       text-align: left;
       font-family: var(--font-sans);
-      font-size: 0.9rem; /* <-- Change this to control the text size */
-      color: #1c1c1c;
-      line-height: 1.6;
-      padding: 0.5rem 0 1.5rem 0;
+      font-size: 0.85rem; /* <-- Change this to control the text size */
+      color: #555555;
+      line-height: 1.4;
+      padding: 0.1rem 0.2rem 1rem 0.2rem;
     }
     /* BASE TEXT STYLING */
     .editorial-text {
@@ -273,7 +273,17 @@ layout: default
       /* Optional: Make the bold text slightly darker than the paragraph so it pops */
       color: #1c1c1c;
     }
-    
+    /* CUSTOM CAPTION LABELS (LEFT/RIGHT) */
+    .caption-label {
+      font-family: "Merriweather", serif;
+      font-weight: 700; /* Use 700 for standard bold, or 900 for extra heavy */
+      margin-right: 4px; /* Adds a little breathing room before the standard description starts */
+      /* NEW: Adds the underline */
+      text-decoration: none;
+
+      /* OPTIONAL: Pushes the underline slightly down so it doesn't cross through the bottom of the letters */
+      text-underline-offset: none;
+    }
   </style>
 
   <!-- 2. DYNAMIC ALGORITHM GALLERY -->
@@ -334,18 +344,7 @@ layout: default
         <img id="lightbox-image-b" class="lightbox-image" src="" alt="" />
       </div>
 
-      <div class="lightbox-desc-wrapper">
-        <div
-          id="lightbox-caption"
-          style="
-            font-family: var(--font-sans);
-            font-size: 0.95rem;
-            line-height: 1.6;
-            color: #ffffff;
-            text-align: left;
-          "
-        ></div>
-      </div>
+      <!-- CHANGED: The entire lightbox-desc-wrapper has been safely deleted from here -->
     </div>
     <div id="lightbox-thumbnails" class="lightbox-thumbnails"></div>
   </div>
