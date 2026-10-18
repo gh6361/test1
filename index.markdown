@@ -28,7 +28,7 @@ full_width: true
 <section id="stacked-layout" style="max-width: 1000px; margin: 0 auto; padding: 2rem 2rem 2rem 2rem;">
   
   <!-- Centered, sans-serif "RECENT" heading without the bottom line -->
-  <h2 style="font-family: var(--font-sans) !important; font-weight: 600; font-size: 2rem; letter-spacing: 0.05em; text-align: center; margin-top: 1rem; margin-bottom: 2rem; color: #1c1c1c;">RECENT</h2>
+  <h2 style="font-family: var(--font-sans) !important; font-weight: 600; font-size: 2rem; letter-spacing: 0.05em; text-align: center; margin-top: 1rem; margin-bottom: 2.5rem; color: #1c1c1c;">RECENT</h2>
 
   <!-- HORIZONTAL CARD CAROUSEL -->
   <div style="position: relative; display: flex; align-items: center; width: 100%;">
@@ -57,11 +57,10 @@ full_width: true
   </style>
 
   <!-- WIDE MINI MAP -->
-  <div style="position: relative; width: 100%; aspect-ratio: 1.8 / 1; background: #e0e0e0; overflow: hidden; margin-top: 1rem; margin-bottom: 0rem; border: 1px solid #e5e5e5;">
+  <div style="position: relative; width: 100%; aspect-ratio: 1.8 / 1; background: #e0e0e0; overflow: hidden; margin-top: 2.5rem; margin-bottom: 0rem; border: 1px solid #e5e5e5;">
   <!-- NEW: Interaction Label overlay -->
     <!-- NEW: Interaction Label overlay (Dark grey background, white text) -->
-    <div style="position: absolute; top: 0px; left: 0px; z-index: 1000; background: rgba(62, 62, 62, 0.75); padding: 0.4rem 0.8rem; border-radius: 0px; font-family: var(--font-sans); font-size: 0.7rem; font-weight: 600; color: #ffffff; letter-spacing: 0.05em; text-transform: none; pointer-events: none; box-shadow: none;">
-      Ctrl + click/scroll to move/zoom
+    <div style="position: absolute; top: 0px; left: 0px; z-index: 1000; background: rgba(62, 62, 62, 0.75); padding: 0.4rem 0.8rem; border-radius: 0px; font-family: var(--font-sans); font-size: 0.7rem; font-weight: 600; color: #ffffff; letter-spacing: 0.05em; text-transform: none; pointer-events: none; box-shadow: none;">Ctrl + click/scroll to move/zoom<
     </div>
     <div id="bottom-map" style="width: 100%; height: 100%; z-index: 1;"></div>
   </div>
@@ -75,7 +74,7 @@ full_width: true
   <div id="featured-editorial" style="max-width: 1000px; margin: 0 auto; padding: 0 2rem 6rem 2rem;">
   
   <!-- Centered, sans-serif "FEATURED" heading without the bottom line -->
-  <h2 style="font-family: var(--font-sans) !important; font-weight: 700 !important; font-size: 2rem; letter-spacing: 0.05em; text-align: center; margin-top: 1rem; margin-bottom: 2rem; color: #1c1c1c;">FEATURED</h2>
+  <h2 style="font-family: var(--font-sans) !important; font-weight: 700 !important; font-size: 2rem; letter-spacing: 0.05em; text-align: center; margin-top: 1rem; margin-bottom: 2rem; color: #1c1c1c;">FEATURED ** beware ** from here down lie broken links </h2>
 
   <!-- Increased height to 700px, added white background and a subtle border -->
   <div style="position: relative; width: 100%; height: 700px; background: #ffffff; border: 1px solid #e5e5e5; overflow: hidden;">
@@ -158,16 +157,12 @@ full_width: true
         boxZoom: false, 
         keyboard: false, 
         zoomSnap: 0.1,
-        
-        minZoom: 1.5, /* NEW: Prevents zooming out far enough to see the grey background */
-
+        minZoom: 1.5,
         maxBounds: [[-90, -Infinity], [90, Infinity]],
         maxBoundsViscosity: 1.0, 
         worldCopyJump: true 
       });
 
-      // NEW: Enable pan and zoom only when holding Ctrl (Windows) or Cmd (Mac)
-     // UPDATED: KEYBOARD CONTROLS FOR MODAL & HOVERED CLUSTERS
       // Enable pan/drag only when holding Ctrl (Windows) or Cmd (Mac)
       document.addEventListener('keydown', (e) => {
         if (e.key === 'Control' || e.key === 'Meta') {
@@ -185,16 +180,11 @@ full_width: true
         }
       });
 
-      // FIXED: Custom Scroll Zoom Logic
+      // Custom Scroll Zoom Logic
       bottomMapEl.addEventListener('wheel', (e) => {
         if (e.ctrlKey || e.metaKey) {
-          // 1. Block the browser's default page zoom
           e.preventDefault(); 
-          
-          // 2. Determine scroll direction (Scroll up = zoom in, Scroll down = zoom out)
           const zoomDelta = e.deltaY > 0 ? -0.5 : 0.5;
-          
-          // 3. Force the map to zoom smoothly around the exact mouse cursor position
           bottomMap.setZoomAround(
             bottomMap.mouseEventToContainerPoint(e), 
             bottomMap.getZoom() + zoomDelta, 
@@ -207,7 +197,7 @@ full_width: true
         className: 'dark-map-layer' 
       }).addTo(bottomMap);
 
-      /* --- NEW: TOP-RIGHT REGION CONTROLS --- */
+      /* --- TOP-RIGHT REGION CONTROLS --- */
       const regionBounds = {
         world: [[-55, -170], [75, 180]],
         europe: [[38, -10], [69, 35]],
@@ -219,7 +209,6 @@ full_width: true
       regionControl.onAdd = function (mapInstance) {
         const div = L.DomUtil.create("div", "map-region-controls");
         
-        // You can add or remove regions here to match your main map exactly
         div.innerHTML = `
           <button type="button" data-region="world">World</button>
           <button type="button" data-region="europe">Europe</button>
@@ -235,26 +224,14 @@ full_width: true
           const targetRegion = e.target.dataset.region;
           if (!targetRegion || !regionBounds[targetRegion]) return;
 
-          // NEW: Close the popup modal if it happens to be open
-          const mapModal = document.getElementById('custom-map-modal');
-          if (mapModal) {
-            mapModal.style.display = 'none';
-          }
-
           const currentZoom = mapInstance.getZoom();
           const isZoomedIn = currentZoom > 4;
           const isWorldTransition = lastRegion === "world" || targetRegion === "world";
 
           if (isZoomedIn || !isWorldTransition) {
-            mapInstance.fitBounds(regionBounds[targetRegion], {
-              animate: false,
-              padding: [20, 20],
-            });
+            mapInstance.fitBounds(regionBounds[targetRegion], { animate: false, padding: [20, 20] });
           } else {
-            mapInstance.flyToBounds(regionBounds[targetRegion], {
-              duration: 0.7,
-              padding: [20, 20],
-            });
+            mapInstance.flyToBounds(regionBounds[targetRegion], { duration: 0.5, padding: [20, 20] });
           }
           lastRegion = targetRegion;
         });
@@ -263,43 +240,146 @@ full_width: true
       regionControl.addTo(bottomMap);
       /* --- END REGION CONTROLS --- */
 
-      // UPDATED: Cluster now embeds all its images and includes hover arrows
+      // NEW: Infinite Looping Carousel Logic for Clusters
+      window.slideCluster = function(event, dir, thumbEl) {
+        if (event) {
+          event.stopPropagation();
+          event.preventDefault();
+        }
+        
+        // Prevent clicking too fast and breaking the animation
+        if (!thumbEl || thumbEl.isAnimating) return;
+        const track = thumbEl.querySelector('.cluster-track');
+        if (!track) return;
+
+        thumbEl.isAnimating = true;
+        
+        // Keep track of the current mathematical index so the map click redirect stays accurate
+        const dataString = thumbEl.getAttribute('data-locations');
+        const locations = JSON.parse(decodeURIComponent(dataString));
+        let currentIndex = parseInt(thumbEl.getAttribute('data-current-index'), 10);
+        
+        currentIndex = (currentIndex + dir + locations.length) % locations.length;
+        thumbEl.setAttribute('data-current-index', currentIndex);
+        
+        // --- INFINITE LOOP SLIDE ANIMATION ---
+        if (dir === 1) {
+          // Slide left to reveal the next image
+          track.style.transition = 'transform 0.3s ease-in-out';
+          track.style.transform = 'translateX(-100%)';
+          
+          setTimeout(() => {
+            track.style.transition = 'none'; // Turn off animation
+            track.appendChild(track.firstElementChild); // Teleport first image to the back
+            track.style.transform = 'translateX(0%)'; // Snap the track back to normal instantly
+            
+            setTimeout(() => { thumbEl.isAnimating = false; }, 20); // Unlock
+          }, 300); // 300ms matches the CSS transition time
+          
+        } else {
+          // Teleport the last image to the front instantly while hidden
+          track.style.transition = 'none';
+          track.prepend(track.lastElementChild);
+          track.style.transform = 'translateX(-100%)'; 
+          
+          // Force the browser to register the instant move before we animate
+          void track.offsetWidth; 
+          
+          // Slide right to reveal the teleported image
+          track.style.transition = 'transform 0.3s ease-in-out';
+          track.style.transform = 'translateX(0%)';
+          
+          setTimeout(() => { thumbEl.isAnimating = false; }, 300); // Unlock
+        }
+      };
+
       const bottomMarkers = L.markerClusterGroup({
         showCoverageOnHover: false, 
-        maxClusterRadius: 80, 
+        maxClusterRadius: 120,
         zoomToBoundsOnClick: false, 
         iconCreateFunction: function (cluster) {
           const children = cluster.getAllChildMarkers();
           const locationCount = cluster.getChildCount(); 
           
-          // Map out the data for all pins hidden inside this cluster
           const clusterData = children.map(child => ({
             img: child.options.firstImg,
             name: child.options.locName,
             query: child.options.queryParam
           }));
 
-          // Encode the data safely so we can attach it directly to the HTML element
           const dataString = encodeURIComponent(JSON.stringify(clusterData));
+          
+          const imagesHtml = clusterData.map(loc => 
+            `<img src="${loc.img}" style="width: 100%; height: 100%; flex-shrink: 0; object-fit: cover !important; display: block;">`
+          ).join('');
 
           return L.divIcon({
             html: `
               <div class="mini-map-thumb cluster-thumb" data-locations="${dataString}" data-current-index="0"
-                   onmouseenter="window.hoveredCluster = this; this.querySelector('.cluster-nav').style.opacity='1';"
-                   onmouseleave="window.hoveredCluster = null; this.querySelector('.cluster-nav').style.opacity='0';">
-                <img src="${clusterData[0].img}">
+                   onmouseenter="
+                     const mapRect = this.closest('.leaflet-container').getBoundingClientRect();
+                     const rect = this.getBoundingClientRect();
+                     let ox = '50%', oy = '50%';
+                     
+                     if (rect.left - mapRect.left < 80) ox = '0%';
+                     if (mapRect.right - rect.right < 80) ox = '100%';
+                     if (rect.top - mapRect.top < 80) oy = '0%';
+                     if (mapRect.bottom - rect.bottom < 80) oy = '100%';
+                     
+                     this.style.transformOrigin = ox + ' ' + oy;
+                     this.style.transform = 'scale(1.5)';
+                     
+                     window.hoveredCluster = this; 
+                     this.querySelector('.cluster-nav').style.opacity = '1';
+                     
+                     // Clear any old timers just in case
+                     clearTimeout(this.initialSlideTimeout);
+                     clearInterval(this.slideshowInterval);
+                     
+                     // 1. Wait 0.7s for the very first slide
+                     this.initialSlideTimeout = setTimeout(() => {
+                       window.slideCluster(null, 1, this);
+                       
+                       // 2. Once the first slide fires, start the 1.5s continuous loop
+                       this.slideshowInterval = setInterval(() => { 
+                         window.slideCluster(null, 1, this); 
+                       }, 1500);
+                     }, 500);
+                   "
+                   onmouseleave="
+                     this.style.transform = 'scale(1)';
+                     window.hoveredCluster = null; 
+                     this.querySelector('.cluster-nav').style.opacity = '0';
+                     
+                     // Kill all timers instantly when the mouse leaves
+                     clearTimeout(this.initialSlideTimeout);
+                     clearInterval(this.slideshowInterval);
+                   ">
+                
+                <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; overflow: hidden; border-radius: 2px;">
+                  <div class="cluster-track" style="display: flex; width: 100%; height: 100%; transform: translateX(0%);">
+                    ${imagesHtml}
+                  </div>
+                </div>
+
                 <div class="thumb-badge">${locationCount}</div>
                 
-                <!-- FIXED: Blocks Leaflet from intercepting the clicks -->
                 <div class="cluster-nav" style="opacity: 0; transition: opacity 0.2s ease;" 
                      onmousedown="event.stopPropagation();" onclick="event.stopPropagation();">
-                  <button onclick="window.slideCluster(event, -1, this.closest('.cluster-thumb'))" style="position: absolute; left: 2px; top: 50%; transform: translateY(-50%); background: rgba(0,0,0,0.6); color: white; border: none; padding: 2px 6px; cursor: pointer; border-radius: 2px; font-size: 0.7rem; z-index: 10;">‹</button>
-                  <button onclick="window.slideCluster(event, 1, this.closest('.cluster-thumb'))" style="position: absolute; right: 2px; top: 50%; transform: translateY(-50%); background: rgba(0,0,0,0.6); color: white; border: none; padding: 2px 6px; cursor: pointer; border-radius: 2px; font-size: 0.7rem; z-index: 10;">›</button>
+                  
+                  <!-- Left Arrow -->
+                  <button onclick="window.slideCluster(event, -1, this.closest('.cluster-thumb'))" 
+                          style="position: absolute; left: -3px; top: 50%; transform: translateY(-50%); background: transparent; color: black; -webkit-text-stroke: 1px #ffffff; border: none; padding: 2px 6px; cursor: pointer; font-size: 1.5rem; font-weight: 700; z-index: 10;">‹</button>
+                  
+                  <!-- Right Arrow -->
+                  <button onclick="window.slideCluster(event, 1, this.closest('.cluster-thumb'))" 
+                          style="position: absolute; right: -3px; top: 50%; transform: translateY(-50%); background: transparent; color: black; -webkit-text-stroke: 1px #ffffff; border: none; padding: 2px 6px; cursor: pointer; font-size: 1.5rem; font-weight: 700; z-index: 10;">›</button>
+                
                 </div>
               </div>
             `,
             className: "", 
-            iconSize: L.point(75, 75)
+            iconSize: L.point(110, 110)
           });
         }
       });
@@ -317,19 +397,33 @@ full_width: true
         }
 
         if (firstImg) {
-          // NEW: Create the URL parameter using loc.id if it exists, otherwise fall back to the index
           const queryParam = loc.id ? `?id=${loc.id}` : `?loc=${index}`;
 
-          // 1. ADD EVERY LOCATION TO THE MAP
+          // UPDATED: Single location HTML (Removed the 'View Gallery' text entirely)
           const customIcon = L.divIcon({
             html: `
-              <div class="mini-map-thumb">
+              <div class="mini-map-thumb"
+                   onmouseenter="
+                     const mapRect = this.closest('.leaflet-container').getBoundingClientRect();
+                     const rect = this.getBoundingClientRect();
+                     let ox = '50%', oy = '50%';
+                     
+                     if (rect.left - mapRect.left < 80) ox = '0%';
+                     if (mapRect.right - rect.right < 80) ox = '100%';
+                     if (rect.top - mapRect.top < 80) oy = '0%';
+                     if (mapRect.bottom - rect.bottom < 80) oy = '100%';
+                     
+                     this.style.transformOrigin = ox + ' ' + oy;
+                     this.style.transform = 'scale(1.5)';
+                   "
+                   onmouseleave="
+                     this.style.transform = 'scale(1)';
+                   ">
                 <img src="${firstImg}">
-                <div class="single-hover">View<br>Gallery</div>
               </div>
             `,
             className: "", 
-            iconSize: L.point(75, 75)
+            iconSize: L.point(110, 110)
           });
           
           const marker = L.marker(loc.coords, { 
@@ -344,17 +438,16 @@ full_width: true
 
           bottomMarkers.addLayer(marker);
 
-          // 2. ONLY ADD THE FIRST 10 LOCATIONS TO THE CAROUSEL
           if (index < 10) {
             const title = loc.name.split(":")[0].trim();
             const country = loc.country || "Other";
             
             carouselHtml += `
               <a href="${mapPageUrl}${queryParam}" class="carousel-card" style="display: flex; flex-direction: column; text-decoration: none; color: inherit; border: 1px solid #e5e5e5; padding: 0; background-color: #ffffff; transition: opacity 0.2s ease;">
-                <img src="${firstImg}" style="width: 100%; height: 120px; object-fit: cover; margin-bottom: 0rem; display: block;">
+                <img src="${firstImg}" style="width: 100%; height: 140px; object-fit: cover; margin-bottom: 0rem; display: block;">
                 <div style="text-align: left;">
-                  <div style="font-family: var(--font-sans); font-size: 0.7rem; color: var(--text-body); text-transform: uppercase; letter-spacing: 0.15em; margin-top: 0.8rem; margin-bottom: 0.3rem; margin-left: 0.5rem; line-height: 1.2;">${country}</div>
-                  <div style="font-size: 1rem; font-weight: 550; color: #1c1c1c; margin-left: 0.5rem; margin-bottom: 0.4rem">${title}</div>
+                  <div style="font-family: 'Merriweather', serif; font-size: 0.9rem; font-weight: 600; line-height: 1.2; color: #1c1c1c; margin-left: 0.5rem; margin-right: 0.5rem; margin-top: 0.8rem; margin-bottom: 0.5rem">${title}</div>
+                  <div style="font-family: var(--font-sans); font-size: 0.6rem; color: var(--text-body); text-transform: uppercase; letter-spacing: 0.15em; margin-bottom: 0.8rem; margin-left: 0.5rem; margin-right: 0.5rem; line-height: 1.2;">${country}</div>
                 </div>
               </a>
             `;
@@ -364,144 +457,36 @@ full_width: true
 
       carouselTrack.innerHTML = carouselHtml;
 
-      // --- NEW: CENTERED MODAL SLIDESHOW LOGIC ---
-      let popupCurrentIndex = 0;
-      let popupLocations = [];
+      // FIXED: Click events for Single Pins & Clusters
+      // Clicking a single pin redirects to its map gallery
+      bottomMarkers.on('click', function(e) {
+        window.location.href = mapPageUrl + e.layer.options.queryParam;
+      });
 
-      // NEW: Function to slide images directly on the map pin
-      window.slideCluster = function(event, dir, thumbEl) {
-        if (event) {
-          event.stopPropagation();
-          event.preventDefault();
-        }
-        if (!thumbEl) return;
-        
-        const dataString = thumbEl.getAttribute('data-locations');
-        const locations = JSON.parse(decodeURIComponent(dataString));
-        let currentIndex = parseInt(thumbEl.getAttribute('data-current-index'), 10);
-        
-        currentIndex = (currentIndex + dir + locations.length) % locations.length;
-        thumbEl.setAttribute('data-current-index', currentIndex);
-        
-        const imgEl = thumbEl.querySelector('img');
-        if (imgEl) imgEl.src = locations[currentIndex].img;
-      };
-
-      // 1. Create the centered modal overlay dynamically
-      let mapModal = document.getElementById('custom-map-modal');
-      if (!mapModal) {
-        mapModal = document.createElement('div');
-        mapModal.id = 'custom-map-modal';
-        // Style it to hover dead-center over the map wrapper
-        Object.assign(mapModal.style, {
-          position: 'absolute',
-          bottom: '0%',
-          left: '0%',
-          transform: 'translate(0%, 0%)',
-          zIndex: '2000',
-          background: '#ffffff',
-          padding: '1.2rem',
-          borderRadius: '4px',
-          boxShadow: '0 10px 30px rgba(0,0,0,0.3)',
-          display: 'none', // Hidden by default
-          width: '260px',
-          boxSizing: 'border-box'
-        });
-        // Append it to the div that wraps bottomMapEl so it stays confined to the map area
-        bottomMapEl.parentElement.appendChild(mapModal);
-      }
-
-      window.changePopupSlide = function(event, dir) {
-        event.stopPropagation(); 
-        event.preventDefault();
-        popupCurrentIndex = (popupCurrentIndex + dir + popupLocations.length) % popupLocations.length;
-        mapModal.innerHTML = window.renderMapPopup();
-      };
-
-      window.closeMapPopup = function(event) {
-        event.stopPropagation();
-        mapModal.style.display = 'none';
-      };
-
-      window.renderMapPopup = function() {
-        if (!popupLocations.length) return "";
-        const loc = popupLocations[popupCurrentIndex];
-        
-        return `
-          <div style="position: relative; width: 100%; text-align: center; font-family: var(--font-sans);">
-            
-            <!-- Custom "X" Button -->
-            <button onclick="window.closeMapPopup(event)" style="position: absolute; top: -10px; right: -10px; background: none; border: none; font-size: 1.5rem; color: #1c1c1c; cursor: pointer; z-index: 10; line-height: 1; padding: 5px;">&times;</button>
-            
-            <div style="position: relative; width: 100%; height: 160px; margin-bottom: 12px; margin-top: 5px;">
-              <img src="${loc.img}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 2px;">
-              
-              ${popupLocations.length > 1 ? `
-                <button onclick="window.changePopupSlide(event, -1)" style="position: absolute; left: 5px; top: 50%; transform: translateY(-50%); background: rgba(0,0,0,0.5); color: white; border: none; padding: 5px 8px; cursor: pointer; border-radius: 3px;">‹</button>
-                <button onclick="window.changePopupSlide(event, 1)" style="position: absolute; right: 5px; top: 50%; transform: translateY(-50%); background: rgba(0,0,0,0.5); color: white; border: none; padding: 5px 8px; cursor: pointer; border-radius: 3px;">›</button>
-                <div style="position: absolute; top: 5px; left: 5px; background: rgba(0,0,0,0.6); color: white; font-size: 0.65rem; padding: 2px 6px; border-radius: 3px;">
-                  ${popupCurrentIndex + 1} /${popupLocations.length}
-                </div>
-              ` : ''}
-            </div>
-            
-            <h4 style="margin: 0 0 12px 0; font-size: 0.95rem; color: #1c1c1c;">${loc.name}</h4>
-            
-            <a href="${mapPageUrl}${loc.query}" onclick="event.stopPropagation();" style="display: inline-block; padding: 8px 14px; background: #1c1c1c; color: #ffffff; text-decoration: none; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.1em; border-radius: 2px; transition: background 0.2s ease;">View Gallery</a>
-          </div>
-        `;
-      };
-
-      // When clicking a single pin
-      // When clicking a single pin
-      // UPDATED: Cluster click now opens the modal starting at the exact image you scrolled to
+      // Clicking a cluster redirects to the gallery of the currently visible image on the mini-carousel
       bottomMarkers.on('clusterclick', function(e) {
-        // Grab the HTML element of the cluster we just clicked
         const clusterEl = e.layer.getElement().querySelector('.cluster-thumb');
-        
         if (clusterEl) {
-          // Read exactly where the user left off on the mini-carousel
-          popupCurrentIndex = parseInt(clusterEl.getAttribute('data-current-index'), 10) || 0;
+          const currentIndex = parseInt(clusterEl.getAttribute('data-current-index'), 10) || 0;
           const dataString = clusterEl.getAttribute('data-locations');
-          popupLocations = JSON.parse(decodeURIComponent(dataString));
-        } else {
-          // Fallback just in case
-          popupCurrentIndex = 0;
-          popupLocations = e.layer.getAllChildMarkers().map(marker => ({
-            img: marker.options.firstImg, name: marker.options.locName, query: marker.options.queryParam
-          }));
+          const locations = JSON.parse(decodeURIComponent(dataString));
+          window.location.href = mapPageUrl + locations[currentIndex].query;
         }
-        
-        mapModal.innerHTML = window.renderMapPopup();
-        mapModal.style.display = 'block';
-        e.layer.zoomToBounds({ padding: [30, 30] });
       });
 
       bottomMap.addLayer(bottomMarkers);
       bottomMap.fitBounds([[-55, -100], [75, 120]], { paddingTopLeft: [0, 60], paddingBottomRight: [0, 20] });
       
-      // FIXED: One combined keyboard listener for the entire map experience
+      // FIXED: Keyboard listener for map panning & cluster navigation
       document.addEventListener('keydown', (e) => {
-        
-        // 1. Map Dragging (Ctrl/Cmd)
         if (e.key === 'Control' || e.key === 'Meta') {
           bottomMap.dragging.enable();
           bottomMap.doubleClickZoom.enable();
           bottomMapEl.style.cursor = 'grab'; 
         }
 
-        // 2. Modal & Hovered Cluster Slideshow Logic
-        const mapModal = document.getElementById('custom-map-modal');
-        const isModalOpen = mapModal && mapModal.style.display === 'block';
-        
-        if (isModalOpen) {
-          // If modal is open, control the modal
-          if (e.key === 'Escape') mapModal.style.display = 'none';
-          else if (e.key === 'ArrowLeft') window.changePopupSlide({ stopPropagation: () => {}, preventDefault: () => {} }, -1);
-          else if (e.key === 'ArrowRight') window.changePopupSlide({ stopPropagation: () => {}, preventDefault: () => {} }, 1);
-        } 
-        else if (window.hoveredCluster) {
-          // If modal is closed but we are hovering a cluster, control the cluster
+        // Arrow keys can still navigate the cluster manually while hovering
+        if (window.hoveredCluster) {
           if (e.key === 'ArrowLeft') window.slideCluster(null, -1, window.hoveredCluster);
           else if (e.key === 'ArrowRight') window.slideCluster(null, 1, window.hoveredCluster);
         }
@@ -513,7 +498,7 @@ full_width: true
       if (btnNextC && btnPrevC) {
         const getScrollDistance = () => {
           const card = carouselTrack.querySelector('.carousel-card');
-          return card ? card.offsetWidth + 24 : 250; // 24px matches your 1.5rem gap
+          return card ? card.offsetWidth + 24 : 250; 
         };
         
         let isAnimating = false;
@@ -525,18 +510,16 @@ full_width: true
           const distance = getScrollDistance();
           carouselTrack.scrollBy({ left: distance, behavior: 'smooth' }); 
           
-          // Wait for the smooth scroll to finish, then quietly move the first card to the back
           setTimeout(() => {
-            carouselTrack.style.scrollBehavior = 'auto'; // Turn off smooth scroll
-            carouselTrack.appendChild(carouselTrack.firstElementChild); // Move item to end
-            carouselTrack.scrollLeft -= distance; // Shift scrollbar back to hide the teleport
+            carouselTrack.style.scrollBehavior = 'auto'; 
+            carouselTrack.appendChild(carouselTrack.firstElementChild); 
+            carouselTrack.scrollLeft -= distance; 
             
-            // Turn smooth scroll back on for the next click
             requestAnimationFrame(() => {
               carouselTrack.style.scrollBehavior = 'smooth';
               isAnimating = false;
             });
-          }, 400); // 400ms gives the browser enough time to finish the slide animation
+          }, 400); 
         });
         
         btnPrevC.addEventListener('click', () => { 
@@ -545,12 +528,10 @@ full_width: true
           
           const distance = getScrollDistance();
           
-          // For the left arrow, we have to teleport the last card to the front FIRST
           carouselTrack.style.scrollBehavior = 'auto'; 
           carouselTrack.prepend(carouselTrack.lastElementChild);
           carouselTrack.scrollLeft += distance; 
           
-          // Turn smooth scroll back on and execute the slide
           requestAnimationFrame(() => {
             carouselTrack.style.scrollBehavior = 'smooth';
             carouselTrack.scrollBy({ left: -distance, behavior: 'smooth' });
