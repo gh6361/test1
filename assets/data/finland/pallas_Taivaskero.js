@@ -56,7 +56,7 @@ export const pallas_Taivaskero = {
       ratio: 1.333,
       detailedDescription: "In English, the plaque reads: <em>At this place, on Taivaskero, the Helsinki \
       Olympic flame was lit on July 6, 1952</em>. Lit together with the midnight sun, the Olympic flame was \
-      carried by relay runners carried all the way to Helsinki where it was joined with the Olympic flame \
+      carried by relay runners all the way to Helsinki where it was joined with the Olympic flame \
       from Athens.",
     },
     {

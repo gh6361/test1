@@ -432,16 +432,16 @@ function init() {
           box-shadow: none !important; 
           transition: color 0.2s ease;
           cursor: pointer;
-          font-family: var(--font-display), serif !important; /* Using DM Serif Display */
-          font-weight: normal !important; /* Critical: DM Serif only supports 400 weight */
+          font-family: "Merriweather", serif;
+          font-weight: 700 !important;
         }
         .alphabet-link:hover {
           color: #888888 !important;
         }
         .alphabet-inactive {
           color: #d3d3d3;
-          font-family: var(--font-display), serif !important; /* Using DM Serif Display */
-          font-weight: normal !important;
+          font-family: "Merriweather", serif;
+          font-weight: 600 !important;
         }
       </style>
       <div style="display: flex; flex-wrap: wrap; gap: 12px; font-size: 1.35rem; margin-bottom: 0.5rem; font-family: var(--font-display), serif; font-weight: normal;">
