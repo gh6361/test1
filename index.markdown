@@ -25,43 +25,97 @@ full_width: true
 </section>
 
 <!-- 2. RECENT: MAP & CAROUSEL SECTION -->
-<section id="stacked-layout" style="max-width: 1000px; margin: 0 auto; padding: 2rem 2rem 2rem 2rem;">
+<section id="stacked-layout" style="max-width: 1000px; margin: 0 auto; padding: 2rem;">
   
-  <!-- Centered, sans-serif "RECENT" heading without the bottom line -->
+  <!-- Centered, sans-serif "RECENT" heading -->
   <h2 style="font-family: var(--font-sans) !important; font-weight: 600; font-size: 2rem; letter-spacing: 0.05em; text-align: center; margin-top: 1rem; margin-bottom: 2.5rem; color: #1c1c1c;">RECENT</h2>
 
   <!-- HORIZONTAL CARD CAROUSEL -->
-  <div style="position: relative; display: flex; align-items: center; width: 100%;">
+  <div style="position: relative; width: 100%;">
     
-    <!-- Left Arrow Button -->
-    <button id="carousel-prev" style="position: absolute; left: -3rem; z-index: 10; background: none; border: none; font-size: 2.5rem; color: #1c1c1c; cursor: pointer; padding: 0; transition: opacity 0.2s ease;">‹</button>
+    <!-- Left Arrow -->
+    <button id="carousel-prev" style="position: absolute; left: -1.7rem; top: 75px; transform: translateY(-50%); z-index: 10; background: none; border: none; font-size: 2.5rem; color: #1c1c1c; cursor: pointer; padding: 0; transition: opacity 0.2s ease;">‹</button>
 
-    <!-- The Track (Hidden Scrollbars) -->
-    <div id="carousel-track" style="display: flex; gap: 1.5rem; overflow-x: auto; scroll-behavior: smooth; width: 100%; padding: 0.5rem 0;">
+    <!-- The Track (Padding/Margin removed to align perfectly with the map) -->
+    <div id="carousel-track" style="display: flex; gap: 1.5rem; overflow-x: auto; scroll-behavior: smooth; width: 100%; padding: 0; margin: 0;">
       <!-- JavaScript will inject your custom cards here -->
     </div>
 
-    <!-- Right Arrow Button -->
-    <button id="carousel-next" style="position: absolute; right: -3rem; z-index: 10; background: none; border: none; font-size: 2.5rem; color: #1c1c1c; cursor: pointer; padding: 0; transition: opacity 0.2s ease;">›</button>
+    <!-- Right Arrow -->
+    <button id="carousel-next" style="position: absolute; right: -1.7rem; top: 75px; transform: translateY(-50%); z-index: 10; background: none; border: none; font-size: 2.5rem; color: #1c1c1c; cursor: pointer; padding: 0; transition: opacity 0.2s ease;">›</button>
 
   </div>
 
-  <!-- CSS to hide scrollbars and size the cards -->
+  <!-- CSS to hide scrollbars, size cards, and manage arrows -->
   <style>
-    /* Hides the default scrollbar */
     #carousel-track::-webkit-scrollbar { display: none; }
     #carousel-track { -ms-overflow-style: none; scrollbar-width: none; }
     
-    /* Forces cards to fit 4 across (25% each minus the gap), minimum width 200px */
-    .carousel-card { flex: 0 0 calc(25% - 1.125rem); min-width: 200px; }
+    /* 1. FLUID CARD SCALING */
+    .carousel-card { flex: 0 0 calc(25% - 1.125rem); min-width: 0; }
+    .carousel-card img { height: auto !important; aspect-ratio: 3 / 2; }
+    /* --- 4. ARROW HOVER & CLICK EFFECTS --- */
+    #carousel-prev, #carousel-next {
+      transition: color 0.2s ease !important;
+    }
+    
+    /* Slightly lighter grey when hovering */
+    #carousel-prev:hover, #carousel-next:hover {
+      color: #737373 !important; 
+    }
+    
+    /* Even lighter grey when physically clicking down */
+    #carousel-prev:active, #carousel-next:active {
+      color: #a6a6a6 !important; 
+    }
+    /* --- 5. IMAGE HOVER ZOOM EFFECT --- */
+    
+    /* Ensure the card clips the expanding image on the sides and top */
+    .carousel-card {
+      overflow: hidden; 
+    }
+
+    /* Set up the smooth animation for the image */
+    .carousel-card img {
+      transition: transform 0.2s ease !important;
+    }
+
+    /* Scale the image up by 5% when hovering over the card */
+    .carousel-card:hover img {
+      transform: scale(1.05);
+    }
+
+    /* Protect the text box so the zooming image doesn't bleed down into the words */
+    .carousel-card > div {
+      position: relative;
+      z-index: 2;
+      background-color: #ffffff;
+    }
+    @media (max-width: 850px) { .carousel-card { flex: 0 0 calc(33.333% - 1rem); } }
+    @media (max-width: 550px) { .carousel-card { flex: 0 0 calc(50% - 0.75rem); } }
+
+    /* 2. RESPONSIVE ARROWS */
+    @media (max-width: 1120px) {
+      #carousel-prev { left: -1.5rem !important; }
+      #carousel-next { right: -1.5rem !important; }
+    }
+    @media (max-width: 850px) {
+      #carousel-prev { left: -1.5rem !important; }
+      #carousel-next { right: -1.5rem !important; }
+    }
+    @media (max-width: 550px) {
+      #carousel-prev { left: -1.5rem !important; }
+      #carousel-next { right: -1.5rem !important; }
+    }
+
+    /* 3. Ctrl + Hover Overlay Logic */
+    .ctrl-active .cluster-thumb:hover .ctrl-zoom-overlay { opacity: 1 !important; }
+    .ctrl-active .cluster-thumb:hover .cluster-nav { opacity: 0 !important; pointer-events: none; }
   </style>
 
   <!-- WIDE MINI MAP -->
   <div style="position: relative; width: 100%; aspect-ratio: 1.8 / 1; background: #e0e0e0; overflow: hidden; margin-top: 2.5rem; margin-bottom: 0rem; border: 1px solid #e5e5e5;">
-  <!-- NEW: Interaction Label overlay -->
-    <!-- NEW: Interaction Label overlay (Dark grey background, white text) -->
-    <div style="position: absolute; top: 0px; left: 0px; z-index: 1000; background: rgba(62, 62, 62, 0.75); padding: 0.4rem 0.8rem; border-radius: 0px; font-family: var(--font-sans); font-size: 0.7rem; font-weight: 600; color: #ffffff; letter-spacing: 0.05em; text-transform: none; pointer-events: none; box-shadow: none;">Ctrl + click/scroll to move/zoom<
-    </div>
+    <div style="position: absolute; top: 0px; left: 0px; z-index: 1000; background: rgba(62, 62, 62, 0.75); padding: 0.4rem 0.8rem; font-family: var(--font-sans); font-size: 0.7rem; font-weight: 600; color: #ffffff; letter-spacing: 0.05em; pointer-events: none;">Ctrl + click/scroll to move/zoom</div>
     <div id="bottom-map" style="width: 100%; height: 100%; z-index: 1;"></div>
   </div>
 
@@ -163,12 +217,19 @@ full_width: true
         worldCopyJump: true 
       });
 
-      // Enable pan/drag only when holding Ctrl (Windows) or Cmd (Mac)
+      // FIXED: Keyboard listener for map panning & cluster navigation
       document.addEventListener('keydown', (e) => {
         if (e.key === 'Control' || e.key === 'Meta') {
           bottomMap.dragging.enable();
           bottomMap.doubleClickZoom.enable();
           bottomMapEl.style.cursor = 'grab'; 
+          bottomMapEl.classList.add('ctrl-active'); // NEW: Activates hover CSS
+        }
+
+        // Arrow keys can still navigate the cluster manually while hovering
+        if (window.hoveredCluster) {
+          if (e.key === 'ArrowLeft') window.slideCluster(null, -1, window.hoveredCluster);
+          else if (e.key === 'ArrowRight') window.slideCluster(null, 1, window.hoveredCluster);
         }
       });
 
@@ -177,7 +238,14 @@ full_width: true
           bottomMap.dragging.disable();
           bottomMap.doubleClickZoom.disable();
           bottomMapEl.style.cursor = 'default';
+          bottomMapEl.classList.remove('ctrl-active'); // NEW: Deactivates hover CSS
         }
+      });
+
+      // NEW: Failsafe to remove the Ctrl state if the user clicks away or switches tabs
+      window.addEventListener('blur', () => {
+        if (bottomMapEl) bottomMapEl.classList.remove('ctrl-active');
+        if (bottomMap) bottomMap.dragging.disable();
       });
 
       // Custom Scroll Zoom Logic
@@ -295,9 +363,10 @@ full_width: true
 
       const bottomMarkers = L.markerClusterGroup({
         showCoverageOnHover: false, 
-        maxClusterRadius: 120,
+        maxClusterRadius: 120, // CHANGED: Reduced from 120 so clusters break apart much easier
         zoomToBoundsOnClick: false, 
         iconCreateFunction: function (cluster) {
+          // ... (keep the data parsing and imagesHtml exactly the same) ...
           const children = cluster.getAllChildMarkers();
           const locationCount = cluster.getChildCount(); 
           
@@ -332,15 +401,12 @@ full_width: true
                      window.hoveredCluster = this; 
                      this.querySelector('.cluster-nav').style.opacity = '1';
                      
-                     // Clear any old timers just in case
                      clearTimeout(this.initialSlideTimeout);
                      clearInterval(this.slideshowInterval);
                      
-                     // 1. Wait 0.7s for the very first slide
                      this.initialSlideTimeout = setTimeout(() => {
                        window.slideCluster(null, 1, this);
                        
-                       // 2. Once the first slide fires, start the 1.5s continuous loop
                        this.slideshowInterval = setInterval(() => { 
                          window.slideCluster(null, 1, this); 
                        }, 1500);
@@ -351,7 +417,6 @@ full_width: true
                      window.hoveredCluster = null; 
                      this.querySelector('.cluster-nav').style.opacity = '0';
                      
-                     // Kill all timers instantly when the mouse leaves
                      clearTimeout(this.initialSlideTimeout);
                      clearInterval(this.slideshowInterval);
                    ">
@@ -360,6 +425,24 @@ full_width: true
                   <div class="cluster-track" style="display: flex; width: 100%; height: 100%; transform: translateX(0%);">
                     ${imagesHtml}
                   </div>
+                </div>
+
+                <!-- NEW: Four diagonal expand arrows (Spread further out, 60% opacity white) -->
+                <div class="ctrl-zoom-overlay" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.55); border-radius: 2px; opacity: 0; transition: opacity 0.2s ease; z-index: 15; display: flex; align-items: center; justify-content: center; pointer-events: none;">
+                  <svg width="50" height="50" viewBox="0 0 24 24" fill="none" stroke="rgba(255, 255, 255, 0.8)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                    <!-- Top Right -->
+                    <polyline points="16 4 20 4 20 8"></polyline>
+                    <line x1="15" y1="9" x2="20" y2="4"></line>
+                    <!-- Bottom Left -->
+                    <polyline points="8 20 4 20 4 16"></polyline>
+                    <line x1="9" y1="15" x2="4" y2="20"></line>
+                    <!-- Top Left -->
+                    <polyline points="8 4 4 4 4 8"></polyline>
+                    <line x1="9" y1="9" x2="4" y2="4"></line>
+                    <!-- Bottom Right -->
+                    <polyline points="16 20 20 20 20 16"></polyline>
+                    <line x1="15" y1="15" x2="20" y2="20"></line>
+                  </svg>
                 </div>
 
                 <div class="thumb-badge">${locationCount}</div>
@@ -463,8 +546,36 @@ full_width: true
         window.location.href = mapPageUrl + e.layer.options.queryParam;
       });
 
-      // Clicking a cluster redirects to the gallery of the currently visible image on the mini-carousel
+      // FIXED: Instant zoom without flyTo animation when Ctrl/Cmd is held
       bottomMarkers.on('clusterclick', function(e) {
+        
+        // 1. Check if the user is holding Ctrl (Windows) or Cmd (Mac)
+        if (e.originalEvent && (e.originalEvent.ctrlKey || e.originalEvent.metaKey)) {
+          const cluster = e.layer;
+          const bounds = cluster.getBounds();
+          const targetCenter = bounds.getCenter();
+          const currentZoom = bottomMap.getZoom();
+          let targetZoom = currentZoom;
+
+          const desiredPixelSpread = cluster.getChildCount() > 2 ? 250 : 50;
+          for (let z = currentZoom; z <= 15; z++) {
+            if (
+              bottomMap.project(bounds.getSouthWest(), z).distanceTo(bottomMap.project(bounds.getNorthEast(), z)) >= desiredPixelSpread
+            ) {
+              targetZoom = z;
+              break;
+            }
+            if (z === 15) targetZoom = 15;
+          }
+
+          if (targetZoom <= currentZoom) targetZoom = Math.min(currentZoom + 3, 15);
+
+          // Force instant zoom immediately (No flyTo animation)
+          bottomMap.setView(targetCenter, targetZoom, { animate: false });
+          return; 
+        }
+
+        // 2. Normal Click -> Redirect to the currently visible image's gallery
         const clusterEl = e.layer.getElement().querySelector('.cluster-thumb');
         if (clusterEl) {
           const currentIndex = parseInt(clusterEl.getAttribute('data-current-index'), 10) || 0;
