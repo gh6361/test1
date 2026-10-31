@@ -108,9 +108,7 @@ full_width: true
       #carousel-next { right: -1.5rem !important; }
     }
 
-    /* 3. Ctrl + Hover Overlay Logic */
-    .ctrl-active .cluster-thumb:hover .ctrl-zoom-overlay { opacity: 1 !important; }
-    .ctrl-active .cluster-thumb:hover .cluster-nav { opacity: 0 !important; pointer-events: none; }
+
   </style>
 
   <!-- WIDE MINI MAP -->
@@ -121,7 +119,31 @@ full_width: true
 
 </section>
 
-{% include collections-grid.html %}
+<!-- COLLECTIONS SECTION -->
+<section id="collections-section" style="background-color: #ffffff; width: 100%; padding: 4rem 0 6rem 0;">
+  <div style="max-width: 1000px; margin: 0 auto; padding: 0 2rem;">
+    <h2 style="font-family: var(--font-sans) !important; font-weight: 600; font-size: 2rem; letter-spacing: 0.05em; text-align: center; margin-top: 1rem; margin-bottom: 2rem; color: #1c1c1c;">COLLECTIONS ** beware ** from here down lie broken links</h2>
+
+    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem;">
+      {% for collection in site.data.collections limit:7 %}
+      <a href="{{ collection.link | relative_url | escape }}" style="position: relative; display: block; aspect-ratio: 4 / 4; text-decoration: none; overflow: hidden; transition: transform 0.3s ease, box-shadow 0.3s ease;" onmouseover="this.style.transform='translateY(-5px)'; this.style.boxShadow='0 10px 20px rgba(0,0,0,0.1)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none';">
+        <img src="{{ collection.cover_image | relative_url | escape }}" alt="" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; display: block; z-index: 1;" />
+        <div style="position: absolute; bottom: 0; left: 0; width: 100%; height: 60%; background: linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0) 100%); z-index: 2; pointer-events: none;"></div>
+        <div style="position: absolute; bottom: 0; left: 0; width: 100%; padding: 1.5rem; box-sizing: border-box; z-index: 3; text-align: left;">
+          {% if collection.subtitle %}
+          <div style="font-family: var(--font-sans); font-weight: 500; font-size: 0.75rem; color: #ffffff; margin: 0 0 0.35rem; letter-spacing: 0.15em; text-transform: uppercase;">
+            {{ collection.subtitle | escape }}
+          </div>
+          {% endif %}
+          <div style="font-family: var(--font-sans); font-weight: 700; font-size: 1.4rem; color: #ffffff; margin: 0; letter-spacing: 0.02em;">
+            {{ collection.title | escape }}
+          </div>
+        </div>
+      </a>
+      {% endfor %}
+    </div>
+  </div>
+</section>
 
 <!-- 3. FEATURED EDITORIAL SLIDESHOW -->
 <section style="background-color: #f4f4f5; width: 100%; padding-top: 2rem;">
@@ -217,16 +239,14 @@ full_width: true
         worldCopyJump: true 
       });
 
-      // FIXED: Keyboard listener for map panning & cluster navigation
+      // Keyboard listener for map panning & cluster navigation
       document.addEventListener('keydown', (e) => {
         if (e.key === 'Control' || e.key === 'Meta') {
           bottomMap.dragging.enable();
           bottomMap.doubleClickZoom.enable();
           bottomMapEl.style.cursor = 'grab'; 
-          bottomMapEl.classList.add('ctrl-active'); // NEW: Activates hover CSS
         }
 
-        // Arrow keys can still navigate the cluster manually while hovering
         if (window.hoveredCluster) {
           if (e.key === 'ArrowLeft') window.slideCluster(null, -1, window.hoveredCluster);
           else if (e.key === 'ArrowRight') window.slideCluster(null, 1, window.hoveredCluster);
@@ -238,13 +258,10 @@ full_width: true
           bottomMap.dragging.disable();
           bottomMap.doubleClickZoom.disable();
           bottomMapEl.style.cursor = 'default';
-          bottomMapEl.classList.remove('ctrl-active'); // NEW: Deactivates hover CSS
         }
       });
 
-      // NEW: Failsafe to remove the Ctrl state if the user clicks away or switches tabs
       window.addEventListener('blur', () => {
-        if (bottomMapEl) bottomMapEl.classList.remove('ctrl-active');
         if (bottomMap) bottomMap.dragging.disable();
       });
 
@@ -427,23 +444,7 @@ full_width: true
                   </div>
                 </div>
 
-                <!-- NEW: Four diagonal expand arrows (Spread further out, 60% opacity white) -->
-                <div class="ctrl-zoom-overlay" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.55); border-radius: 2px; opacity: 0; transition: opacity 0.2s ease; z-index: 15; display: flex; align-items: center; justify-content: center; pointer-events: none;">
-                  <svg width="50" height="50" viewBox="0 0 24 24" fill="none" stroke="rgba(255, 255, 255, 0.8)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                    <!-- Top Right -->
-                    <polyline points="16 4 20 4 20 8"></polyline>
-                    <line x1="15" y1="9" x2="20" y2="4"></line>
-                    <!-- Bottom Left -->
-                    <polyline points="8 20 4 20 4 16"></polyline>
-                    <line x1="9" y1="15" x2="4" y2="20"></line>
-                    <!-- Top Left -->
-                    <polyline points="8 4 4 4 4 8"></polyline>
-                    <line x1="9" y1="9" x2="4" y2="4"></line>
-                    <!-- Bottom Right -->
-                    <polyline points="16 20 20 20 20 16"></polyline>
-                    <line x1="15" y1="15" x2="20" y2="20"></line>
-                  </svg>
-                </div>
+            
 
                 <div class="thumb-badge">${locationCount}</div>
                 
@@ -546,36 +547,8 @@ full_width: true
         window.location.href = mapPageUrl + e.layer.options.queryParam;
       });
 
-      // FIXED: Instant zoom without flyTo animation when Ctrl/Cmd is held
+      // Clicking a cluster redirects to the gallery of the currently visible image on the mini-carousel
       bottomMarkers.on('clusterclick', function(e) {
-        
-        // 1. Check if the user is holding Ctrl (Windows) or Cmd (Mac)
-        if (e.originalEvent && (e.originalEvent.ctrlKey || e.originalEvent.metaKey)) {
-          const cluster = e.layer;
-          const bounds = cluster.getBounds();
-          const targetCenter = bounds.getCenter();
-          const currentZoom = bottomMap.getZoom();
-          let targetZoom = currentZoom;
-
-          const desiredPixelSpread = cluster.getChildCount() > 2 ? 250 : 50;
-          for (let z = currentZoom; z <= 15; z++) {
-            if (
-              bottomMap.project(bounds.getSouthWest(), z).distanceTo(bottomMap.project(bounds.getNorthEast(), z)) >= desiredPixelSpread
-            ) {
-              targetZoom = z;
-              break;
-            }
-            if (z === 15) targetZoom = 15;
-          }
-
-          if (targetZoom <= currentZoom) targetZoom = Math.min(currentZoom + 3, 15);
-
-          // Force instant zoom immediately (No flyTo animation)
-          bottomMap.setView(targetCenter, targetZoom, { animate: false });
-          return; 
-        }
-
-        // 2. Normal Click -> Redirect to the currently visible image's gallery
         const clusterEl = e.layer.getElement().querySelector('.cluster-thumb');
         if (clusterEl) {
           const currentIndex = parseInt(clusterEl.getAttribute('data-current-index'), 10) || 0;

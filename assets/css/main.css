@@ -1,4 +1,6 @@
-/* --- THE TISA EDITORIAL THEME --- */
+/* #region Main styles */
+
+/* --- THEME TOKENS AND GLOBAL BASE STYLES --- */
 :root {
   /* Sampled directly from the images */
   --bg-bone: #ffffff;          /* Coastal Mist: Cool, crisp off-white */
@@ -15,6 +17,9 @@
   
   /* NEW: Your special occasion font */
   --font-display: 'DM Serif Display', serif;
+
+  /* Keeps the image and caption layout aligned symmetrically. */
+  --desc-gap: 0.1vw;
 }
 
 /* Disable Bootstrap's CSS scrolling so our JS can control the speed perfectly */
@@ -23,19 +28,12 @@ html {
 }
 
 /* --- GLOBAL TYPOGRAPHY --- */
-/* 1. Body Text (Paragraphs, descriptions, map text) */
 body, p, span, div {
   font-family: var(--font-sans); /* Montserrat */
 }
 
-/* 2. Headings (Titles, Popups, Gallery Headers) */
-h1, h2, h3, h4, h5, h6 {
-  font-family: "Merriweather", serif !important; /* Cormorant Garamond */
-  font-weight: 500;
-}
-
-/* 3. Buttons (Map buttons, contact forms) */
-button, .btn, .leaflet-control-zoom a {
+/* Buttons (Map buttons, contact forms) */
+button, .leaflet-control-zoom a {
   font-family: var(--font-sans) !important; 
 }
 
@@ -43,7 +41,6 @@ button, .btn, .leaflet-control-zoom a {
 body {
   background-color: var(--bg-bone) !important;
   color: var(--text-body);
-  font-family: var(--font-sans);
   font-size: 0.85rem;
   font-weight: 400;
   line-height: 1.9;
@@ -58,92 +55,29 @@ h5,
 h6 {
   font-family: var(--font-serif) !important; /* Uses Garamond */
   color: var(--text-dark);
-  font-weight: 400; /* Reverted back to 500 so Garamond looks its best */
+  font-weight: 400;
   letter-spacing: 0;
   margin-bottom: 1.2rem;
 }
 
-/* Small, uppercase meta text (like "2026 PROJECTS") */
-.meta-text {
-  font-family: var(--font-sans);
-  font-size: 0.65rem;
-  text-transform: uppercase;
-  letter-spacing: 2px;
-  color: var(--text-body);
-  font-weight: 500;
+/* --- SHARED LINK STYLES --- */
+a {
+  color: var(--text-dark);
+  text-decoration: none;
+  border-bottom: 1px solid rgba(28, 28, 28, 0.2);
+  transition: all 0.3s ease;
 }
 
-/* --- FULL-BLEED HERO WITH OVERLAY --- */
-.full-bleed-hero {
-  position: relative;
-  z-index: 0;
-  /* Break out of the Jekyll layout container */
-  width: 100vw;
-  margin-left: calc(-50vw + 50%);
-  
-  height: 85vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  overflow: hidden;
+a:hover {
+  border-bottom: 1px solid rgba(28, 28, 28, 1);
 }
 
-.full-bleed-bg {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  z-index: 1;
-}
+/* #endregion */
 
-/* The dark tint layer. Adjust the 0.3 (30%) opacity if you need it darker/lighter */
-.full-bleed-overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(28, 28, 28, 0); 
-  z-index: 2;
-}
+/* #region Navigation and header */
 
-.full-bleed-content {
-  position: relative;
-  z-index: 3;
-  padding: 0 5%;
-  max-width: 900px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-/* Utilities for the overlay text */
-.text-light {
-  color: var(--bg-bone) !important;
-}
-
-.justify-center {
-  justify-content: center;
-}
-
-.mt-4 {
-  margin-top: 2rem;
-}
-
-/* Adjusts the editorial link hover state for light text */
-.link-editorial.border-light:hover {
-  border-bottom-color: var(--bg-bone);
-}
-
-
-/* --- PERMANENT STICKY HEADER --- */
-
-/* --- PERFECT NAVBAR ALIGNMENT --- */
-.editorial-header .container,
-.editorial-header .container-fluid {
+/* --- SITE NAVIGATION --- */
+.editorial-header .container {
   /* Let the container stretch across the entire screen */
   max-width: 100% !important; 
   
@@ -168,6 +102,8 @@ html, body {
   
   /* 1. Force the exact height (adjust this number if you want it taller/shorter) */
   height: 68px !important; 
+  padding-top: 0;
+  padding-bottom: 0;
   
   /* 2. Vertically center the text inside the new height */
   display: flex !important;
@@ -179,21 +115,19 @@ html, body {
   box-shadow: none !important; 
 }
 
-/* 1. STRIP BOOTSTRAP'S PADDING */
 .editorial-header .navbar-brand,
 .editorial-header .nav-link {
   padding-top: 0 !important;
   padding-bottom: 0 !important;
   margin: 0 !important;
-  line-height: 1 !important; 
+  text-decoration: none !important;
+  border: none !important;
 }
 
-
-/* 3. TYPOGRAPHY: NAVIGATION LINKS */
 .editorial-header .nav-link {
+  display: flex !important;
+  align-items: center !important;
   font-family: var(--font-sans) !important; 
-  
-  /* Control your link size right here */
   font-size: 0.75rem !important; 
   
   text-transform: uppercase !important; 
@@ -204,7 +138,6 @@ html, body {
   transition: color 0.3s ease;
 }
 
-/* 4. TYPOGRAPHY: BRAND LOGO (Special Occasion) */
 .editorial-header .navbar-brand {
   font-family: var(--font-display) !important; /* Uses DM Serif Display! */
   font-size: 1.8rem !important; 
@@ -216,13 +149,18 @@ html, body {
   transition: color 0.3s ease;
 }
 
-/* 5. HOVER EFFECT FOR BOTH */
+.editorial-header .nav-link:hover {
+  opacity: 0.5;
+}
+
 .editorial-header .nav-link:hover,
 .editorial-header .navbar-brand:hover {
   color: var(--text-body) !important; 
 }
+/* #endregion */
 
-/* --- HOMEPAGE MAP THUMBNAIL MARKERS --- */
+/* #region Homepage map */
+
 .mini-map-thumb {
   position: relative;
   width: 100%;
@@ -251,32 +189,6 @@ html, body {
   display: block;
 }
 
-/* NEW: The dark "View Gallery" overlay moved from inline JS */
-.single-hover {
-  position: absolute;
-  top: 0; left: 0; right: 0; bottom: 0;
-  background: rgba(0,0,0,0.65);
-  color: #ffffff;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  opacity: 0;
-  transition: opacity 0.2s ease;
-  font-family: var(--font-sans);
-  font-size: 0.65rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  text-align: center;
-  line-height: 1.1;
-  border-radius: 2px;
-  z-index: 2;
-}
-
-/* Triggers the fade-in effect on hover */
-.mini-map-thumb:hover .single-hover {
-  opacity: 1;
-}
-
 .thumb-badge {
   position: absolute;
   top: -8px;
@@ -299,111 +211,11 @@ html, body {
 .leaflet-marker-icon:has(.mini-map-thumb:hover) {
   z-index: 9999 !important;
 }
+/* #endregion */
 
-.leaflet-top.leaflet-right .map-region-controls {
-  margin-top: 15px !important; /* Adjust this value to move it higher or lower */
-}
-
-/* =========================================
-   COLLECTIONS PAGE GRID
-========================================= */
-
-.collections-wrapper {
-  max-width: 1400px;
-  margin: 0 auto 8rem auto;
-  padding: 0 4.2vw;
-  padding-top: 140px; /* Creates the perfect breathing room below the nav bar */
-  box-sizing: border-box;
-}
-
-/* 2. The CSS Grid */
-.collections-grid {
-  display: grid;
-  /* Auto-fit creates columns automatically. minmax ensures they never get too squished */
-  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-  gap: 0.6rem 0.6rem;           /* 4rem vertical gap, 3rem horizontal gap between images */
-}
-
-/* 3. The clickable item link */
-.collection-item {
-  text-decoration: none;
-  display: block;
-  color: inherit;
-  cursor: pointer;
-}
-
-/* 4. The Image Box */
-.collection-img-box {
-  position: relative; /* CRITICAL: This traps the absolute text inside the box */
-  width: 100%;
-  aspect-ratio: 1 / 1; 
-  overflow: hidden;
-  /* Removed bottom margin since the text is no longer underneath it */
-}
-
-.collection-img-box img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  transition: transform 0.8s ease; 
-}
-
-/* THE DIMMING OVERLAY */
-.collection-overlay {
-  position: absolute;
-  top: 0; 
-  left: 0; 
-  right: 0; 
-  bottom: 0;
-  
-  /* A directional shadow: 60% dark in the top left, fading to only 15% dark in the bottom right */
-  background: linear-gradient(135deg, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0.15) 100%);
-  
-  z-index: 1;
-  opacity: 0; /* Keeps the photo perfectly clean and bright by default */
-  transition: opacity 0.5s ease; /* Matches the speed of your text fading in */
-}
-
-/* Fades the shadow in when the mouse hovers over the image */
-.collection-item:hover .collection-overlay {
-  opacity: 1; 
-}
-
-.collection-text {
-  position: absolute;
-  top: 1.8rem;   
-  left: 1.8rem;  
-  right: 1.8rem; 
-  text-align: left;
-  z-index: 2; 
-  padding: 0;
-  
-  /* The Hover Reveal logic */
-  opacity: 0; 
-  transform: translateY(-10px); /* Starts slightly lifted up */
-  transition: opacity 0.5s ease, transform 0.5s ease;
-}
-
-.collection-item:hover .collection-text {
-  opacity: 1;
-  transform: translateY(0); /* Slides down gently into perfect top-left position */
-}
-
-/* 4. The guaranteed Sans-Serif title */
-.collection-title {
-  font-family: var(--font-sans, sans-serif) !important; 
-  font-size: 1.2rem; 
-  font-weight: 500; 
-  color: #ffffff; 
-  text-transform: none; 
-  letter-spacing: 0em; 
-  margin: 0;
-}
-
-
-/* --- MAP LAYOUT --- */
-
-
+/* #region Map-page */
+/* #region map-page Layout */
+/* --- MAP PAGE LAYOUT --- */
 .map-page {
   display: flex;
   height: 85vh;
@@ -451,7 +263,7 @@ html, body {
   z-index: 1;
 }
 
-/* --- MOBILE --- */
+/* --- RESPONSIVE MAP LAYOUT --- */
 @media (max-width: 900px) {
   .map-page {
     flex-direction: column;
@@ -471,121 +283,10 @@ html, body {
   }
 }
 
-/* Update sidebar buttons for the dark background */
-.map-sidebar .btn-primary {
-  background-color: transparent;
-  color: var(--text-light);
-  border: 1px solid var(--text-light);
-}
+/* #endregion */
 
-.map-sidebar .btn-primary:hover {
-  background-color: var(--text-light);
-  color: var(--bg-olive);
-}
-
-/* Map hover card text (keep this dark since the card background is white) */
-.map-hover-title {
-  color: var(--text-dark);
-}
-
-/* The Navbar (Mirrors the top of the screenshots) */
-.navbar.bg-dark {
-  background-color: var(--bg-bone) !important;
-  border-bottom: none;
-  padding: 1rem 3rem !important;
-  /* Deep padding */
-}
-
-/* --- TISA NAVBAR TYPOGRAPHY --- */
-.navbar-brand {
-  font-family: var(--font-serif) !important;
-  color: var(--text-dark) !important;
-  font-size: 1.4rem !important; 
-  font-weight: 600 !important;
-  letter-spacing: 0 !important;
-  margin: 0 !important; 
-  line-height: 1 !important;
-  text-decoration: none !important; /* Kills the underline */
-  border-bottom: none !important;   /* Double protection against borders */
-}
-
-.nav-link {
-  font-family: var(--font-serif) !important; 
-  color: var(--text-dark) !important;
-  font-size: 0.85rem !important; /* Scaled down slightly for all-caps */
-  text-transform: uppercase !important; /* Brings back the ALL CAPS */
-  letter-spacing: 2px !important; /* Adds elegant breathing room between letters */
-  font-weight: 500 !important;
-  margin-left: 2rem !important; 
-  transition: opacity 0.3s ease;
-  text-decoration: none !important; 
-  border: none !important;
-  display: flex !important;
-  align-items: center !important; 
-}
-
-.nav-link:hover {
-  opacity: 0.5; 
-}
-
-/* Standard Links in the sidebar */
-a {
-  color: var(--text-dark);
-  text-decoration: none;
-  border-bottom: 1px solid rgba(28, 28, 28, 0.2);
-  transition: all 0.3s ease;
-}
-
-a:hover {
-  border-bottom: 1px solid rgba(28, 28, 28, 1);
-}
-
-/* Clean, Minimalist Buttons */
-.btn-primary {
-  background-color: transparent;
-  color: var(--text-dark);
-  border: 1px solid var(--text-dark);
-  border-radius: 0;
-  padding: 10px 24px;
-  font-family: var(--font-sans);
-  font-weight: 500;
-  text-transform: uppercase;
-  font-size: 0.65rem;
-  letter-spacing: 2px;
-  transition: all 0.4s ease;
-}
-
-.btn-primary:hover {
-  background-color: var(--text-dark);
-  color: var(--bg-bone);
-}
-
-/* Optional: Class to create the dark olive sections shown in your screenshots */
-.tisa-dark-section {
-  background-color: var(--bg-olive);
-  color: var(--text-light);
-  padding: 5rem 2rem;
-  text-align: center;
-}
-
-.tisa-dark-section h1,
-.tisa-dark-section h2,
-.tisa-dark-section h3 {
-  color: var(--text-light);
-}
-
-
-
-/* --- Custom Navbar Height --- */
-.navbar {
-  height: 62px;
-  padding-top: 0;
-  padding-bottom: 0;
-}
-
-
-
-/* --- Custom Map Hover Tooltip --- */
+/* #region map-page Markers and map controls */
+/* --- MAP TOOLTIP AND MARKER STYLES --- */
 
 /* Override default Leaflet tooltip styles for clean text boxes */
 .leaflet-tooltip.custom-map-tooltip {
@@ -622,7 +323,7 @@ a:hover {
   cursor: pointer;
 }
 
-/* Custom Leaflet Cluster Circle */
+/* Custom Leaflet cluster circle */
 .custom-cluster-icon {
   background-color: #3b83f6cb; /* Change this to match your blue/yellow pins */
   color: #ffffff;
@@ -648,92 +349,8 @@ a:hover {
 }
 
 
-/* --- Standard Gallery Preview Override (Single Images) --- */
-.location-preview-button {
-  position: relative;
-  width: 370px !important;     /* Force exactly the width of the sidebar */
-  left: 50%;                   /* Push to the center... */
-  transform: translateX(-50%); /* ...and pull back perfectly edge-to-edge */
-  
-  margin-top: 20px;
-  margin-bottom: 20px;
-  padding: 0;
-  border: none;
-  background: none;
-  cursor: pointer;
-  display: block;
-}
-
-.location-preview-button img {
-  width: 100%;
-  height: auto;
-  display: block;
-  object-fit: cover;
-}
-
-.location-preview-button:focus {
-  outline: none;
-}
-
-.location-image {
-  width: 100%;
-  height: 220px;
-  object-fit: cover;
-  display: block;
-  margin-bottom: 20px;
-  border-radius: 0;
-}
-
 #location-panel h2 {
   margin-bottom: 10px;
-}
-
-.location-page {
-  padding-bottom: 3rem;
-}
-
-.location-content {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 24px;
-  /* Animates the margin shift when the screen resizes */
-  transition: max-width 0.3s ease; 
-  box-sizing: border-box;
-}
-
-.location-cover img {
-  display: block;
-  width: 100%;
-  height: auto;
-  max-height: 60vh;       /* The vertical ceiling */
-  object-fit: contain;    /* Prevents distortion */
-  border-radius: 0;
-  box-shadow: none;
-}
-
-.location-cover {
-  margin-bottom: 2rem;
-}
-
-.location-header {
-  margin-bottom: 1.25rem;
-}
-
-.location-header h1 {
-  margin: 0 0 0.5rem 0;
-}
-
-.location-meta {
-  margin: 0;
-  color: #6c757d;
-  font-size: 1.05rem;
-}
-
-.location-story {
-  max-width: 860px;
-  font-size: 1.05rem;
-  line-height: 1.8;
-  margin-bottom: 2rem;
 }
 
 /* --- SIDEBAR DESTINATION LINKS --- */
@@ -749,7 +366,7 @@ a:hover {
   transform: translateX(2px);
 }
 
-/* --- Map Region Controls --- */
+/* --- MAP REGION CONTROLS --- */
 .map-region-controls {
   display: flex;
   flex-direction: column;
@@ -784,9 +401,70 @@ a:hover {
   transform: scale(0.97);
 }
 
-/* =========================================
-   FOUNDATIONAL LIGHTBOX CLASSES
-========================================= */
+/* #endregion */
+
+/* #region map-page Leaflet map appearance */
+.leaflet-tile-pane {
+    filter: grayscale(0%) sepia(15%) brightness(0.98) contrast(1) saturate(0.98);
+}
+
+.leaflet-control button {
+    background-color: var(--bg-bone) !important;
+    color: var(--text-dark) !important;
+    border: 1px solid var(--text-dark) !important;
+    border-radius: 0 !important; /* Removes the rounded corners for a sharp look */
+    font-family: var(--font-sans) !important;
+    text-transform: uppercase !important;
+    font-size: 0.65rem !important;
+    letter-spacing: 2px !important;
+    padding: 8px 16px !important;
+    margin-bottom: 5px !important;
+    transition: all 0.3s ease !important;
+    box-shadow: none !important; /* Removes default drop shadows */
+}
+
+.leaflet-control button:hover {
+    background-color: var(--text-dark) !important;
+    color: var(--bg-bone) !important;
+}
+
+.leaflet-popup-content-wrapper {
+    background-color: var(--bg-bone) !important;
+    color: var(--text-dark) !important;
+    border-radius: 0 !important; /* Sharp corners */
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08) !important; /* Very soft, premium shadow */
+    padding: 5px !important;
+}
+
+.leaflet-popup-tip {
+    background-color: var(--bg-bone) !important;
+}
+
+.leaflet-popup-content {
+    font-family: var(--font-sans) !important;
+    font-size: 0.8rem !important;
+    text-align: center !important;
+}
+
+.leaflet-popup-content b,
+.leaflet-popup-content strong {
+    font-family: var(--font-serif) !important;
+    font-size: 1.2rem !important;
+    font-weight: 600 !important;
+    display: block !important;
+    margin-bottom: 5px !important;
+}
+
+.leaflet-top.leaflet-right .map-region-controls {
+  margin-top: 15px !important;
+}
+/* #endregion */
+
+/* #endregion */
+
+/* #region Lightbox */
+
+/* #region lightbox overall structure */
 .lightbox {
   position: fixed;
   inset: 0;
@@ -796,6 +474,7 @@ a:hover {
   justify-content: stretch;
   z-index: 9999;
   overflow: hidden;
+  cursor: default !important;
 }
 
 .hidden {
@@ -807,18 +486,10 @@ a:hover {
   display: none !important;
 }
 
-/* =========================================
-   THE 38.2% LIGHTBOX LAYOUT
-========================================= */
-:root {
-  /* 1. Experiment with your distance here! */
-  /* The caption width will automatically calculate itself to preserve your symmetry */
-  --desc-gap: 0.1vw; 
-}
+/* #endregion */
 
-/* =========================================
-   THE 38.2% LIGHTBOX LAYOUT
-========================================= */
+/* #region lightbox image main layout */
+
 .lightbox-main {
   width: 100vw;
   height: 100vh;
@@ -826,15 +497,6 @@ a:hover {
   align-items: center;
   justify-content: center;
   position: relative;
-}
-
-.lightbox-center-group {
-  display: flex;
-  align-items: center; /* Vertically centers the image */
-  justify-content: center;
-  width: 100%;
-  height: 100vh; /* Crucial: Ensures the flex container spans the full screen */
-  gap: var(--desc-gap); 
 }
 
 /* Container shrinks to exactly fit the active image */
@@ -868,31 +530,10 @@ a:hover {
   opacity: 1;
   pointer-events: auto;
 }
+/* #endregion */
 
-/* The Description Box */
-.lightbox-desc-wrapper {
-  /* 2. MAGIC HORIZONTAL MATH: Box + Gap ALWAYS = 23.6vw */
-  width: calc(23.6vw - var(--desc-gap)); 
-  
-  flex-shrink: 0;
-  background-color: #ffffff; 
-  padding: 1.5rem;
-  border-radius: 2px;
-  color: #000000;
-  
-  align-self: flex-start; 
-  
-  /* REMOVED: transform and fixed margin-top */
-  /* ADDED: Smooth movement when the window resizes or thumbnails appear */
-  transition: margin-top 0.2s ease-out; 
-  
-  /* Cap the maximum height */
-  max-height: 74vh; 
-  
-  overflow-y: auto;
-}
+/* #region Lightbox thumbnails */
 
-/* --- LIGHTBOX THUMBNAILS --- */
 .lightbox-thumbnails {
   position: absolute;
   bottom: 0;
@@ -935,6 +576,10 @@ a:hover {
   transform: scale(1.15);
   border: 1px solid #f4f3ee;
 }
+
+/* #endregion */
+
+/* #region lightbox captions */
 
 /* --- Lightbox Caption Typography --- */
 
@@ -982,9 +627,10 @@ a:hover {
   margin-bottom: 0;
 }
 
-/* =========================================
-   PERMANENT UI (NO FADING)
-========================================= */
+/* #endregion */
+
+/* #region lightbox controls */
+
 .lightbox-arrow,
 .lightbox-control {
   position: absolute;
@@ -1011,9 +657,9 @@ a:hover {
 #lightbox-next { right: 2rem; top: 50%; transform: translateY(-50%); }
 #lightbox-close { right: 2rem; top: 2rem; font-size: 2.5rem; }
 
-/* Force cursor to stay normal since UI never fades */
-.lightbox { cursor: default !important; }
+/* #endregion */
 
+/* #region lightbox sizing, alignment, and overrides */
 /* --- Detached Global Image Counter --- */
 #lightbox-global-counter {
   position: absolute;
@@ -1028,90 +674,7 @@ a:hover {
   z-index: 1000;
 }
 
-/* --- THE MAP TILES (Editorial Muted Filter) --- */
-/* This applies a soft, warm, desaturated look to the default map */
-.leaflet-tile-pane {
-    filter: grayscale(0%) sepia(15%) brightness(0.98) contrast(1) saturate(0.98);
-}
-
-/* --- THE RIGHT-SIDE MAP BUTTONS --- */
-/* Assuming these have standard button classes, we force the editorial style */
-.leaflet-top.leaflet-right .btn,
-.leaflet-control button,
-.map-controls-container button { /* Add whatever specific class your buttons use if they don't respond to this */
-    background-color: var(--bg-bone) !important;
-    color: var(--text-dark) !important;
-    border: 1px solid var(--text-dark) !important;
-    border-radius: 0 !important; /* Removes the rounded corners for a sharp look */
-    font-family: var(--font-sans) !important;
-    text-transform: uppercase !important;
-    font-size: 0.65rem !important;
-    letter-spacing: 2px !important;
-    padding: 8px 16px !important;
-    margin-bottom: 5px !important;
-    transition: all 0.3s ease !important;
-    box-shadow: none !important; /* Removes default drop shadows */
-}
-
-.leaflet-top.leaflet-right .btn:hover,
-.leaflet-control button:hover {
-    background-color: var(--text-dark) !important;
-    color: var(--bg-bone) !important;
-}
-
-
-/* --- THE MAP POPUPS --- */
-/* The main bubble */
-.leaflet-popup-content-wrapper {
-    background-color: var(--bg-bone) !important;
-    color: var(--text-dark) !important;
-    border-radius: 0 !important; /* Sharp corners */
-    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08) !important; /* Very soft, premium shadow */
-    padding: 5px !important;
-}
-
-/* The little triangle pointing to the marker */
-.leaflet-popup-tip {
-    background-color: var(--bg-bone) !important;
-}
-
-/* The popup text formatting */
-.leaflet-popup-content {
-    font-family: var(--font-sans) !important;
-    font-size: 0.8rem !important;
-    text-align: center !important;
-}
-
-/* The popup title (forcing the serif font) */
-.leaflet-popup-content b, 
-.leaflet-popup-content strong {
-    font-family: var(--font-serif) !important;
-    font-size: 1.2rem !important;
-    font-weight: 600 !important;
-    display: block !important;
-    margin-bottom: 5px !important;
-}
-
-/* --- BULLETPROOF SOLID HEADER TEXT --- */
-nav.header-solid {
-  background-color: #f4f3ee !important; /* Forces the bone background */
-}
-
-nav.header-solid .navbar-brand,
-nav.header-solid .nav-link {
-  color: #1c1c1c !important; /* Forces the dark text, bypassing variables */
-  text-shadow: none !important;
-}
-
-nav.header-solid .nav-link:hover {
-  color: #595959 !important; /* Lighter gray for the hover state */
-}
-
-/* =========================================
-   UNIVERSAL LIGHTBOX IMAGE SIZING
-   (Applies to all screens, big and small)
-========================================= */
-.lightbox.has-thumbnails .lightbox-image,
+/* --- LIGHTBOX IMAGE SIZE OVERRIDES --- */
 .lightbox .lightbox-image {
   
   /* Try your 350px here now! It will instantly work. */
@@ -1125,9 +688,7 @@ nav.header-solid .nav-link:hover {
 }
 
 
-/* =========================================
-   SMALL SCREEN OVERRIDES 
-========================================= */
+/* --- SMALL-SCREEN LIGHTBOX OVERRIDES --- */
 @media (max-width: 1200px), (max-height: 800px) {
   
   .lightbox-desc-wrapper {
@@ -1141,19 +702,10 @@ nav.header-solid .nav-link:hover {
     line-height: 1.65 !important;
   }
 
-  .caption-index {
-    font-size: 0.55rem !important;
-    margin-bottom: 0.5rem !important; 
-  }
-
-} /* <-- THIS IS THE BRACKET THAT WAS SWALLOWING YOUR CSS! */
+} 
 
 
-/* =========================================
-   THE BOTTOM ANCHOR (OUTSIDE THE MEDIA QUERY)
-========================================= */
-
-/* Parent Group */
+/* --- LIGHTBOX CAPTION COLLAPSE AND ALIGNMENT --- */
 .lightbox-center-group {
   display: flex;
   align-items: center; 
@@ -1204,10 +756,7 @@ nav.header-solid .nav-link:hover {
 }
 
 
-/* =========================================
-   SINGLE IMAGE LIGHTBOX EXPANSION
-========================================= */
-/* When there is no caption or thumbnails, let the image fill the empty space */
+/* --- SINGLE-IMAGE LIGHTBOX SIZING --- */
 .lightbox.single-mode .lightbox-image {
   max-width: 80vw !important;
   max-height: 80vh !important; 
@@ -1221,3 +770,6 @@ nav.header-solid .nav-link:hover {
   }
 }
 
+/* #endregion */
+
+/* #endregion */
